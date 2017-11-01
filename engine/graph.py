@@ -36,6 +36,9 @@ class DGraph:
         print("write_dot called")
         nx.drawing.nx_pydot.write_dot(self.dgraph, path)
 
+    def adjacency_matrix(self):
+        return nx.to_numpy_matrix(self.dgraph)
+
     @staticmethod
     def read_dot(path):
         return DGraph(nx.drawing.nx_pydot.read_dot(path))
