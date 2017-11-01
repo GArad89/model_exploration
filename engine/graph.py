@@ -37,6 +37,9 @@ class DGraph:
     def read_dot(path):
         return DGraph(nx.drawing.nx_pydot.read_dot(path))
 
+    def project(vertices):
+        pass
+
 # for testing purposes
 def main():
     g = DGraph.read_dot("./dot/g1.dot")
