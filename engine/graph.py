@@ -26,6 +26,9 @@ class DGraph:
         nx.draw(self.dgraph)
         plt.show()
 
+    def number_of_nodes(self):
+        return self.dgraph.number_of_nodes()
+
     def node_attr(self, node, attr):
         return self.dgraph.nodes[node]['attr'][attr]
 
