@@ -11,18 +11,28 @@ This README would normally document whatever steps are necessary to get your app
 ### How do I get set up? ###
 
 * Summary of set up
+
+`pip3 install -r requirements.txt`
+
 * Configuration
+
+`webapp_config.py` contains configuration for the web application
+
 * Dependencies
-* Database configuration
+
+Flask
+
 * How to run tests
 * Deployment instructions
+
+`python3 run.py`
 
 ### Contribution guidelines ###
 
 * Writing tests
 * Code review
 * Other guidelines
-
+web
 ### Who do I talk to? ###
 
 * Repo owner or admin

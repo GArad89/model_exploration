@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block title %}Select Model{% endblock %}
+{% block body %}
+  <div class="row">
+  	<h3>Select a model or upload a DOT file</h3>
+  </div>
+  <form id="model-form" action="{{ url_for('algorithm_choice_form') }}">
+  	<div class="form-group row">
+  		<label for="model" class="col-form-label col-sm-2">Select Model</label>
+  		<select name="model" class="form-control col-sm-6">
+  			<option>Test_One</option>
+  			<option>Test_Two</option>
+  		</select>
+  	</div>
+  </form>
+	<div class="form-group row">
+		<label for="upload-file" class="col-sm-2 col-form-label">Or, Upload File</label>
+		<input type="file" class="form-control-file" id="upload-file">
+		<!-- TODO: jquery ajax file upload immediately after selecting -->
+	</div>
+	<button type="submit" form="model-form" class="btn btn-primary">Choose Model</button>
+{% endblock %}
