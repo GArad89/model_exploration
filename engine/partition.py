@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class StopCriteria(ABC)
+class StopCriteria(ABC):
 
     @abstractmethod
     def check(self, dgraph, **params):

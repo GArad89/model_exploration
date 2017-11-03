@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class Cluster(ABC)
+class Cluster(ABC):
 
     @abstractmethod
     def cluster(self, dgraph):
