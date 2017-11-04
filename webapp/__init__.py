@@ -1,7 +1,6 @@
 
 from flask import Flask, render_template, request, jsonify, flash, \
                     redirect, url_for
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config.from_object('website_config')
