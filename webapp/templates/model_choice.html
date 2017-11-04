@@ -8,8 +8,10 @@
   	<div class="form-group row">
   		<label for="model" class="col-form-label col-sm-2">Select Model</label>
   		<select name="model" class="form-control col-sm-6">
-  			<option>Test_One</option>
-  			<option>Test_Two</option>
+        <option disabled selected value>Select File</option>
+      {% for model_id in models %}
+  			<option>{{ model_id }}</option>
+      {% endfor %}
   		</select>
   	</div>
   </form>
