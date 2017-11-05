@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from scipy.stats.mstats_basic import threshold
 
 
 
@@ -12,7 +13,7 @@ class StopCriteria(ABC):
 
 class SizeCriteria(StopCriteria):
 
-    threshold = 1
+    threshold = 5
     def __init__(self, threshold):
         self.threshold = threshold
 
@@ -21,12 +22,13 @@ class SizeCriteria(StopCriteria):
     
 class InOutDegreeCriteria(StopCriteria):
 
-    threshold = 1
+    threshold = 3
     def __init__(self, threshold):
         self.threshold = threshold
 
     def check(self, dgraph, **params):
-        pass #TODO: implement
+        return dgraph.maxInOutDegree() <= threshold
+
 
 class CyclometricCriteria(StopCriteria):
 
@@ -35,7 +37,7 @@ class CyclometricCriteria(StopCriteria):
         self.threshold = threshold
 
     def check(self, dgraph, **params):
-        pass #TODO: implement
+        return ( dgraph.number_of_nodes() - dgraph.number_of_edges() + 2*dgraph.numberOfComponenets()) < threshold
 
 
         

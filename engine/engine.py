@@ -23,9 +23,9 @@ def partition(dgraph, state_subset, clustertype = "SpectralClustering", simplety
 
     if dendrogram == None:
         dendrogram = Dendrogram(dgraph)
-    else:   
+    else:   #are we sure that we need an 'else' clause here?
         projected_graph = dgraph.project(states)
-        dendrogram.add_node(Node(rootnode,state_subset,projected_graph))
+        dendrogram.add_node(Node(rootnode,state_subset,projected_graph)) #why are we this here?
         dandrogram.add_leaf(rootnode,len(dendrogram.nodes())-1)
         rootnode=len(dendrogram.nodes())-1 #need to make sure rootnode won't be changed by the recursion calls
         

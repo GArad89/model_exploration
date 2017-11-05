@@ -28,6 +28,9 @@ class DGraph:
 
     def number_of_nodes(self):
         return self.dgraph.number_of_nodes()
+    
+    def number_of_edges(self):
+        return self.dgraph.size()
 
     def node_attr(self, node, attr):
         return self.dgraph.nodes[node]['attr'][attr]
@@ -38,12 +41,21 @@ class DGraph:
 
     def adjacency_matrix(self):
         return nx.to_numpy_matrix(self.dgraph)
+    
+    def maxInOutDegree(self):
+        maxdeg = 0
+        for node in self.dgraph.nodes():
+            maxdeg = max(max,max(self.in_degree(node), self.out_degree(node)))
+        return maxdeg
+    
+    def numberOfComponenets(self):
+            return nx.number_connected_components(self)
 
     @staticmethod
     def read_dot(path):
         return DGraph(nx.drawing.nx_pydot.read_dot(path))
 
-    def project(vertices):
+    def project(self,vertices):
         pass
 
 # for testing purposes
