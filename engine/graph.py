@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from random import *
+from _functools import partial
 
 class DGraph:
     dgraph = None
@@ -55,8 +56,24 @@ class DGraph:
     def read_dot(path):
         return DGraph(nx.drawing.nx_pydot.read_dot(path))
 
-    def project(self,vertices):
-        pass
+    def project(self,vertices, inNode, outNode):
+        partialGraph = self.subgraph(vertices)
+        
+        partialGraph.add_node(inNode)
+        partialGraph.add_node(outNode)
+        
+        for node in vertices:
+            for edge in self.out_edges(node):
+                if edge not in partialGraph.out_edges(node):
+                    partialGraph.add_edge(node,outNode)
+            for edge in self.in_edges(node):
+                if edge not in partialGraph.in_edges(node):
+                    partialGraph.add_edge(inNode,node)      
+        
+        
+        return partialGraph      
+                    
+
 
 # for testing purposes
 def main():
