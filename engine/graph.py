@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from random import *
+from _functools import partial
 
 class DGraph:
     dgraph = None
@@ -21,6 +22,9 @@ class DGraph:
 
     def edges(self):
         return self.dgraph.edges()
+    
+    def edges_ofnode(self, node): #method currently isn't used.
+        return self.dgraph.edges(node)
 
     def draw(self):
         nx.draw(self.dgraph)
@@ -39,21 +43,71 @@ class DGraph:
     def adjacency_matrix(self):
         return nx.to_numpy_matrix(self.dgraph)
 
+    def subgraph(self, vertices):
+        return self.dgraph.subgraph(vertices)  #subgraph is read only. probably a useless method
+
+  
+
     @staticmethod
     def read_dot(path):
         return DGraph(nx.drawing.nx_pydot.read_dot(path))
 
-    def project(vertices):
-        pass
+    def project(self, vertices):   #, inNode, outNode
+       # partialGraph = self.subgraph(vertices)
+        projectedGraph=DGraph(nx.DiGraph()) #couldn't get DGraph(self) to work for some reason.
+          
+       # partialGraph.add_node("inNode") #gives error: SubGraph Views are readonly. Mutations not allowed
+
+       #naive solution for now:
+        for node in vertices:
+           projectedGraph.add_node(node)
+              
+        projectedGraph.add_node("inNode")
+        projectedGraph.add_node("outNode")
+
+        for edge1,edge2 in list(self.edges()):
+            if (edge1 in vertices):
+                if (edge2 in vertices):
+                    projectedGraph.add_edge(edge1,edge2)
+                else:
+                    projectedGraph.add_edge(edge1,"outNode")
+            else:
+                if(edge2 in vertices):
+                    projectedGraph.add_edge("inNode",edge2)
+        
+        
+        """   #previous code:
+        for node in vertices:
+            for edge in self.out_edges(node):
+                if edge not in  projectedGraph.out_edges(node):
+                     projectedGraph.add_edge(node,outNode)
+            for edge in self.in_edges(node):
+                if edge not in  projectedGraph.in_edges(node):
+                     projectedGraph.add_edge(inNode,node)      
+        """        
+
+                    
+        return projectedGraph
+    
+
+       
+  
+                    
+
+
 
 # for testing purposes
 def main():
-    g = DGraph.read_dot("./dot/g1.dot")
-    g.draw()
-    new_node = random() * 10000
-    g.add_node(new_node)
-    DGraph.write_dot(g, "./dot/g1.dot")
+    g = DGraph.read_dot("./dot/g2.dot")
+   # g.draw()
+   # new_node = random() * 10000
+    #g.add_node(new_node)
+    #DGraph.write_dot(g, "./dot/g2.dot")
 
-
+def projectedgraph_test():
+    g = DGraph.read_dot("./dot/g2.dot")
+    print(g.project([1,2,3]).nodes())
+    
 if __name__ == "__main__":
    main()
+   #projectedgraph_test()

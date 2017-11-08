@@ -17,7 +17,7 @@ class BranchAndBoundCluster (Cluster):
         pass #TODO: implement
 
 class SpectralCluster (Cluster):
-    def cluster(self, dgraph, n = 2):
+    def cluster(dgraph, n = 2):
         """
         just the basics required for the SpectralClustering algorithm for now.
         need to test what kind of output it gives.

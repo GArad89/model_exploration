@@ -26,16 +26,16 @@ class Node:
     
 class Dendrogram:
     dgraph=None
-    nodes=[]
+    node_list=[]
     def __init__(self,dgraph):
-        self.nodes+=[Node(None,dgraph.nodes())] #root node
+        self.node_list+=[Node(None,dgraph.nodes())] #root node
         self.dgraph=dgraph
 
     def add_node(self,node):
-        self.nodes+=node
+        self.node_list+=node
 
     def nodes(self):
-        return self.nodes
+        return self.node_list
 
     def add_leaf(self,root,leaf):
         self.nodes[root].add_leaf(leaf)
