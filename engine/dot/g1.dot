@@ -1,7 +1,5 @@
-digraph "G" {
-1 [attr="{'foo': 5, 'baz': 4}"];
-2 [attr="{'foo': 'a', 'baz': 'c'}"];
-"6493.937253973816" [attr="{}"];
-"5266.064224111736" [attr="{}"];
-1 -> 2  [key=0];
-}
+strict digraph  { 
+1 [attr="{'foo': 5, 'baz': 4}"]; 
+2 [attr="{'foo': 'a', 'baz': 'c'}"]; 
+1 -> 2; 
+} 

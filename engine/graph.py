@@ -98,11 +98,13 @@ class DGraph:
 
 # for testing purposes
 def main():
-    g = DGraph.read_dot("./dot/g2.dot")
-   # g.draw()
-   # new_node = random() * 10000
-    #g.add_node(new_node)
-    #DGraph.write_dot(g, "./dot/g2.dot")
+    g = DGraph.read_dot("./dot/g1.dot") 
+    g.draw() 
+    new_node = random() * 10000 
+    g.add_node(new_node) 
+    DGraph.write_dot(g, "./dot/g1.dot") 
+ 
+
 
 def projectedgraph_test():
     g = DGraph.read_dot("./dot/g2.dot")
