@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Choose Algorithms{% endblock %}
+{% block body %}
+  <form id="algorithm-form" method="post">
+    <h3>Select an Algorithm:<h3>
+  	<div class="form-group row">
+  		<select id="algorithm" class="form-control col-sm-6">
+  			<option>Spectral Clustering</option>
+  			<option>Branch and Bound</option>
+  		</select>
+      <!-- pass selected model id to next stage -->
+      <input id="model_id" type="hidden" value="{{ model_id }}">
+  	</div>
+	 <button type="submit" class="btn btn-primary">Choose Algorithm</button>
+  </form>
+{% endblock %}

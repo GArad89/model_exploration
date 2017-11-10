@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+{% block title %}Select Model{% endblock %}
+
+{% block head %}
+{{ super() }}
+<!-- support for jQuery.fileupload -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.19.1/js/vendor/jquery.ui.widget.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.19.1/js/jquery.iframe-transport.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/9.19.1/js/jquery.fileupload.js"></script>
+{% endblock %}
+
+{% block body %}
+  <div class="row">
+  	<h3>Select a model or upload a DOT file</h3>
+  </div>
+  <form id="model-form" action="{{ url_for('algorithm_choice_form') }}">
+  	<div class="form-group row">
+  		<label for="model" class="col-form-label col-sm-2">Select Model</label>
+      <div class="col-auto">
+    		<select id="model" class="form-control">
+          <option disabled selected value>Select File</option>
+        {% for model_id in models %}
+    			<option>{{ model_id }}</option>
+        {% endfor %}
+    		</select>
+      </div>
+  	</div>
+  </form>
+	<div class="row" id="file-uploader">
+		<label for="upload-file" class="col-sm-2 col-form-label">Or, Upload File</label>
+    <div class="col-sm-4">
+  		<input type="file" class="form-control-file" id="upload-file" data-url="/models" name="file">
+      <div id="file-upload-status"></div>
+    </div>
+    <div id="progress" class="col-sm-2">
+      <div class="bar" style="width: 0%"></div>
+    </div>
+	</div>
+  <button type="submit" form="model-form" class="btn btn-primary">Choose Model</button>
+  <script>
+
+  function setFileError(msg) {
+    $('#file-upload-status')
+      .html($('<small class="text-danger" />').text(msg));
+  }
+
+  function setFileSuccess(msg) {
+    $('#file-upload-status')
+      .html($('<small class="text-success" />').text(msg));
+  }
+
+  function setSelectionFromResult(result) {
+    if (result.models.length > 0) {
+      $('#model').empty();
+      result.models.forEach(function(item) {
+        $('<option />')
+          .prop('selected',(item == result.new_model ? 'selected' : undefined))
+          .text(item)
+          .appendTo('#model');
+      });
+    }
+
+  }
+  $(function () {
+    $('#upload-file').fileupload({
+      acceptFileTypes: /\.dot/, // accept .dot files (lowercase only)
+      done: function(e, data) {
+        console.log('done ok')
+        console.log(e);
+        console.log(data);
+        if (data.result) {
+          setSelectionFromResult(data.result);
+        }
+        setFileSuccess('Upload OK!');
+      },
+      fail: function(e,data) {
+        console.log('fail');
+        console.log(e);
+        console.log(data);
+        if (data.jqXHR.responseJSON) {
+          setFileError('Failed to upload file! Server says: ' + data.jqXHR.responseJSON.message);
+        } else {
+          setFileError('Failed to upload: ' + data.errorThrown);
+        }
+      },
+      progressall: function (e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#progress .bar').css(
+            'width',
+            progress + '%'
+        );
+      },
+      sequentialUploads: true
+
+    });
+
+  });
+  </script>
+{% endblock %}
