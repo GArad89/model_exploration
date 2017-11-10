@@ -32,13 +32,13 @@ class Dendrogram:
         self.dgraph=dgraph
 
     def add_node(self,node):
-        self.node_list+=node
+        self.node_list+=[node]
 
     def nodes(self):
         return self.node_list
 
-    def add_leaf(self,root,leaf):
-        self.nodes[root].add_leaf(leaf)
+    def add_leaf(self,root,leaf):  #only used right after add_node. need to merge methods if there are no further uses
+        self.node_list[root].add_leaf(leaf)
 
 
 

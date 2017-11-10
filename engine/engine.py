@@ -19,24 +19,26 @@ def cluster(dgraph,  clustertype = "SpectralClustering"):
     else:
         return SpectralCluster.cluster(dgraph)
 
+
+#need to check if we want to add a stop critrea for after x runs.    
 def partition(dgraph, state_subset, clustertype = "SpectralClustering", simpletype = "Size", threshold = 20, dendrogram = None, rootnode = 0):
 
-    print(state_subset)
     projected_graph = dgraph.project(state_subset)
+    #print(projected_graph.nodes())
     
     if dendrogram == None:
         dendrogram = Dendrogram(dgraph)
     else:   
         dendrogram.add_node(Node(rootnode,state_subset,projected_graph))
-        dandrogram.add_leaf(rootnode,len(dendrogram.nodes())-1)
+        dendrogram.add_leaf(rootnode,len(dendrogram.nodes())-1)
         rootnode=len(dendrogram.nodes())-1 #need to make sure rootnode won't be changed by the recursion calls
         
     if is_simple(projected_graph, simpletype, threshold):
         return
 
     clusters = cluster(projected_graph, clustertype)
-    for clutser in clusters:
-         partition(dgraph, cluster, clustertype, simpletype , threshold , dendrogram , rootnode )
+    for cluster_iter in clusters:
+         partition(dgraph, cluster_iter, clustertype, simpletype , threshold , dendrogram , rootnode )
 
     return dendrogram
 
@@ -45,7 +47,9 @@ def partition(dgraph, state_subset, clustertype = "SpectralClustering", simplety
 def spectralcluster_test():
 
     g = DGraph.read_dot("./dot/g2.dot")
+    print("testing SpectralCluster on g2.dot:")
     print(cluster(g))
+    print("\n")
 
 def partition_test():
 
@@ -53,9 +57,12 @@ def partition_test():
     g = DGraph.read_dot("./dot/g2.dot")
     den=partition(g,g.nodes()) 
     #print(len(den.node_list))  #should be 1 (root node only)
-    den=partition(g,g.nodes(),"SpectralClustering","Size",2) 
-    print(len(den.node_list))  #should be 3. but gives 2 currently
+    print("testing partition on g2.dot:")
+    den=partition(g,g.nodes(),"SpectralClustering","Size",7)
+    print("the number of super-nodes in the dendogram (including the root):")
+    print(len(den.node_list))  #should be 4. but gives 2 currently
+    print("the number of nodes in the 1st node (1st one after the root):")
     print(den.node_list[1].subset)
 
-#spectralcluster_test()
+spectralcluster_test()
 partition_test()
