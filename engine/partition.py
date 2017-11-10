@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 
-class StopCriteria(ABC)
+
+
+class StopCriteria(ABC):
 
     @abstractmethod
     def check(self, dgraph, **params):
@@ -16,3 +18,25 @@ class SizeCriteria(StopCriteria):
 
     def check(self, dgraph, **params):
         return dgraph.number_of_nodes() <= self.threshold
+    
+class InOutDegreeCriteria(StopCriteria):
+
+    threshold = 1
+    def __init__(self, threshold):
+        self.threshold = threshold
+
+    def check(self, dgraph, **params):
+        pass #TODO: implement
+
+class CyclometricCriteria(StopCriteria):
+
+    threshold = 1
+    def __init__(self, threshold):
+        self.threshold = threshold
+
+    def check(self, dgraph, **params):
+        pass #TODO: implement
+
+
+        
+
