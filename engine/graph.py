@@ -99,7 +99,7 @@ class DGraph:
 # for testing purposes
 def main():
     g = DGraph.read_dot("./dot/g2.dot")
-   # g.draw()
+    #g.draw()
    # new_node = random() * 10000
     #g.add_node(new_node)
     #DGraph.write_dot(g, "./dot/g2.dot")
@@ -111,3 +111,5 @@ def projectedgraph_test():
 if __name__ == "__main__":
    main()
    #projectedgraph_test()
+   arr=["A","B","C"]
+   print("a" in arr)

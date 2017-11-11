@@ -8,7 +8,7 @@ class Node:
     
     def __init__(self, root=None, subset=[],dgraph=None):
         self.rootindex=root
-        self.subset=[]
+        self.subset=subset
         self.projected_graph=dgraph
 
     def add_leaf(self, leaf):
