@@ -17,7 +17,7 @@
   	<div class="form-group row">
   		<label for="model" class="col-form-label col-sm-2">Select Model</label>
       <div class="col-auto">
-    		<select id="model" class="form-control">
+    		<select id="model" name="model" class="form-control">
           <option disabled selected value>Select File</option>
         {% for model_id in models %}
     			<option>{{ model_id }}</option>
@@ -52,6 +52,8 @@
   function setSelectionFromResult(result) {
     if (result.models.length > 0) {
       $('#model').empty();
+      // update the form to show the newly returned model list
+      // make the new action selected
       result.models.forEach(function(item) {
         $('<option />')
           .prop('selected',(item == result.new_model ? 'selected' : undefined))
