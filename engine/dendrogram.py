@@ -1,24 +1,24 @@
 from graph import DGraph
 
 class Node:
-    rootindex=None
-    leafindexes=[]
+    parent_index=None
+    child_indexes=[]
     subset=[]
     projected_graph=None
     
-    def __init__(self, root=None, subset=[],dgraph=None):
-        self.rootindex=root
+    def __init__(self, parent=None, subset=[],dgraph=None):
+        self.parent_index=parent
         self.subset=subset
         self.projected_graph=dgraph
 
-    def add_leaf(self, leaf):
-        self.leafindexes+=[leaf]
+    def add_child(self, child):
+        self.child_indexes+=[child]
 
-    def root(self):
-        return self.rootindex
+    def parent(self):
+        return self.parent_index
 
-    def leaf(self):
-        return self.leafindexes
+    def child(self):
+        return self.child_indexes
 
     def set(self, subset,dgraph):
         self.subset=subset
@@ -37,8 +37,8 @@ class Dendrogram:
     def nodes(self):
         return self.node_list
 
-    def add_leaf(self,root,leaf):  #only used right after add_node. need to merge methods if there are no further uses
-        self.node_list[root].add_leaf(leaf)
+    def add_child(self,parent,child):  #only used right after add_node. need to merge methods if there are no further uses
+        self.node_list[parent].add_child(child)
 
 
 

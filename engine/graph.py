@@ -111,5 +111,4 @@ def projectedgraph_test():
 if __name__ == "__main__":
    main()
    #projectedgraph_test()
-   arr=["A","B","C"]
-   print("a" in arr)
+

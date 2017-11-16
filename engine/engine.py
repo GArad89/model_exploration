@@ -1,28 +1,20 @@
 from graph import *
 from cluster import BranchAndBoundCluster,SpectralCluster
-from partition import *
+from partition import SizeCriteria
 from dendrogram import Node,Dendrogram
 
-def is_simple(dgraph, simpletype = "Size",threshold = 20):
-    
-    if simpletype == "InOutDegree":
-        return InOutDegreeCriteria(threshold).check(dgraph)       
-    elif simpletype == "Cyclometric":
-        return CyclometricCriteria(threshold).check(dgraph)
-    else:
-       return SizeCriteria(threshold).check(dgraph)
+def is_simple(dgraph, simpletype = SizeCriteria ,threshold = 20):
+      
+     return simpletype(threshold).check(dgraph)
 
-def cluster(dgraph,  clustertype = "SpectralClustering"):
+def cluster(dgraph,  clustertype = SpectralCluster, **params):
     
-    if clustertype == "BranchAndBound":
-        return BranchAndBoundCluster(dgraph,state_subset)
-    else:
-        return SpectralCluster.cluster(dgraph)
+    return clustertype.cluster(dgraph,**params)
 
 
 #need to check if we want to add a stop critrea for after x runs.    
-def partition(dgraph, state_subset, clustertype = "SpectralClustering", simpletype = "Size", threshold = 20, dendrogram = None, rootnode = 0):
-
+def partition(dgraph, state_subset, clustertype = SpectralCluster, simpletype = SizeCriteria, threshold = 20, dendrogram = None, rootnode = 0):
+    print("check")
     projected_graph = dgraph.project(state_subset)
     #print(projected_graph.nodes())
     
@@ -31,8 +23,8 @@ def partition(dgraph, state_subset, clustertype = "SpectralClustering", simplety
     else:
         if((len(projected_graph.nodes())-2)!=len(dgraph.nodes())): #in case a dendrogram WAS initiated. making sure not to add the root twice
             dendrogram.add_node(Node(rootnode,state_subset,projected_graph))
-            dendrogram.add_leaf(rootnode,len(dendrogram.nodes())-1)
-        rootnode=len(dendrogram.nodes())-1 #need to make sure rootnode won't be changed by the recursion calls
+            dendrogram.add_child(rootnode,len(dendrogram.nodes())-1)
+        rootnode = len(dendrogram.nodes())-1 
         
     if is_simple(projected_graph, simpletype, threshold):
         return dendrogram
@@ -60,12 +52,14 @@ def partition_test():
     #den=partition(g,g.nodes()) 
     #print(len(den.node_list))  #should be 1 (root node only)
     print("testing partition on g2.dot:")
-    den=partition(g,g.nodes(),"SpectralClustering","Size",4)
+    den = partition(g,g.nodes(), SpectralCluster, SizeCriteria, 2)
     print("the number of super-nodes in the dendogram (including the root):")
     print(len(den.node_list))  #should be 3.
+    
     if(len(den.node_list)>1):
         print("the number of nodes in the 1st node (1st one after the root):")
-        print(den.node_list[1].subset) 
+        print(den.node_list[1].subset)
 
-spectralcluster_test()
+       
+#spectralcluster_test()
 partition_test()

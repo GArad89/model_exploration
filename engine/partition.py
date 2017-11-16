@@ -17,7 +17,9 @@ class SizeCriteria(StopCriteria):
         self.threshold = threshold
 
     def check(self, dgraph, **params):
-        return dgraph.number_of_nodes() <= self.threshold
+        if("inNode" in dgraph.nodes()):
+            return dgraph.number_of_nodes()-2 <= self.threshold
+        return dgraph.number_of_nodes()-2 <= self.threshold
     
 class InOutDegreeCriteria(StopCriteria):
 
