@@ -11,10 +11,11 @@ from webapp.models import Models
 models = Models(app.config['MODELS_PATH'])
 
 
+
+
 ############ main flow ##################
 @app.route('/')
 def model_choice_form():
-    print(models)
     return render_template('model_choice.html', models=models.list())
 
 
@@ -35,6 +36,9 @@ def algorithm_choice_form():
     errors = {}
     if request.method == 'POST':
         #TODO: validate form, run algorithm
+        # params = get_params(form)
+        # result = run_algo(model_id, algorithm, params)
+        # result_id = serialize_result(result)
         algorithm_results_id = 'placeholder'
         return redirect(url_for('show_results', result_id=algorithm_results_id))
 
@@ -44,10 +48,52 @@ def algorithm_choice_form():
 @app.route('/explore/<result_id>')
 def show_results(result_id):
     # TODO: read the result and pass it back
+    #result = read_result(result_id)
+    #return render_template('explorer.html', result=result)
+    
     return render_template('explorer.html', result_id=result_id)
 
 
 #TODO: un-hardcode result
+
+example_data = {
+    "edges" : [
+               {"from": 0, "to": 1, "label":"AB"},
+               {"from": 0, "to": 2, "label":"AC"},
+               {"from": 1, "to": 4, "label":"BE"},
+               {"from": 2, "to": 3, "label":"CD"},
+               {"from": 3, "to": 4, "label":"DE"},
+              ],
+    "vertices" : [
+                  {
+                      "name": "A", 
+                      "id": 0
+                  }, 
+                  {
+                      "name": "B", 
+                      "id": 1
+                  },
+                  {
+                      "name": "C", 
+                      "id": 2
+                  },
+                  {
+                      "name": "D", 
+                      "id": 3
+                  },
+                  {
+                      "name": "E", 
+                      "id": 4
+                  },
+                 ],
+    "clusters" : [
+                  {
+                      "contains": [0,1,2,3,4,],
+                      "out": {}
+                  }
+                 ],
+}
+
 import json
 hardcoded_data = json.loads("""{
   "name": "root",
