@@ -207,6 +207,7 @@ jsonform.fieldTemplate = function(inner) {
         '<% } %>' +
       '<% } %>' +
       inner +
+      '<span class="form-text jsonform-errortext invalid-feedback"></span>' +
       '<% if (node.append) { %>' +
         '<span class="add-on"><%= node.append %></span>' +
       '<% } %>' +
@@ -216,7 +217,6 @@ jsonform.fieldTemplate = function(inner) {
       '<% if (node.description) { %>' +
         '<span class="text-muted"><%= node.description %></span>' +
       '<% } %>' +
-      '<span class="form-text jsonform-errortext" style="display:none;"></span>' +
     '</div></div>';
 };
 
@@ -2601,7 +2601,7 @@ formNode.prototype.generate = function () {
   });
   data.children = childrenhtml;
 
-  data.fieldHtmlClass = 'form-control';
+  data.fieldHtmlClass = 'col-sm-6';
   if (this.ownerTree &&
       this.ownerTree.formDesc &&
       this.ownerTree.formDesc.params &&
@@ -3445,7 +3445,7 @@ jsonform.getFormValue = function (formelt) {
  *   specific error messages)
  */
 $.fn.jsonFormErrors = function(errors, options) {
-  $(".error", this).removeClass("error");
+  $(".is-invalid", this).removeClass("is-invalid");
   $(".warning", this).removeClass("warning");
 
   $(".jsonform-errortext", this).hide();
@@ -3469,8 +3469,8 @@ $.fn.jsonFormErrors = function(errors, options) {
       escapeSelector(key.replace(/\./g,"---"));
     errorSelectors.push(errormarkerclass);
 
-    var errorType = errors[i].type || "error";
-    $(errormarkerclass, this).addClass(errorType);
+    var errorType = "is-invalid";
+    $(errormarkerclass + ' input,' + errormarkerclass +' select', this).addClass(errorType);
     $(errormarkerclass + " .jsonform-errortext", this).html(errors[i].message).show();
   }
 
