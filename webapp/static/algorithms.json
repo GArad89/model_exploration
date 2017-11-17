@@ -1,0 +1,20 @@
+{
+  "algorithms": [
+    {
+      "name": "Spectral Clustering",
+      "scehma": {
+        "n": {
+          "type": "integer",
+          "title": "Number of clusters",
+          "required": "true"
+        },
+
+        "affinity": {
+          "type": "string",
+          "enum": ["precomputed"]
+        }
+      }
+    }
+  ]
+
+}
