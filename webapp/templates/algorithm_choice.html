@@ -1,16 +1,51 @@
 {% extends "layout.html" %}
 {% block title %}Choose Algorithms{% endblock %}
+
+{% block head %}
+{{ super() }}
+<script type="text/javascript" src="/static/jsonform/deps/underscore.js"></script>
+<script type="text/javascript" src="/static/jsonform/deps/opt/jsv.js"></script>
+<script type="text/javascript" src="/static/jsonform/lib/jsonform.js"></script>
+{% endblock %}
+
 {% block body %}
+  <h3>Select an Algorithm:</h3>
+  <div class="form-group">
+    <select id="algorithms-select" class="form-control col-sm-6">
+      <option disabled selected value> -- select an option -- </option>
+    </select>
+    <!-- pass selected model id to next stage -->
+  </div>
   <form id="algorithm-form" method="post">
-    <h3>Select an Algorithm:<h3>
-  	<div class="form-group row">
-  		<select id="algorithm" name="algorithm" class="form-control col-sm-6">
-  			<option>Spectral Clustering</option>
-  			<option>Branch and Bound</option>
-  		</select>
-      <!-- pass selected model id to next stage -->
-      <input id="model_id" type="hidden" value="{{ model_id }}">
-  	</div>
-	 <button type="submit" class="btn btn-primary">Choose Algorithm</button>
+    <!-- jsonform will insert its fields before the button and hidden fields,
+          hidden algorithm field will match the select above, which is outside the form -->
+    <input id="algorithm" name="algorithm" type="hidden">
+    <input id="model_id" name="model_id" type="hidden" value="{{ model_id }}">
+    <div class="form-group">
+      <button type="submit" class="btn btn-primary">Choose Algorithm</button>
+    </div>
   </form>
+
+
+  <script type="text/javascript">
+    $(document).ready(
+      function(){
+        var algos = {{algo_data | tojson}};
+        console.log(algos);
+        for (i in algos) {
+          $('#algorithms-select').append($('<option>', {
+            value: i,
+            text: algos[i].name
+          }));
+        }
+
+        $('#algorithms-select').change(function() {
+          selected_algo = algos[$(this).val()];
+          // make hidden field that actually submits the value match the 
+          $('#algorithm').val(selected_algo.name);
+          console.log(JSON.stringify(selected_algo.form));
+          $('#algorithm-form').jsonForm(selected_algo.form);
+        });
+    });
+  </script>
 {% endblock %}

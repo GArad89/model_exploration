@@ -42,7 +42,12 @@ def algorithm_choice_form():
         algorithm_results_id = 'placeholder'
         return redirect(url_for('show_results', result_id=algorithm_results_id))
 
-    return render_template('algorithm_choice.html', model_id=model_id, errors=errors)
+    #TODO: algo_data = engine.get_algorithms() instead
+    algo_file_path = os.path.join(app.static_folder, 'algorithms.json')
+    with open(algo_file_path) as algo_file:
+        algo_data = json.load(algo_file)
+
+    return render_template('algorithm_choice.html', model_id=model_id, errors=errors, algo_data=algo_data)
 
 
 @app.route('/explore/<result_id>')
@@ -50,7 +55,7 @@ def show_results(result_id):
     # TODO: read the result and pass it back
     #result = read_result(result_id)
     #return render_template('explorer.html', result=result)
-    
+
     return render_template('explorer.html', result_id=result_id)
 
 
