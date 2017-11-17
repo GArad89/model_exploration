@@ -1,6 +1,7 @@
 
-from flask import Flask, render_template, request, jsonify, flash, \
+from flask import Flask, render_template, request, json, jsonify, flash, \
                     redirect, url_for
+import os
 
 app = Flask(__name__)
 app.config.from_object('website_config')
@@ -13,7 +14,11 @@ models = webapp.models.Models(app.config['MODELS_PATH'])
 
 @app.route('/')
 def model_choice_form():
-    return render_template('model_choice.html', models=models.list())
+    #return render_template('model_choice.html', models=models.list())
+    algo_file_path = os.path.join(app.static_folder, 'algorithms.json')
+    with open(algo_file_path) as algo_file:
+        algo_data = json.load(algo_file)
+        return render_template('algorithm_choice.html', algo_data=algo_data)
 
 
 @app.route('/choose_model', methods=['GET', 'POST'])
@@ -22,7 +27,7 @@ def algorithm_choice_form():
     model_id = request.values.get('model_id','') or request.values.get('model', '')
 
     if not model_id:
-        #TODO: implement flash display 
+        #TODO: implement flash display
         flash('Must select valid model to choose the algorithm')
         return redirect(url_for('model_choice_form'))
 
