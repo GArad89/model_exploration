@@ -1,16 +1,42 @@
 {% extends "layout.html" %}
 {% block title %}Choose Algorithms{% endblock %}
 {% block body %}
-  <form id="algorithm-form" method="post">
+
+<script type="text/javascript" src="/static/jsonform/deps/jquery.min.js"></script>
+<script type="text/javascript" src="/static/jsonform/deps/underscore.js"></script>
+<script type="text/javascript" src="/static/jsonform/deps/opt/jsv.js"></script>
+<script type="text/javascript" src="/static/jsonform/lib/jsonform.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(
+      function(){
+        var algos = {{algo_data | tojson}};
+        for (i in algos) {
+          $('#algorithms_select').append($('<option>', {
+            value: i,
+            text: algos[i].name
+          }));
+        }
+
+        $('#algorithms_select').change(function() {
+          selected_algo = algos[$(this).val()];
+          alert(JSON.stringify(selected_algo.form));
+          $('#algorithms_form').jsonForm(selected_algo.form);
+        });
+    });
+  </script>
+
+  <form id="select-algorithm-form" method="post">
     <h3>Select an Algorithm:<h3>
   	<div class="form-group row">
-  		<select id="algorithm" class="form-control col-sm-6">
-  			<option>Spectral Clustering</option>
-  			<option>Branch and Bound</option>
+  		<select id="algorithms_select" class="form-control col-sm-6">
+        <option disabled selected value> -- select an option -- </option>
   		</select>
       <!-- pass selected model id to next stage -->
       <input id="model_id" type="hidden" value="{{ model_id }}">
   	</div>
 	 <button type="submit" class="btn btn-primary">Choose Algorithm</button>
   </form>
+
+  <form id="algorithms_form" />
 {% endblock %}
