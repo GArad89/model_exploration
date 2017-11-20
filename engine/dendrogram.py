@@ -2,11 +2,12 @@ from graph import DGraph
 
 class Node:
     rootindex=None
+    label=None
     leafindexes=[]
     subset=[]
     projected_graph=None
     
-    def __init__(self, root=None, subset=[],dgraph=None):
+    def __init__(self, root=None, subset=[],dgraph=None,label=None):
         self.rootindex=root
         self.subset=[]
         self.projected_graph=dgraph
@@ -19,6 +20,12 @@ class Node:
 
     def leaf(self):
         return self.leafindexes
+
+    def label(self):
+        return self.label
+
+    def vertices(self):
+        return self.subset
 
     def set(self, subset,dgraph):
         self.subset=subset
