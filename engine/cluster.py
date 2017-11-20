@@ -35,7 +35,7 @@ class SpectralCluster (Cluster):
 
 
         
-    def cluster(dgraph, n = 2, affinity='precomputed'):
+    def cluster(dgraph, n = 2, affinity='amg'):
         """
         just the basics required for the SpectralClustering algorithm for now.
         need to test what kind of output it gives.
@@ -44,7 +44,7 @@ class SpectralCluster (Cluster):
         adj_mat =dgraph.adjacency_matrix()
         
         #SpectralClustering
-        sc = SpectralClustering(n, affinity)
+        sc = SpectralClustering(n)
         sc.fit(adj_mat)
         result=sc.labels_
 
