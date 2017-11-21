@@ -1,0 +1,30 @@
+[
+	{
+		"name": "Spectral Clustering",
+		"form": {
+"schema": {
+	"n": {
+		"type": "integer",
+		"title": "Number of clusters",
+		"minimum": 2,
+		"required": true
+	},
+	"affinity": {
+		"type": "string",
+		"title": "Affinity"
+	}
+},
+"form": [
+	{
+		"key": "n",
+		"type": "text"
+	},
+
+	{
+		"key": "affinity",
+		"type": "text"
+	}
+]
+}
+	}
+]

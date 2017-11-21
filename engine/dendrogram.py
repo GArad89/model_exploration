@@ -3,6 +3,9 @@ from graph import DGraph
 class Node:
     parent_index=None
     child_indexes=[]
+    rootindex=None
+    label=None
+    leafindexes=[]
     subset=[]
     projected_graph=None
     
@@ -19,6 +22,12 @@ class Node:
 
     def child(self):
         return self.child_indexes
+
+    def label(self):
+        return self.label
+
+    def vertices(self):
+        return self.subset
 
     def set(self, subset,dgraph):
         self.subset=subset
