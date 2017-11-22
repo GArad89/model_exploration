@@ -3,16 +3,15 @@ from graph import DGraph
 class Node:
     parent_index=None
     child_indexes=[]
-    rootindex=None
     label=None
-    leafindexes=[]
     subset=[]
     projected_graph=None
     
-    def __init__(self, parent=None, subset=[],dgraph=None):
+    def __init__(self, parent=None, subset=[],dgraph=None, label=None):
         self.parent_index=parent
         self.subset=subset
         self.projected_graph=dgraph
+        self.label=label
 
     def add_child(self, child):
         self.child_indexes+=[child]
@@ -37,6 +36,7 @@ class Dendrogram:
     dgraph=None
     node_list=[]
     def __init__(self,dgraph):
+        self.node_list=[]
         self.node_list+=[Node(None,dgraph.nodes())] #root node
         self.dgraph=dgraph
 

@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
 from graph import DGraph
-from sklearn.cluster import SpectralClustering
+from sklearn.cluster import SpectralClustering, KMeans
 import numpy as np
 import networkx as nx
 
-    
+#Branch and Bound not working for now
+
 class BnBNode():
     
     graph_node_list=[]
@@ -115,6 +116,48 @@ class BranchAndBoundCluster (Cluster):
     def Check_Live(tree):     # run over the remaining BnB sub_problems and rejects according to the bounds
         pass #TO DO
 
+##running but not giving desired results
+class KmeansClustering (Cluster):
+
+    def getParams():
+        form = [{'key': 'n', 'type': 'text'},{'key': 'affinity', 'type': 'text'}]
+        schema = {
+            'n' : {'type': 'integer', 'title': 'number of clusters', 'minimum' : 2, 'required' : True},
+            'affinity' : {'type': 'string', 'title': 'affinity'}
+            }
+        return schema, form
+
+    
+    def cluster(dgraph, n = 2):
+        """
+        just the basics required for the Kmeans algorithm for now.
+        need to test what kind of output it gives.
+        """
+        #adjacency matrix
+        adj_mat =dgraph.adjacency_matrix()
+        if("inNode" in dgraph.nodes()):
+            adj_mat=np.delete(adj_mat, np.s_[-2::], 1)
+            adj_mat=np.delete(adj_mat, np.s_[-2::], 0)
+
+        
+        #KMeans clustering
+        ##eigen_values, eigen_vectors = np.linalg.eigh(adj_mat)
+        ##print(adj_mat)
+        km = KMeans(n).fit(adj_mat)
+        #km.fit(adj_mat)
+        result=km.labels_
+
+        #seperating the result list to lists for each cluster (1= the node is in the substae 0= the node is not in the state)
+        output=[];
+        for i in range(0,max(result)+1):
+            temp_list=[];
+            for j in range(0,len(result)):
+                if result[j]!=i:
+                    temp_list+=[0]
+                else:
+                    temp_list+=[1]
+            output.append(temp_list)
+        return output
         
 
 class SpectralCluster (Cluster):
@@ -132,7 +175,7 @@ class SpectralCluster (Cluster):
 
 
         
-    def cluster(dgraph, n = 2, affinity='amg'):
+    def cluster(dgraph, n = 2, affinity='precomputed'):
         """
         just the basics required for the SpectralClustering algorithm for now.
         need to test what kind of output it gives.
@@ -142,22 +185,22 @@ class SpectralCluster (Cluster):
         if("inNode" in dgraph.nodes()):
             adj_mat=np.delete(adj_mat, np.s_[-2::], 1)
             adj_mat=np.delete(adj_mat, np.s_[-2::], 0)
+        print(adj_mat)
 
         
         #SpectralClustering
-        sc = SpectralClustering(n)
+        sc = SpectralClustering(n,affinity=affinity)
         sc.fit(adj_mat)
         result=sc.labels_
 
         #seperating the result list to lists for each cluster (1= the node is in the substae 0= the node is not in the state)
         output=[];
+        dnodes=list(dgraph.nodes())
         for i in range(0,max(result)+1):
             temp_list=[];
             for j in range(0,len(result)):
                 if result[j]!=i:
-                    temp_list+=[0]
-                else:
-                    temp_list+=[1]
+                    temp_list+=[dnodes[j]]
             output.append(temp_list)
         return output
 
