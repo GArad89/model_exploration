@@ -50,7 +50,7 @@ def spectralcluster_test():
 def partition_test():
 
     den = None
-    g = DGraph.read_dot("./dot/test.dot")
+    g = DGraph.read_dot("./dot/weighted_g2.dot")
     #den=partition(g,g.nodes()) 
     #print(len(den.node_list))  #should be 1 (root node only)
     print("testing partition on g2.dot for threshold=4:")

@@ -25,8 +25,8 @@ class DGraph:
     def nodes(self):
         return self.dgraph.nodes()
 
-    def edges(self):
-        return self.dgraph.edges()
+    def edges(self, data=None):
+        return self.dgraph.edges(data=data)
     
     def edges_ofnode(self, node): #method currently isn't used.
         return self.dgraph.edges(node)
@@ -55,7 +55,7 @@ class DGraph:
 
     @staticmethod
     def read_dot(path):
-        return DGraph(nx.drawing.nx_pydot.read_dot(path))
+        return DGraph(nx.DiGraph(nx.drawing.nx_pydot.read_dot(path)))
 
     def project(self, vertices):   #, inNode, outNode
        # partialGraph = self.subgraph(vertices)
@@ -70,15 +70,17 @@ class DGraph:
         projectedGraph.add_node("inNode")
         projectedGraph.add_node("outNode")
 
-        for edge1,edge2 in list(self.edges()):
+        for edge1,edge2,dic in list(self.dgraph.edges(data=True)):
+            weight=dic.get('weight', 1)
+            
             if (edge1 in vertices):
                 if (edge2 in vertices):
-                    projectedGraph.add_edge(edge1,edge2)
+                    projectedGraph.add_edge(edge1, edge2, weight)
                 else:
-                    projectedGraph.add_edge(edge1,"outNode")
+                    projectedGraph.add_edge(edge1, "outNode", weight)
             else:
                 if(edge2 in vertices):
-                    projectedGraph.add_edge("inNode",edge2)
+                    projectedGraph.add_edge("inNode", edge2, weight)
         
         
         """   #previous code:
