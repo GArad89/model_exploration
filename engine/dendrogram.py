@@ -1,19 +1,26 @@
 from graph import DGraph
 
 class Node:
-    parent_index=None
+    parent_index=-1
     child_indexes=[]
     label=None
     subset=[]
     projected_graph=None
     
     def __init__(self, parent=None, subset=[],dgraph=None, label=None):
-        self.parent_index=parent
+        if(parent==None):
+            if(label==None):
+                self.label='root'
+        else:
+            self.parent_index=parent
+                
         self.subset=subset
         self.projected_graph=dgraph
         self.label=label
+        self.child_indexes=[]
 
     def add_child(self, child):
+        print("child indexes of ",self.get_label()," ,is: ",self.child_indexes)
         self.child_indexes+=[child]
 
     def parent(self):
@@ -22,7 +29,7 @@ class Node:
     def child(self):
         return self.child_indexes
 
-    def label(self):
+    def get_label(self):
         return self.label
 
     def vertices(self):
@@ -37,10 +44,12 @@ class Dendrogram:
     node_list=[]
     def __init__(self,dgraph):
         self.node_list=[]
-        self.node_list+=[Node(None,dgraph.nodes())] #root node
+        self.node_list+=[Node(None,list(dgraph.nodes()))] #root node
         self.dgraph=dgraph
 
     def add_node(self,node):
+        if(node.get_label()==None):
+            node.label='Node '+str(len(self.node_list))
         self.node_list+=[node]
 
     def nodes(self):

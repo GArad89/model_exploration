@@ -26,11 +26,11 @@ def partition(dgraph, state_subset=None, clustering_algo = SpectralCluster, stop
             dendrogram.add_node(Node(rootnode,state_subset,projected_graph))
             dendrogram.add_child(rootnode,len(dendrogram.nodes())-1)
         rootnode = len(dendrogram.nodes())-1 
-        
+    #print(dendrogram.nodes()[rootnode].child())
     if stopCri.check(projected_graph):
         #print("check2")
         return dendrogram
-
+    #print(clustering_algo.cluster)
     clusters = clustering_algo.cluster(projected_graph)
     #print("clusters: ", clusters)
     for cluster_iter in clusters:
@@ -73,5 +73,5 @@ def partition_test():
      
 
        
-spectralcluster_test()
-partition_test()
+#spectralcluster_test()
+#partition_test()
