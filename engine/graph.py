@@ -13,8 +13,8 @@ class DGraph:
 
     
 
-    def add_node(self, node, **attr):
-        self.dgraph.add_node(node, attr = attr)
+    def add_node(self, node, label=None, **attr):
+        self.dgraph.add_node(node,label=label, attr = attr)
 
     def add_edge(self, node1, node2, weight=None):
         if(weight == None):
@@ -65,7 +65,7 @@ class DGraph:
 
        #naive solution for now:
         for node in vertices:
-           projectedGraph.add_node(node)
+           projectedGraph.add_node(node,label=self.dgraph.node[node]['label'])
               
         projectedGraph.add_node("inNode")
         projectedGraph.add_node("outNode")
@@ -105,27 +105,29 @@ class DGraph:
 
 # for testing purposes
 def main():
-    g = DGraph.read_dot("./dot/g1.dot") 
+    g = DGraph.read_dot("./dot/g2.dot")
+    for n in g.dgraph.nodes():
+        print(g.dgraph.node[n]['label'])
     g.draw() 
     new_node = random() * 10000 
-    g.add_node(new_node, weight=0.4)
-    g.add_edge(2, '1', weight=0.2)
-    DGraph.write_dot(g, "./dot/g1.dot") 
+    #g.add_node(new_node, weight=0.4)
+    #g.add_edge(2, '1', weight=0.2)
+    #DGraph.write_dot(g, "./dot/g1.dot") 
  
 
 
 def projectedgraph_test():
     #g = DGraph.read_dot("./dot/weighted_g2.dot")
     g=DGraph(nx.DiGraph())
-    g.add_node('1')
+    g.add_node('1' , label='kekek')
     g.add_node('2')
     g.add_node('3')
     g.add_node('4')
     g.add_edge('1','2',weight=2)
     DGraph.write_dot(g, "./dot/test.dot")
-    print(g.project([1,2,3]).nodes())
+    
     
 if __name__ == "__main__":
-   #main()
-   projectedgraph_test()
+   main()
+   #projectedgraph_test()
 

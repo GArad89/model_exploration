@@ -134,7 +134,7 @@ class KmeansClustering (Cluster):
         need to test what kind of output it gives.
         """
         #adjacency matrix
-        adj_mat =dgraph.adjacency_matrix()
+        lap_mat =dgraph.laplacian_matrix()
         if("inNode" in dgraph.nodes()):
             adj_mat=np.delete(adj_mat, np.s_[-2::], 1)
             adj_mat=np.delete(adj_mat, np.s_[-2::], 0)

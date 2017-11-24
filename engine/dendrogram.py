@@ -1,4 +1,5 @@
 from .graph import DGraph
+import networkx as nx
 
 class Node:
     parent_index=-1
@@ -49,7 +50,7 @@ class Dendrogram:
 
     def add_node(self,node):
         if(node.get_label()==None):
-            node.label='Node '+str(len(self.node_list))
+            self.label_by_sum_names(node)
         self.node_list+=[node]
 
     def nodes(self):
@@ -58,8 +59,20 @@ class Dendrogram:
     def add_child(self,parent,child):  #only used right after add_node. need to merge methods if there are no further uses
         self.node_list[parent].add_child(child)
 
-
-
-
-
+    def label_by_order(self,node):
+        node.label='Node '+str(len(self.node_list))
+    
+    def label_by_sum_names(self, node):
+        label_temp=''
+        #label_list=
+        #print(label_list)
+        for graph_node in node.projected_graph.dgraph.nodes():
+            temp=str(node.projected_graph.dgraph.node[graph_node]['label'])
+            if(temp!='None'):
+                label_temp+=temp
+        if(label_temp!=''):        
+            node.label=label_temp
+        else:
+            self.label_by_order(node)
+        
 
