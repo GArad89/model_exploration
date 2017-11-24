@@ -1,4 +1,4 @@
-from graph import DGraph
+from .graph import DGraph
 
 class Node:
     parent_index=-1
@@ -13,14 +13,14 @@ class Node:
                 self.label='root'
         else:
             self.parent_index=parent
+            self.label=label
                 
         self.subset=subset
         self.projected_graph=dgraph
-        self.label=label
         self.child_indexes=[]
 
     def add_child(self, child):
-        print("child indexes of ",self.get_label()," ,is: ",self.child_indexes)
+        #print("child indexes of ",self.get_label()," ,is: ",self.child_indexes)
         self.child_indexes+=[child]
 
     def parent(self):

@@ -1,5 +1,5 @@
-from cluster import *
-from dendrogram import *
+from .cluster import *
+from .dendrogram import *
 import json
 
 def createAlgoParamsJSON():
@@ -25,4 +25,25 @@ def dendrogramToJSON(dendro):
         clusters +=[ {'name' : node.get_label(), 'inEdge' : node.parent(), 'outEdge' : node.child(), 'vertices' : node.vertices()}]        
     #print(clusters)
     jsondata['clusters'] = clusters
-    return json.dumps(jsondata)
+    result=jsondata['clusters']
+    jsondata['cluster_struct']=clusterBuild(0,result)
+    #print(jsondata['cluster_struct'])
+
+    return jsondata
+
+def clusterBuild(index,cluster_list):
+    text=""
+    x='"'
+    text=text+'{'+'\n'+""""name": """+x+cluster_list[index]['name']+x
+    for j in range(len(cluster_list[index]['outEdge'])):
+        text=text+','
+        if(j==0):
+            text=text+"""\n"children": ["""
+        text=text+'\n'+clusterBuild(cluster_list[index]['outEdge'][j], cluster_list)
+    if(len(cluster_list[index]['outEdge'])>0):
+        text=text+"""\n] \n}"""
+    else:
+        text=text+""" \n}"""
+    return text
+
+

@@ -2,14 +2,17 @@ from flask import Flask, render_template, session, redirect, url_for, \
      request, flash, g, jsonify, abort, send_from_directory
 from werkzeug.utils import secure_filename
 import os
+import sys
 
 app = Flask(__name__)
 app.config.from_object('website_config')
 
 from webapp.models import Models
+from engine.engineMainFlow import run_algo
+from engine.graph import DGraph
 
 models = Models(app.config['MODELS_PATH'])
-
+result=''
 
 
 
@@ -23,7 +26,6 @@ def model_choice_form():
 def algorithm_choice_form():
     # take model id either from form or from get param, prefer the form
     model_id = request.values.get('model_id','') or request.values.get('model', '')
-
     if not model_id:
         #TODO: implement flash display 
         flash('Must select valid model to choose the algorithm')
@@ -31,15 +33,16 @@ def algorithm_choice_form():
 
     # validate the .dot file: load it
     # TODO: wrap with exception handling. Right now it's still more useful to see the exception in flask
-    model = models.open(model_id)
+    
 
     errors = {}
     if request.method == 'POST':
         #TODO: validate form, run algorithm
         # params = get_params(form)
-        # result = run_algo(model_id, algorithm, params)
+        global result
+        result=run_algo(DGraph.read_dot('./engine/dot/'+model_id+'.dot'),"SpectralCluster",None,stopCriteria="SizeCriteria")
         # result_id = serialize_result(result)
-        algorithm_results_id = 'placeholder'
+        algorithm_results_id = model_id+'?SpectralCluster'
         return redirect(url_for('show_results', result_id=algorithm_results_id))
 
     #TODO: algo_data = engine.get_algorithms() instead
@@ -60,6 +63,15 @@ def show_results(result_id):
 
 
 #TODO: un-hardcode result
+import json
+
+
+
+
+
+
+
+      
 
 example_data = {
     "edges" : [
@@ -71,7 +83,7 @@ example_data = {
               ],
     "vertices" : [
                   {
-                      "name": "A", 
+                      "name": "check", 
                       "id": 0
                   }, 
                   {
@@ -99,33 +111,18 @@ example_data = {
                  ],
 }
 
-import json
-hardcoded_data = json.loads("""{
-  "name": "root",
-  "children": [
-    {
-     "name": "parent A",
-     "children": [
-       {"name": "child A1"},
-       {"name": "child A2"},
-       {"name": "child A3"}
-     ]
-    },{
-     "name": "parent B",
-     "children": [
-       {"name": "child B1"},
-       {"name": "child B2"}
-     ]
-    }
-  ]
-  }""")
+
+##hardcoded_data = result['cluster_struct']
+
+
 
 
 @app.route('/results/<result_id>')
+
 def get_result(result_id):
     #TODO: load actual results
-    return jsonify(hardcoded_data)
-
+    
+    return jsonify(json.loads(result['cluster_struct']))
 
 def json_error(message, status_code = 400):
     "Wrap an error message in a json response. status_code is http status code"
@@ -163,4 +160,5 @@ def models_endpoint():
         # return list of models (now with new model)
         return jsonify(models=models.list(), new_model=new_model)
     else: # GET, return list of models
+
         return jsonify(models=models.list())

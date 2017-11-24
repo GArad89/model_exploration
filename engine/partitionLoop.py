@@ -1,7 +1,7 @@
-from graph import *
-from cluster import BranchAndBoundCluster,SpectralCluster, KmeansClustering
-from stopCriteria import *
-from dendrogram import Node,Dendrogram
+from .graph import *
+from .cluster import BranchAndBoundCluster,SpectralCluster, KmeansClustering
+from .stopCriteria import *
+from .dendrogram import Node,Dendrogram
 
 ###old code
 """
