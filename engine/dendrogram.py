@@ -69,10 +69,14 @@ class Dendrogram:
         for graph_node in node.projected_graph.dgraph.nodes():
             temp=str(node.projected_graph.dgraph.node[graph_node]['label'])
             if(temp!='None'):
-                label_temp+=temp
+                label_temp+=temp+'_'
         if(label_temp!=''):        
             node.label=label_temp
         else:
             self.label_by_order(node)
+
+    def edges_by_sum_names(self,node):
+        #TO DO
+        pass
         
 

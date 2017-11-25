@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from .graph import DGraph
+from graph import DGraph
 from sklearn.cluster import SpectralClustering, KMeans
 import numpy as np
 import networkx as nx
@@ -134,19 +134,23 @@ class KmeansClustering (Cluster):
         need to test what kind of output it gives.
         """
         #adjacency matrix
-        lap_mat =dgraph.laplacian_matrix()
+        adj_mat =dgraph.adjacency_matrix()
         if("inNode" in dgraph.nodes()):
             adj_mat=np.delete(adj_mat, np.s_[-2::], 1)
             adj_mat=np.delete(adj_mat, np.s_[-2::], 0)
-
+        adj_mat=adj_mat.max()-adj_mat
+        print(adj_mat)
+       # adj_mat=np.add( adj_mat, adj_mat.transpose() )
         
         #KMeans clustering
         ##eigen_values, eigen_vectors = np.linalg.eigh(adj_mat)
-        ##print(adj_mat)
+        #adj_mat=np.exp(- adj_mat ** 2 / (2.* 0.3 ** 2))
+        #np.fill_diagonal(adj_mat,0)
+        #print(adj_mat)
         km = KMeans(n).fit(adj_mat)
         #km.fit(adj_mat)
         result=km.labels_
-
+        print(km.cluster_centers_)
         #seperating the result list to lists for each cluster (1= the node is in the substae 0= the node is not in the state)
         output=[];
         for i in range(0,max(result)+1):
@@ -159,6 +163,32 @@ class KmeansClustering (Cluster):
             output.append(temp_list)
         return output
         
+class Minimum_Cut(Cluster):
+
+    def getParams():
+        form = [{}]
+        schema = { {} }
+        return schema, form
+               
+    def cluster(dgraph):
+        cop=dgraph.dgraph.copy()
+        cop=cop.to_undirected()
+        cut_edges=nx.minimum_edge_cut(cop)
+        
+        print(cut_edges)
+        cop.remove_edges_from(cut_edges)
+        
+        sub_graphs = nx.connected_component_subgraphs(cop)
+        output=[]
+
+        for sg in sub_graphs:
+            output+=[sg.nodes()]
+
+        return output
+            
+
+
+
 
 class SpectralCluster (Cluster):
 
@@ -189,7 +219,7 @@ class SpectralCluster (Cluster):
 
         
         #SpectralClustering
-        sc = SpectralClustering(n,affinity=affinity)
+        sc = SpectralClustering(2,affinity=affinity)
         sc.fit(adj_mat)
         result=sc.labels_
 

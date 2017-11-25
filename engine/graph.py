@@ -65,7 +65,11 @@ class DGraph:
 
        #naive solution for now:
         for node in vertices:
-           projectedGraph.add_node(node,label=self.dgraph.node[node]['label'])
+           temp=self.dgraph.node[node].get('label',None)
+           if(temp!=None):
+               projectedGraph.add_node(node,label=self.dgraph.node[node]['label'])
+           else:
+               projectedGraph.add_node(node)
               
         projectedGraph.add_node("inNode")
         projectedGraph.add_node("outNode")
@@ -105,9 +109,9 @@ class DGraph:
 
 # for testing purposes
 def main():
-    g = DGraph.read_dot("./dot/g2.dot")
-    for n in g.dgraph.nodes():
-        print(g.dgraph.node[n]['label'])
+    g = DGraph.read_dot("./dot/example.dot")
+    #for n in g.dgraph.nodes():
+        #print(g.dgraph.node[n]['label'])
     g.draw() 
     new_node = random() * 10000 
     #g.add_node(new_node, weight=0.4)
