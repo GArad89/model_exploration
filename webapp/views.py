@@ -71,30 +71,51 @@ example_data = {
               ],
     "vertices" : [
                   {
-                      "name": "A", 
+                      "name": "A",
                       "id": 0
-                  }, 
+                  },
                   {
-                      "name": "B", 
+                      "name": "B",
                       "id": 1
                   },
                   {
-                      "name": "C", 
+                      "name": "C",
                       "id": 2
                   },
                   {
-                      "name": "D", 
+                      "name": "D",
                       "id": 3
                   },
                   {
-                      "name": "E", 
+                      "name": "E",
                       "id": 4
                   },
                  ],
     "clusters" : [
                   {
-                      "contains": [0,1,2,3,4,],
-                      "out": {}
+                      "label": "Entire Graph",
+                      "vertices": [0,1,2,3,4],
+                      "outEdge": [1,2]
+                  },
+                  {
+                      "label": "first level - 1",
+                      "vertices": [0,1],
+                      "outEdge": {}
+                  },
+                  {
+                      "label": "first level - 2",
+                      "vertices": [2, 3, 4],
+                      "outEdge": {3}
+                  },
+                  {
+                      "label": "second level - 1",
+                      "vertices": [2, 3],
+                      "outEdge": {3}
+                  },
+                  {
+                      "label": "second level - 2",
+                      "vertices": [4],
+                      "outEdge": {3}
                   }
                  ],
 }
