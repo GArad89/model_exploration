@@ -13,11 +13,29 @@ class Cluster(ABC):
         """
 
 class BranchAndBoundCluster (Cluster):
+    def getParams():
+        return {},[] #TODO
+
+    
     def cluster(self, dgraph):
         pass #TODO: implement
 
 class SpectralCluster (Cluster):
-    def cluster(dgraph, n = 2):
+
+    def getParams():
+        form = [{'key': 'n', 'type': 'text'},{'key': 'affinity', 'type': 'text'}]
+        schema = {
+            'n' : {'type': 'integer', 'title': 'number of clusters', 'minimum' : 2, 'required' : True},
+            'affinity' : {'type': 'string', 'title': 'affinity'}
+            }
+        return schema, form
+        
+
+
+
+
+        
+    def cluster(dgraph, n = 2, affinity='amg'):
         """
         just the basics required for the SpectralClustering algorithm for now.
         need to test what kind of output it gives.
@@ -26,7 +44,7 @@ class SpectralCluster (Cluster):
         adj_mat =dgraph.adjacency_matrix()
         
         #SpectralClustering
-        sc = SpectralClustering(n, affinity='precomputed')
+        sc = SpectralClustering(n)
         sc.fit(adj_mat)
         result=sc.labels_
 
