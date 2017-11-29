@@ -40,7 +40,7 @@ def algorithm_choice_form():
         #TODO: validate form, run algorithm
         # params = get_params(form)
         global result
-        result=run_algo(models.open(model_id),"SpectralCluster",None,stopCriteria="SizeCriteria")
+        result=run_algo(DGraph.read_dot('./engine/dot/'+model_id+'.dot'),"SpectralCluster",None,stopCriteria="SizeCriteria")
         # result_id = serialize_result(result)
         algorithm_results_id = model_id+'?SpectralCluster'
         return redirect(url_for('show_results', result_id=algorithm_results_id))
