@@ -2,15 +2,18 @@ from flask import Flask, render_template, session, redirect, url_for, \
      request, flash, g, jsonify, abort, send_from_directory
 from werkzeug.utils import secure_filename
 import os
+import sys
+import json
 
 app = Flask(__name__)
 app.config.from_object('website_config')
 
-from webapp.models import Models
+from webapp.models import Models, Results
+from engine.engineMainFlow import run_algo
+from engine.graph import DGraph
 
 models = Models(app.config['MODELS_PATH'])
-
-
+results = Results(app.config['RESULTS_PATH'])
 
 
 ############ main flow ##################
@@ -23,7 +26,6 @@ def model_choice_form():
 def algorithm_choice_form():
     # take model id either from form or from get param, prefer the form
     model_id = request.values.get('model_id','') or request.values.get('model', '')
-
     if not model_id:
         #TODO: implement flash display 
         flash('Must select valid model to choose the algorithm')
@@ -31,16 +33,17 @@ def algorithm_choice_form():
 
     # validate the .dot file: load it
     # TODO: wrap with exception handling. Right now it's still more useful to see the exception in flask
-    model = models.open(model_id)
+    graph = models.open(model_id)
 
     errors = {}
     if request.method == 'POST':
         #TODO: validate form, run algorithm
         # params = get_params(form)
-        # result = run_algo(model_id, algorithm, params)
-        # result_id = serialize_result(result)
-        algorithm_results_id = 'placeholder'
-        return redirect(url_for('show_results', result_id=algorithm_results_id))
+        # result = run_algo(models.open(model_id), **params)
+        result = run_algo(graph, "SpectralCluster", None, stopCriteria="SizeCriteria")
+        result_id = results.save(result)
+
+        return redirect(url_for('show_results', result_id=result_id))
 
     #TODO: algo_data = engine.get_algorithms() instead
     algo_file_path = os.path.join(app.static_folder, 'algorithms.json')
@@ -52,101 +55,13 @@ def algorithm_choice_form():
 
 @app.route('/explore/<result_id>')
 def show_results(result_id):
-    # TODO: read the result and pass it back
-    #result = read_result(result_id)
-    #return render_template('explorer.html', result=result)
-
+    # pass result id so d3 can ajax to get the json of the result
     return render_template('explorer.html', result_id=result_id)
-
-
-#TODO: un-hardcode result
-
-example_data = {
-    "edges" : [
-               {"from": 0, "to": 1, "label":"AB"},
-               {"from": 0, "to": 2, "label":"AC"},
-               {"from": 1, "to": 4, "label":"BE"},
-               {"from": 2, "to": 3, "label":"CD"},
-               {"from": 3, "to": 4, "label":"DE"},
-              ],
-    "vertices" : [
-                  {
-                      "name": "A",
-                      "id": 0
-                  },
-                  {
-                      "name": "B",
-                      "id": 1
-                  },
-                  {
-                      "name": "C",
-                      "id": 2
-                  },
-                  {
-                      "name": "D",
-                      "id": 3
-                  },
-                  {
-                      "name": "E",
-                      "id": 4
-                  },
-                 ],
-    "clusters" : [
-                  {
-                      "label": "Entire Graph",
-                      "vertices": [0,1,2,3,4],
-                      "outEdge": [1,2]
-                  },
-                  {
-                      "label": "first level - 1",
-                      "vertices": [0,1],
-                      "outEdge": {}
-                  },
-                  {
-                      "label": "first level - 2",
-                      "vertices": [2, 3, 4],
-                      "outEdge": {3}
-                  },
-                  {
-                      "label": "second level - 1",
-                      "vertices": [2, 3],
-                      "outEdge": {3}
-                  },
-                  {
-                      "label": "second level - 2",
-                      "vertices": [4],
-                      "outEdge": {3}
-                  }
-                 ],
-}
-
-import json
-hardcoded_data = json.loads("""{
-  "name": "root",
-  "children": [
-    {
-     "name": "parent A",
-     "children": [
-       {"name": "child A1"},
-       {"name": "child A2"},
-       {"name": "child A3"}
-     ]
-    },{
-     "name": "parent B",
-     "children": [
-       {"name": "child B1"},
-       {"name": "child B2"}
-     ]
-    }
-  ]
-  }""")
-
 
 @app.route('/results/<result_id>')
 def get_result(result_id):
-    #TODO: load actual results
-    return jsonify(hardcoded_data)
-
+    "return clustering algorithm results by id"
+    return jsonify(json.loads(results.open(result_id)['cluster_struct']))
 
 def json_error(message, status_code = 400):
     "Wrap an error message in a json response. status_code is http status code"
@@ -184,4 +99,5 @@ def models_endpoint():
         # return list of models (now with new model)
         return jsonify(models=models.list(), new_model=new_model)
     else: # GET, return list of models
+
         return jsonify(models=models.list())
