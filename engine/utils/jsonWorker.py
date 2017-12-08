@@ -1,5 +1,5 @@
-from .cluster import *
-from .dendrogram import *
+from ..clustering import *
+from ..baisc_entities.dendrogram import *
 import json
 
 def createAlgoParamsJSON():

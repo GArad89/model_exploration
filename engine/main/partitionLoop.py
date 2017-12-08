@@ -1,7 +1,7 @@
-from .graph import *
-from .cluster import BranchAndBoundCluster,SpectralCluster, KmeansClustering
-from .stopCriteria import *
-from .dendrogram import Node,Dendrogram
+from ..baisc_entities.graph import *
+from ..clustering import SpectralCluster, minimum_cut, Kmeans, Branch_and_Bound
+from ..stopping_criteria.stopCriteria import *
+from ..baisc_entities.dendrogram import Node,Dendrogram
 
 ###old code
 """
@@ -15,7 +15,7 @@ def cluster(dgraph,  clustertype = SpectralCluster, **params):
 """
 
 #need to check if we want to add a stop critrea for after x runs.    
-def partition(dgraph, state_subset=None, clustering_algo = SpectralCluster, stopCri = SizeCriteria(20), dendrogram = None, rootnode = 0):
+def partition(dgraph, state_subset=None, clustering_algo = SpectralCluster.SpectralCluster, stopCri = SizeCriteria(20), dendrogram = None, rootnode = 0):
     projected_graph = dgraph.project(state_subset)
     #print(projected_graph.nodes())
     #print(projected_graph.nodes())
@@ -54,7 +54,7 @@ def partition_test():
     #den=partition(g,g.nodes()) 
     #print(len(den.node_list))  #should be 1 (root node only)
     print("testing partition on g2.dot for threshold=4:")
-    den = partition(g,g.nodes(), SpectralCluster, SizeCriteria(4))
+    den = partition(g,g.nodes(), SpectralCluster.SpectralCluster, SizeCriteria(4))
     print("the number of super-nodes in the dendogram (including the root):")
     print(len(den.node_list))  #should be 3.
     
@@ -63,7 +63,7 @@ def partition_test():
         print(den.node_list[1].subset)
         
     print("testing partition on g2.dot for threshold=2:")
-    den = partition(g,g.nodes(), SpectralCluster, SizeCriteria(2),dendrogram=None)
+    den = partition(g,g.nodes(), SpectralCluster.SpectralCluster, SizeCriteria(2),dendrogram=None)
     print("the number of super-nodes in the dendogram (including the root):")
     print(len(den.node_list))  #should be 7.
     
