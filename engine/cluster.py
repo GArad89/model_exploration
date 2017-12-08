@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from graph import DGraph
+from engine.graph import DGraph
 from sklearn.cluster import SpectralClustering, KMeans
 import numpy as np
 import networkx as nx
