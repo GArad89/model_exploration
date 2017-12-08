@@ -4,7 +4,7 @@ import time
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 
-from engine.graph import DGraph
+from engine.baisc_entities.graph import DGraph
 
 EXTENSION = '.dot'
 

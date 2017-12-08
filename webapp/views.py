@@ -9,8 +9,8 @@ app = Flask(__name__)
 app.config.from_object('website_config')
 
 from webapp.models import Models, Results
-from engine.engineMainFlow import run_algo
-from engine.graph import DGraph
+from engine.main.engineMainFlow import run_algo
+from engine.baisc_entities.graph import DGraph
 
 models = Models(app.config['MODELS_PATH'])
 results = Results(app.config['RESULTS_PATH'])
