@@ -28,7 +28,7 @@ class DGraph:
     def edges(self, data=None):
         return self.dgraph.edges(data=data)
     
-    def edges_ofnode(self, node): #method currently isn't used.
+    def edges_of_node(self, node): 
         return self.dgraph.edges(node)
 
     def draw(self):
@@ -128,10 +128,12 @@ def projectedgraph_test():
     g.add_node('3')
     g.add_node('4')
     g.add_edge('1','2',weight=2)
-    DGraph.write_dot(g, "./dot/test.dot")
+    g.add_edge('3','2',weight=2)
+    #print(list(g.edges_of_node('3'))[0][0])
+    #DGraph.write_dot(g, "./dot/test.dot")
     
     
 if __name__ == "__main__":
-   main()
-   #projectedgraph_test()
+   #main()
+   projectedgraph_test()
 
