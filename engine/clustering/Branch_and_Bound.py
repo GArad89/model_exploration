@@ -53,7 +53,7 @@ class BnBSearchTree():
     best_solution=None
     
     def __init__(self,dgraph):
-        self.weight_limit=len(dgraph.nodes())//2
+        self.weight_limit=len(dgraph.nodes())//2+1
         self.graph=dgraph
         self.sorted_graph_nodes=Sort_Nodes(dgraph)
         self.node_list+=[BnBNode(self.sorted_graph_nodes[0],True, 0)]
@@ -67,7 +67,8 @@ class BnBSearchTree():
        # print(bnb_node.node_list_checked)
         self.live_nodes.sort(key=lambda x: x.lower_bound)
         bnb_parent.add_child(bnb_node)
-        if((len(self.sorted_graph_nodes)==len(bnb_node.node_list_checked))or(len(bnb_node.node_list_accepted)==self.weight_limit)):
+        if((len(self.sorted_graph_nodes)==len(bnb_node.node_list_checked))or(len(bnb_node.node_list_accepted)==self.weight_limit)or(len(bnb_node.node_list_rejected)==self.weight_limit)):
+           #bnb_node.lower_bound=check_final_cut(bnb_node,self.graph)
            if(bnb_node.lower_bound<self.upper_bound):
                self.best_solution=bnb_node
                self.upper_bound=bnb_node.lower_bound
@@ -105,6 +106,7 @@ class BranchAndBoundCluster (Cluster):
                 current_upper_bound=bnb_tree.upper_bound
                 Check_Live(bnb_tree)
         Print_Sol(bnb_tree)
+        print(bnb_tree.best_solution. node_list_accepted)
         return bnb_tree.best_solution. node_list_accepted
         
         """
@@ -157,10 +159,19 @@ def Check_Live(tree):     # run over the remaining BnB sub_problems and rejects 
         tree.kill_node(node)
 
 def Lower_Bound_Greedy_Simple(dgraph, bnb_node, graph_node, is_accepted):
-    graph_edges=dgraph.dgraph.neighbors(graph_node)
-    lower_bound=bnb_node.lower_bound
+    graph_edges=dgraph.edges()
+    
+    edge_list=[]
     for edge in graph_edges:
-        #print(graph_node)
+        if(edge[0]==graph_node):
+            
+            edge_list+=[edge[1]]
+        elif((edge[1]==graph_node)):
+            edge_list+=[edge[0]]
+    lower_bound=bnb_node.lower_bound
+    
+    for edge in edge_list:
+        
         if(bnb_node.node_list_accepted.count(edge)>0):
             lower_bound+=(1-is_accepted)
         if(bnb_node.node_list_rejected.count(edge)>0):
@@ -187,5 +198,26 @@ def Print_Sol(bnbtree):
         print(node.node_list_rejected)
         print("lower_bound: ")
         print(node.lower_bound)
+
+def check_final_cut(bnbnode,dgraph):
+    if(len(bnbnode.node_list_accepted)>=len(bnbnode.node_list_rejected)):
+       added_list=bnbnode.node_list_accepted
+    else:
+       added_list=bnbnode.node_list_rejected
+    for node in dgraph.nodes():
+       if(bnbnode.node_list_checked.count(node)==0):
+           added_list+=[node]
+       
+    graph_edges=dgraph.edges()
+    
+    lower_bound=0
+    for edge in graph_edges:
+        if((bnbnode.node_list_accepted.count(edge[0])>0)and(bnbnode.node_list_rejected.count(edge[1])>0)):
+           lower_bound+=1
+        else:
+           if((bnbnode.node_list_accepted.count(edge[1])>0)and(bnbnode.node_list_rejected.count(edge[0])>0)):
+              lower_bound+=1
+        
+    return lower_bound
         
 
