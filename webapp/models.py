@@ -46,7 +46,7 @@ class Models:
 
     @staticmethod
     def filename_to_model_name(filename):
-        # basename does  /path/to/file -> file
+        # basename does /path/to/file -> file
         return os.path.basename(_remove_ext(filename))
 
 class Results:
