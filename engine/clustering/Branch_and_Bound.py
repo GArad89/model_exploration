@@ -104,7 +104,7 @@ class BranchAndBoundCluster (Cluster):
             bnb_tree.kill_node(live_node)
             if(bnb_tree.upper_bound<current_upper_bound):
                 current_upper_bound=bnb_tree.upper_bound
-                Check_Live(bnb_tree)
+            Check_Live(bnb_tree)
         Print_Sol(bnb_tree)
         print(bnb_tree.best_solution. accepted)
         return bnb_tree.best_solution. accepted
@@ -157,6 +157,7 @@ def Sort_Nodes(dgraph):
     return sorted_nodes
 
 def Print_Sol(bnbtree):
+    print("bnb search tree holds "+str(len(bnbtree.node_list))+" nodes")
     for node in bnbtree.node_list:
         print("accepted: ")
         print(node.accepted)
