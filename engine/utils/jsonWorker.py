@@ -1,5 +1,6 @@
-from ..clustering import *
-from ..baisc_entities.dendrogram import *
+from engine.clustering import *
+from engine.clustering.cluster_abstract import Cluster
+from engine.baisc_entities.dendrogram import *
 import json
 
 def createAlgoParamsJSON():
@@ -10,7 +11,7 @@ def createAlgoParamsJSON():
         schema, form = algo.getParams()
         algo_form = {'name' : algo.__name__ , 'form' : {'schema' : schema, 'form' : form}}
         jsonlist += [algo_form]
-    return json.dumps(jsonlist)
+    return jsonlist
 
 
 

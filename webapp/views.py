@@ -4,12 +4,26 @@ from werkzeug.utils import secure_filename
 import os
 import sys
 import json
+import yaml
+
+import logging
+import logging.config
+
 
 app = Flask(__name__)
 app.config.from_object('website_config')
 
+# set up logging
+with open(os.path.join(app.config['BASE_PATH'], "logging.conf")) as f:
+    logging_conf = yaml.load(f)
+    logging.config.dictConfig(logging_conf)
+
+
+log = app.logger
+
 from webapp.models import Models, Results
 from engine.main.engineMainFlow import run_algo
+from engine.utils.jsonWorker import createAlgoParamsJSON
 from engine.baisc_entities.graph import DGraph
 
 models = Models(app.config['MODELS_PATH'])
@@ -19,6 +33,7 @@ results = Results(app.config['RESULTS_PATH'])
 ############ main flow ##################
 @app.route('/')
 def model_choice_form():
+    log.info('Choosing model')
     return render_template('model_choice.html', models=models.list())
 
 
@@ -27,6 +42,7 @@ def algorithm_choice_form():
     # take model id either from form or from get param, prefer the form
     model_id = request.values.get('model_id','') or request.values.get('model', '')
     if not model_id:
+
         #TODO: implement flash display 
         flash('Must select valid model to choose the algorithm')
         return redirect(url_for('model_choice_form'))
@@ -37,18 +53,22 @@ def algorithm_choice_form():
 
     errors = {}
     if request.method == 'POST':
-        #TODO: validate form, run algorithm
+        #TODO: get params from form
         # params = get_params(form)
         # result = run_algo(models.open(model_id), **params)
+
+        log.info("Running algorithm")
         result = run_algo(graph, "SpectralCluster", None, stopCriteria="SizeCriteria")
         result_id = results.save(result)
 
         return redirect(url_for('show_results', result_id=result_id))
 
     #TODO: algo_data = engine.get_algorithms() instead
-    algo_file_path = os.path.join(app.static_folder, 'algorithms.json')
-    with open(algo_file_path) as algo_file:
-        algo_data = json.load(algo_file)
+    #algo_file_path = os.path.join(app.static_folder, 'algorithms.json')
+    #with open(algo_file_path) as algo_file:
+    #    algo_data = json.load(algo_file)
+
+    algo_data = createAlgoParamsJSON()
 
     return render_template('algorithm_choice.html', model_id=model_id, errors=errors, algo_data=algo_data)
 
@@ -74,14 +94,14 @@ def models_endpoint():
     if request.method == 'POST':
         # method == POST, handle upload
         if 'file' not in request.files:
-            return json_error("TODO: missing file in post handling")
+            return json_error("File missing")
             
         file = request.files['file']
 
         # if user does not select file, browser also
         # submit a empty part without filename
         if not file.filename:
-            return json_error("TODO: no file in post handling")
+            return json_error("No file selected")
 
         if not Models.allowed_filename(file.filename):
             return json_error("Bad file extension! allowed file extension: '{}'".format(EXTENSION))
@@ -98,6 +118,6 @@ def models_endpoint():
         new_model = Models.filename_to_model_name(filename)
         # return list of models (now with new model)
         return jsonify(models=models.list(), new_model=new_model)
-    else: # GET, return list of models
-
+    else: 
+        # GET, return list of models
         return jsonify(models=models.list())
