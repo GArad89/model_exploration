@@ -68,7 +68,7 @@ class BnBSearchTree():
         self.live_nodes.sort(key=lambda x: x.LB)
         bnb_parent.add_child(bnb_node)
         if((len(self.sorted_graph_nodes)==len(bnb_node.checked))or(len(bnb_node.accepted)==self.weight_limit)or(len(bnb_node.rejected)==self.weight_limit)):
-           #bnb_node.LB=check_final_cut(bnb_node,self.graph)
+           bnb_node.LB=check_final_cut(bnb_node,self.graph)
            if(bnb_node.LB<self.upper_bound):
                self.best_solution=bnb_node
                self.upper_bound=bnb_node.LB
@@ -104,18 +104,19 @@ class BranchAndBoundCluster (Cluster):
             bnb_tree.kill_node(live_node)
             if(bnb_tree.upper_bound<current_upper_bound):
                 current_upper_bound=bnb_tree.upper_bound
-                Check_Live(bnb_tree)
+            Check_Live(bnb_tree)
         Print_Sol(bnb_tree)
         print(bnb_tree.best_solution. accepted)
         return bnb_tree.best_solution. accepted
         
 def Check_Live(tree):     # run over the remaining BnB sub_problems and rejects according to the bounds
-    rejected=[]                     
-    for node in tree.live_nodes:
-        if(node.LB>tree.upper_bound):
-            rejected+=[node]
-    for node in rejected:
-        tree.kill_node(node)
+    rejected=[]
+    if(tree.upper_bound>0):
+        for node in tree.live_nodes:
+            if(node.LB>tree.upper_bound):
+                rejected+=[node]
+        for node in rejected:
+            tree.kill_node(node)
 
 def LB_Greedy_Simple(dgraph, bnb_node, graph_node, is_accepted):
     graph_edges=dgraph.edges()
@@ -156,6 +157,7 @@ def Sort_Nodes(dgraph):
     return sorted_nodes
 
 def Print_Sol(bnbtree):
+    print("bnb search tree holds "+str(len(bnbtree.node_list))+" nodes")
     for node in bnbtree.node_list:
         print("accepted: ")
         print(node.accepted)
@@ -164,11 +166,12 @@ def Print_Sol(bnbtree):
         print("LB: ")
         print(node.LB)
 
+
 def check_final_cut(bnbnode,dgraph):
     if(len(bnbnode.accepted)>=len(bnbnode.rejected)):
-       added_list=bnbnode.accepted
-    else:
        added_list=bnbnode.rejected
+    else:
+       added_list=bnbnode.accepted
     for node in dgraph.nodes():
        if(bnbnode.checked.count(node)==0):
            added_list+=[node]
