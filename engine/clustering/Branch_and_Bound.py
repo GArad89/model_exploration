@@ -105,8 +105,8 @@ class BranchAndBoundCluster (Cluster):
             if(bnb_tree.upper_bound<current_upper_bound):
                 current_upper_bound=bnb_tree.upper_bound
             Check_Live(bnb_tree)
-        Print_Sol(bnb_tree)
-        print(bnb_tree.best_solution. accepted)
+        #Print_Sol(bnb_tree)
+        #print(bnb_tree.best_solution. accepted)
         return bnb_tree.best_solution. accepted
         
 def Check_Live(tree):     # run over the remaining BnB sub_problems and rejects according to the bounds

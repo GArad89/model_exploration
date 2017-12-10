@@ -1,5 +1,6 @@
-from abc import ABC, abstractmethod       
-        
+from abc import ABC, abstractmethod
+
+
 class Cluster(ABC):
 
     @abstractmethod
@@ -7,6 +8,7 @@ class Cluster(ABC):
         """Returns a list of set of states for dgraph
         sets can be joint
         """
+
 
 
 

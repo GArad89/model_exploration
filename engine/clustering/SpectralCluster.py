@@ -36,7 +36,6 @@ class SpectralCluster (Cluster):
         sc = SpectralClustering(2,affinity=affinity)
         sc.fit(adj_mat)
         result=sc.labels_
-
         #seperating the result list to lists for each cluster (1= the node is in the substae 0= the node is not in the state)
         output=[];
         dnodes=list(dgraph.nodes())
