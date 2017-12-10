@@ -29,7 +29,7 @@ class SpectralCluster (Cluster):
         if("inNode" in dgraph.nodes()):
             adj_mat=np.delete(adj_mat, np.s_[-2::], 1)
             adj_mat=np.delete(adj_mat, np.s_[-2::], 0)
-        print(adj_mat)
+        #print(adj_mat)
 
         
         #SpectralClustering
