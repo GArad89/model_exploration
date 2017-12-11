@@ -29,14 +29,13 @@ class SpectralCluster (Cluster):
         if("inNode" in dgraph.nodes()):
             adj_mat=np.delete(adj_mat, np.s_[-2::], 1)
             adj_mat=np.delete(adj_mat, np.s_[-2::], 0)
-        print(adj_mat)
+        #print(adj_mat)
 
         
         #SpectralClustering
         sc = SpectralClustering(2,affinity=affinity)
         sc.fit(adj_mat)
         result=sc.labels_
-
         #seperating the result list to lists for each cluster (1= the node is in the substae 0= the node is not in the state)
         output=[];
         dnodes=list(dgraph.nodes())

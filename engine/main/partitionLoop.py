@@ -38,15 +38,6 @@ def partition(dgraph, state_subset=None, clustering_algo = SpectralCluster.Spect
 
     return dendrogram
 
-#tests area
-
-def spectralcluster_test():
-
-    g = DGraph.read_dot("./dot/weighted_g2.dot")
-    print("testing SpectralCluster on g2.dot:")
-    print(SpectralCluster.cluster(g))
-    print("\n")
-
 def partition_test():
 
     den = None

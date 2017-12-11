@@ -27,7 +27,7 @@ class KmeansClustering (Cluster):
             adj_mat=np.delete(adj_mat, np.s_[-2::], 1)
             adj_mat=np.delete(adj_mat, np.s_[-2::], 0)
         adj_mat=adj_mat.max()-adj_mat
-        print(adj_mat)
+        #print(adj_mat)
        # adj_mat=np.add( adj_mat, adj_mat.transpose() )
         
         #KMeans clustering
@@ -38,7 +38,7 @@ class KmeansClustering (Cluster):
         km = KMeans(n).fit(adj_mat)
         #km.fit(adj_mat)
         result=km.labels_
-        print(km.cluster_centers_)
+        #print(km.cluster_centers_)
         #seperating the result list to lists for each cluster (1= the node is in the substae 0= the node is not in the state)
         output=[];
         for i in range(0,max(result)+1):
