@@ -13,10 +13,7 @@ import logging.config
 app = Flask(__name__)
 app.config.from_object('website_config')
 
-# set up logging
-with open(os.path.join(app.config['BASE_PATH'], "logging.conf")) as f:
-    logging_conf = yaml.load(f)
-    logging.config.dictConfig(logging_conf)
+logging.config.dictConfig(app.config['LOGGING_CONFIG'])
 
 
 log = app.logger
@@ -26,15 +23,22 @@ from engine.main.engineMainFlow import run_algo
 from engine.utils.jsonWorker import createAlgoParamsJSON
 from engine.baisc_entities.graph import DGraph
 
-models = Models(app.config['MODELS_PATH'])
-results = Results(app.config['RESULTS_PATH'])
+# get instances of Models, Results according to current config
+# this is lightweight for now, but in the future we may want to cache this in the application context
+# but that would require hooking the app context teardown for cleanup (this is what sqlalchemy does, for example)
+def get_models():
+    return Models(app.config['MODELS_PATH'])
 
+def get_results():
+    return Results(app.config['RESULTS_PATH'])
+
+
+# TODO: init command from flask commandline (@flask.api.commandline decorator)
 
 ############ main flow ##################
 @app.route('/')
 def model_choice_form():
-    log.info('Choosing model')
-    return render_template('model_choice.html', models=models.list())
+    return render_template('model_choice.html', models=get_models().list())
 
 
 @app.route('/choose_model', methods=['GET', 'POST'])
@@ -49,17 +53,17 @@ def algorithm_choice_form():
 
     # validate the .dot file: load it
     # TODO: wrap with exception handling. Right now it's still more useful to see the exception in flask
-    graph = models.open(model_id)
+    graph = get_models().open(model_id)
 
     errors = {}
     if request.method == 'POST':
         #TODO: get params from form
         # params = get_params(form)
-        # result = run_algo(models.open(model_id), **params)
+        # result = run_algo(get_models().open(model_id), **params)
 
         log.info("Running algorithm")
         result = run_algo(graph, "SpectralCluster", None, stopCriteria="SizeCriteria")
-        result_id = results.save(result)
+        result_id = get_results().save(result)
 
         return redirect(url_for('show_results', result_id=result_id))
 
@@ -78,7 +82,7 @@ def show_results(result_id):
 @app.route('/results/<result_id>')
 def get_result(result_id):
     "return clustering algorithm results by id"
-    return jsonify(json.loads(results.open(result_id)['cluster_struct']))
+    return jsonify(json.loads(get_results().open(result_id)['cluster_struct']))
 
 def json_error(message, status_code = 400):
     "Wrap an error message in a json response. status_code is http status code"
@@ -114,7 +118,7 @@ def models_endpoint():
 
         new_model = Models.filename_to_model_name(filename)
         # return list of models (now with new model)
-        return jsonify(models=models.list(), new_model=new_model)
+        return jsonify(models=get_models().list(), new_model=new_model)
     else: 
         # GET, return list of models
-        return jsonify(models=models.list())
+        return jsonify(models=get_models().list())
