@@ -65,11 +65,12 @@ class DGraph:
 
        #naive solution for now:
         for node in vertices:
-           temp=self.dgraph.node[node].get('label',None)
-           if(temp!=None):
-               projectedGraph.add_node(node,label=self.dgraph.node[node]['label'])
-           else:
-               projectedGraph.add_node(node)
+           if(node!="inNode")and(node!="outNode"): 
+               temp=self.dgraph.node[node].get('label',None)
+               if(temp!=None):
+                   projectedGraph.add_node(node,label=self.dgraph.node[node]['label'])
+               else:
+                   projectedGraph.add_node(node)
               
         projectedGraph.add_node("inNode")
         projectedGraph.add_node("outNode")
