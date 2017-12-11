@@ -105,7 +105,7 @@ def models_endpoint():
             return json_error("No file selected")
 
         if not Models.allowed_filename(file.filename):
-            return json_error("Bad file extension! allowed file extension: '{}'".format(EXTENSION))
+            return json_error("Bad file extension! allowed file extension is .dot")
 
         # secure filename to stop directory traversals, etc.
         filename = secure_filename(file.filename)
