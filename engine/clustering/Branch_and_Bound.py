@@ -3,6 +3,7 @@ from ..baisc_entities.graph import DGraph
 import numpy as np
 import networkx as nx
 import copy
+import __main__
 
 #Branch and Bound not working for now
 
@@ -105,8 +106,10 @@ class BranchAndBoundCluster (Cluster):
             if(bnb_tree.upper_bound<current_upper_bound):
                 current_upper_bound=bnb_tree.upper_bound
             Check_Live(bnb_tree)
-        #Print_Sol(bnb_tree)
-        #print(bnb_tree.best_solution. accepted)
+        main_name=__main__.__file__.split('\\')
+        if(main_name[-1]=='BnB_test.py'):
+            Print_Sol(bnb_tree)
+            print(bnb_tree.best_solution. accepted)
         return bnb_tree.best_solution. accepted
         
 def Check_Live(tree):     # run over the remaining BnB sub_problems and rejects according to the bounds

@@ -25,7 +25,7 @@ class DGraph:
     def nodes(self):
         return self.dgraph.nodes()
 
-    def edges(self, data=None):
+    def edges(self, data=True):
         return self.dgraph.edges(data=data)
     
     def edges_of_node(self, node): 
