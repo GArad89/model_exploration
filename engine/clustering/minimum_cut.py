@@ -3,7 +3,7 @@ from engine.baisc_entities.graph import DGraph
 import networkx as nx
    
         
-class Minimum_Cut(Cluster):
+class MinimumCut(Cluster):
 
     def getParams():
         form = []
@@ -15,7 +15,7 @@ class Minimum_Cut(Cluster):
         cop=cop.to_undirected()
         cut_edges=nx.minimum_edge_cut(cop)
         
-        print(cut_edges)
+        #print(cut_edges)
         cop.remove_edges_from(cut_edges)
         
         sub_graphs = nx.connected_component_subgraphs(cop)

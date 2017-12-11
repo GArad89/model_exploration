@@ -68,7 +68,7 @@ class Dendrogram:
         #print(label_list)
         for graph_node in node.projected_graph.dgraph.nodes():
             temp=str(node.projected_graph.dgraph.node[graph_node]['label'])
-            if(temp!='None'):
+            if(temp!='None')and(temp!='""'):
                 label_temp+=temp+'_'
         if(label_temp!=''):        
             node.label=label_temp
