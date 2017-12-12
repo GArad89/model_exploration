@@ -11,8 +11,6 @@ class DGraph:
     def __init__(self, nx_graph):
         self.dgraph = nx_graph
 
-    
-
     def add_node(self, node, label=None, **attr):
         self.dgraph.add_node(node,label=label, attr = attr)
 
@@ -51,8 +49,6 @@ class DGraph:
     def subgraph(self, vertices):
         return self.dgraph.subgraph(vertices)  #subgraph is read only. probably a useless method
 
-  
-
     @staticmethod
     def read_dot(path):
         return DGraph(nx.DiGraph(nx.drawing.nx_pydot.read_dot(path)))
@@ -71,9 +67,11 @@ class DGraph:
                    projectedGraph.add_node(node,label=self.dgraph.node[node]['label'])
                else:
                    projectedGraph.add_node(node)
-              
-        projectedGraph.add_node("inNode")
-        projectedGraph.add_node("outNode")
+       
+        # TODO (roee): comment out if necessary
+        #              seems to me this is the issue
+        #projectedGraph.add_node("inNode")
+        #projectedGraph.add_node("outNode")
 
         for edge1,edge2,dic in list(self.dgraph.edges(data=True)):
             weight=dic.get('weight', 1)
@@ -81,11 +79,11 @@ class DGraph:
             if (edge1 in vertices):
                 if (edge2 in vertices):
                     projectedGraph.add_edge(edge1, edge2, weight)
-                else:
-                    projectedGraph.add_edge(edge1, "outNode", weight)
-            else:
-                if(edge2 in vertices):
-                    projectedGraph.add_edge("inNode", edge2, weight)
+            #    else:
+            #        projectedGraph.add_edge(edge1, "outNode", weight)
+            #else:
+            #    if(edge2 in vertices):
+            #        projectedGraph.add_edge("inNode", edge2, weight)
         
         
         """   #previous code:
