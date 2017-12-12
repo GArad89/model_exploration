@@ -82,7 +82,7 @@ def show_results(result_id):
 @app.route('/results/<result_id>')
 def get_result(result_id):
     "return clustering algorithm results by id"
-    return jsonify(json.loads(get_results().open(result_id)['cluster_struct']))
+    return jsonify(get_results().open(result_id))
 
 def json_error(message, status_code = 400):
     "Wrap an error message in a json response. status_code is http status code"

@@ -49,6 +49,7 @@ class Dendrogram:
         self.dgraph=dgraph
 
     def add_node(self,node):
+        print()
         if(node.get_label()==None):
             self.label_by_sum_names(node)
         self.node_list+=[node]
@@ -63,15 +64,20 @@ class Dendrogram:
         node.label='Node '+str(len(self.node_list))
     
     def label_by_sum_names(self, node):
-        label_temp=''
+        label_temp=[]
         #label_list=
         #print(label_list)
-        for graph_node in node.projected_graph.dgraph.nodes():
-            temp=str(node.projected_graph.dgraph.node[graph_node]['label'])
-            if(temp!='None')and(temp!='""'):
-                label_temp+=temp+'_'
-        if(label_temp!=''):        
-            node.label=label_temp
+        for graph_node in node.subset:
+            temp=node.projected_graph.dgraph.node[graph_node]['label']
+            if temp:
+                label_temp.append(str(temp))
+            else: #TODO: something better
+                label_temp.append(str(graph_node))
+
+        #for edge in node.projected_graph.dgraph.edges():
+
+        if label_temp:        
+            node.label = "_".join(label_temp)
         else:
             self.label_by_order(node)
 
