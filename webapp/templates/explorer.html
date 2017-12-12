@@ -33,7 +33,7 @@
 
 {% block body %}
 <svg id="d3-main"></svg>
-<svg id="supergraph"></svg>
+<div id="supergraph"></svg>
 {% endblock %}
 
 {% block end_of_body %}
@@ -60,8 +60,8 @@ var svg = d3.select("#d3-main")
 // declares a tree layout and assigns the size
 var treemap = d3.tree().size([height, width]);
 d3.json("{{ url_for('get_result', result_id=result_id) }}", function(error, data) {
-     if (error) throw error;
-     console.log(data);
+if (error) throw error;
+//console.log(data);
 
 // set up for graph view
 
@@ -246,7 +246,7 @@ function updateGraph(source) {
 	console.log('Updating supergraph')
 	// the clusters with no children are the super-cut
 	var supergraphNodes = getActiveClusters(root);
-	console.log(supergraphNodes);
+	//console.log(supergraphNodes);
 
 	// To construct the edges, we'll map each edge in the original graph
 	// into an edge in the supergraph.
@@ -283,7 +283,7 @@ function updateGraph(source) {
 			dstNode = vertexToNode[edge[1]];
 
 		if (srcNode === dstNode) {
-			console.log('edge within node: ', srcNode, edge);
+			//console.log('edge within node: ', srcNode, edge);
 			var edges = internalEdges[srcNode];
 			if (edges === undefined) {
 				edges = [];
@@ -294,7 +294,7 @@ function updateGraph(source) {
 
 		var existingEdges = superEdges[srcNode];
 		if (existingEdges === undefined) {
-			console.log('First edge for', srcNode);
+			//console.log('First edge for', srcNode);
 			existingEdges = [];
 		}
 		// TODO: get extra properties (e.g. label)
@@ -303,25 +303,48 @@ function updateGraph(source) {
 	});
 
 	var graphvizOutput = '';
-	console.log(supergraphNodes)
-	console.log(superEdges);
+	//console.log(supergraphNodes)
+	//console.log(superEdges);
 
 	// TODO: get node shape from original graph potentially
 	// TODO: get smart name for result
 	graphvizOutput += 'Digraph "Supergraph" {\n' 
 
-	// assign a number to every node
+	// assign a number to every cluster for the graphviz graph, which is 
 	var supernodeToGraph = {};
+
 	supergraphNodes.forEach(function (node, index) {
-		supernodeToGraph[node] = index + 1;
-	});	
+		// update mapping for edge lookups
+		supernodeToGraph[node.data.name] = index + 1;
 
-	nodeDeclarations = supergraphNodes.map(function (node, index) {
-
+		// TODO: get extra properties (e.g. weight, shape)
+		graphvizOutput += '' + (index + 1) + ' [label="' + node.data.name + '"];\n';
 	});
 
-	graphviz_output += '}\n';
-	console.log(graphviz_output);
+	for (var srcNode in superEdges) {
+		if (superEdges.hasOwnProperty(srcNode)) {
+			var seenDsts = {};
+			superEdges[srcNode].forEach(function (target) {
+				// check if this edge is inserted already
+				// this can happen if supernode contains multiple vertices that
+				// had edges to vertices in the same dst supernode
+				// here is where we de-duplicate
+				// TODO: weight, labels
+				if (seenDsts[target.dst]) {
+					return;
+				}
+				seenDsts[target.dst] = true;
+
+				graphvizOutput += '' + supernodeToGraph[srcNode] + ' -> ' + supernodeToGraph[target.dst] + ';\n';
+			});
+		}
+	}
+
+	graphvizOutput += '}\n';
+	//console.log(graphvizOutput);
+	graph = Viz(graphvizOutput);
+	document.getElementById('supergraph').innerHTML = graph;
+	//console.log(graph);
 }
 
 function getActiveClusters(root) {
