@@ -113,3 +113,5 @@ results/*.json
 # log files and rotated logs
 logs/*.log*
 
+# test outputs
+tests/dot_export/
