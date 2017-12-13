@@ -18,11 +18,11 @@ def cluster(dgraph,  clustertype = SpectralCluster, **params):
 def partition(dgraph, state_subset=None, clustering_algo = SpectralCluster.SpectralCluster, stopCri = SizeCriteria(20), dendrogram = None, rootnode = 0):
     projected_graph = dgraph.project(state_subset)
     #print(projected_graph.nodes())
-    #print(projected_graph.nodes())
+    #print(projected_graph.edges())
     if dendrogram == None:  #in case no dendrogram was initiated
         dendrogram = Dendrogram(dgraph)
     else:
-        if((len(projected_graph.nodes())-2)!=len(dgraph.nodes())): #in case a dendrogram WAS initiated. making sure not to add the root twice
+        if len(projected_graph.nodes()) != len(dgraph.nodes()): #in case a dendrogram WAS initiated. making sure not to add the root twice
             dendrogram.add_node(Node(rootnode,state_subset,projected_graph))
             dendrogram.add_child(rootnode,len(dendrogram.nodes())-1)
         rootnode = len(dendrogram.nodes())-1 

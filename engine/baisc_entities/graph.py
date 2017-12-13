@@ -54,12 +54,16 @@ class DGraph:
         return DGraph(nx.DiGraph(nx.drawing.nx_pydot.read_dot(path)))
 
     def project(self, vertices):   #, inNode, outNode
-       # partialGraph = self.subgraph(vertices)
+        # partialGraph = self.subgraph(vertices)
         projectedGraph=DGraph(nx.DiGraph()) #couldn't get DGraph(self) to work for some reason.
           
-       # partialGraph.add_node("inNode") #gives error: SubGraph Views are readonly. Mutations not allowed
+        # partialGraph.add_node("inNode") #gives error: SubGraph Views are readonly. Mutations not allowed
+        # TODO: check that original graph doesn't contain inNode, outNode
+        #for bad_node in ("inNode", "outNode"):
+        #    if bad_node in vertices:
+        #        vertices.remove(bad_node)
 
-       #naive solution for now:
+        #naive solution for now:
         for node in vertices:
            if(node!="inNode")and(node!="outNode"): 
                temp=self.dgraph.node[node].get('label',None)
@@ -68,8 +72,8 @@ class DGraph:
                else:
                    projectedGraph.add_node(node)
        
-        projectedGraph.add_node("inNode")
-        projectedGraph.add_node("outNode")
+        #projectedGraph.add_node("inNode")
+        #projectedGraph.add_node("outNode")
 
         for edge1,edge2,dic in list(self.dgraph.edges(data=True)):
             weight=dic.get('weight', 1)
@@ -77,11 +81,12 @@ class DGraph:
             if (edge1 in vertices):
                 if (edge2 in vertices):
                     projectedGraph.add_edge(edge1, edge2, weight)
-                else:
-                    projectedGraph.add_edge(edge1, "outNode", weight)
-            else:
-                if(edge2 in vertices):
-                    projectedGraph.add_edge("inNode", edge2, weight)
+            #    else:
+            #        projectedGraph.add_edge(edge1, "outNode", weight)
+            #else:
+            #    if(edge2 in vertices):
+            #        projectedGraph.add_edge("inNode", edge2, weight)
+                
         
         
         """   #previous code:
