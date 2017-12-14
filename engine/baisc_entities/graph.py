@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from random import *
-from _functools import partial
+from itertools import chain
 
 class DGraph:
     dgraph = None
@@ -51,7 +51,17 @@ class DGraph:
 
     @staticmethod
     def read_dot(path):
-        return DGraph(nx.DiGraph(nx.drawing.nx_pydot.read_dot(path)))
+        nx_graph = nx.DiGraph(nx.drawing.nx_pydot.read_dot(path))
+
+        # deal with ""-encapsulated strings in properties
+        # e.g. java.net.DatagramSocket.dot
+        for item, attrs in chain(nx_graph.nodes.items(), nx_graph.edges.items()):
+            for key in ('label', 'style'):
+                if key in attrs:
+                    # remove surrounding double-quotes
+                    attrs[key] = attrs[key].strip('"')
+
+        return DGraph(nx_graph)
 
     def project(self, vertices):   #, inNode, outNode
         # partialGraph = self.subgraph(vertices)
