@@ -61,16 +61,23 @@ var svg = d3.select("#d3-main")
 var treemap = d3.tree().size([height, width]);
 d3.json("{{ url_for('get_result', result_id=result_id) }}", function(error, data) {
 if (error) throw error;
-//console.log(data);
+console.log(data);
 
 // set up for graph view
 
 // mapping of: cluster i name -> [vertex i1, vertex i2, ..., ik];
 var nameToCluster = {};
-data['clusters'].forEach(function (cluster) {
+data['clusters'].forEach(function(cluster) {
 	nameToCluster[cluster.name] = cluster;
 });
-
+// TODO(roee): hack! get better data from server-side
+// create fake, unconnected clusters for stand-alone vertices for the super-state graph
+data['vertices'].forEach(function(vertex) {
+	if (!nameToCluster[vertex]) {
+		// TODO: name from real graph!
+		nameToCluster[vertex] = {vertices:[vertex], name:vertex}
+	}
+});
 
 // set up tree view
 treeData = data['cluster_struct'];
@@ -243,10 +250,11 @@ function updateTree(source) {
 function updateGraph(source) {
 	// generate the supergraph - its nodes and then edges
 	// derived from the graph and clusters
-	console.log('Updating supergraph')
+	console.log('Updating super-state graph');
 	// the clusters with no children are the super-cut
 	var supergraphNodes = getActiveClusters(root);
 	//console.log(supergraphNodes);
+	//console.log(nameToCluster);
 
 	// To construct the edges, we'll map each edge in the original graph
 	// into an edge in the supergraph.
@@ -354,7 +362,17 @@ function getActiveClusters(root) {
 		if (node.children) {
 			node.children.forEach(getRecursive);
 		} else {
-			active.push(node);			
+			// if not actually a leaf node, it becomes a node in the super-state graph
+			if (node._children) {
+				active.push(node);	
+			} else {
+				// leaf node, make all its contained vertices nodes in the super-state graph
+				//console.log(node);
+				nameToCluster[node.data.name].vertices.forEach(function(vertex) {
+					// TODO(roee): massive hack, wrap fake cluster with extra fake cluster
+					active.push({data: nameToCluster[vertex]});
+				});
+			}
 		}
 	}
 	getRecursive(root);
