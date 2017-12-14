@@ -72,6 +72,7 @@ data['clusters'].forEach(function(cluster) {
 });
 // TODO(roee): hack! get better data from server-side
 // create fake, unconnected clusters for stand-alone vertices for the super-state graph
+// to allow us to treat them the same when creating the super-state graph
 data['vertices'].forEach(function(vertex) {
 	if (!nameToCluster[vertex]) {
 		// TODO: name from real graph!
@@ -310,6 +311,12 @@ function updateGraph(source) {
 		superEdges[srcNode] = existingEdges;
 	});
 
+
+	document.getElementById('supergraph').innerHTML = supergraphToSvg(supergraphNodes, superEdges);
+}
+
+// convert supergraphNodes, superEdges into a .dot file, render to svg
+function supergraphToSvg(supergraphNodes, superEdges) {
 	var graphvizOutput = '';
 	//console.log(supergraphNodes)
 	//console.log(superEdges);
@@ -350,9 +357,8 @@ function updateGraph(source) {
 
 	graphvizOutput += '}\n';
 	//console.log(graphvizOutput);
-	graph = Viz(graphvizOutput);
-	document.getElementById('supergraph').innerHTML = graph;
-	//console.log(graph);
+	// use Viz (graphviz in emscripten) to render the .dot file
+	return Viz(graphvizOutput);
 }
 
 function getActiveClusters(root) {
