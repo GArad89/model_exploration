@@ -8,7 +8,7 @@ class TestClusterAlgos(unittest.TestCase):
     def isEqualClusters(self, ideal_result, algo_result):
         algo_result.sort()
         for v in algo_result:
-            v.sort
+            v.sort()
         return (ideal_result == algo_result)
 
     def assertIsClusterRepresentation(self, algo_result, error_msg):

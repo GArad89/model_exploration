@@ -1,4 +1,4 @@
-from .cluster_abstract import Cluster
+from engine.clustering.cluster_abstract import Cluster
 from engine.baisc_entities.graph import DGraph
 from sklearn.cluster import SpectralClustering, KMeans
 import numpy as np
@@ -26,6 +26,7 @@ class SpectralCluster (Cluster):
         """
         #adjacency matrix
         adj_mat =dgraph.adjacency_matrix()
+        #print(adj_mat)
         if("inNode" in dgraph.nodes()):
             adj_mat=np.delete(adj_mat, np.s_[-2::], 1)
             adj_mat=np.delete(adj_mat, np.s_[-2::], 0)

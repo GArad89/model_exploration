@@ -1,5 +1,6 @@
-from ..clustering import *
-from ..baisc_entities.dendrogram import *
+from engine.clustering import *
+from engine.clustering.cluster_abstract import Cluster
+from engine.baisc_entities.dendrogram import *
 import json
 
 def createAlgoParamsJSON():
@@ -10,10 +11,7 @@ def createAlgoParamsJSON():
         schema, form = algo.getParams()
         algo_form = {'name' : algo.__name__ , 'form' : {'schema' : schema, 'form' : form}}
         jsonlist += [algo_form]
-    return json.dumps(jsonlist)
-
-
-
+    return jsonlist
 
 def dendrogramToJSON(dendro):
     jsondata = {}
@@ -32,18 +30,16 @@ def dendrogramToJSON(dendro):
     return jsondata
 
 def clusterBuild(index,cluster_list):
-    text=""
-    x='"'
-    text=text+'{'+'\n'+""""name": """+x+cluster_list[index]['name']+x
-    for j in range(len(cluster_list[index]['outEdge'])):
-        text=text+','
-        if(j==0):
-            text=text+"""\n"children": ["""
-        text=text+'\n'+clusterBuild(cluster_list[index]['outEdge'][j], cluster_list)
-    if(len(cluster_list[index]['outEdge'])>0):
-        text=text+"""\n] \n}"""
-    else:
-        text=text+""" \n}"""
-    return text
+    node = {}
 
+    node["name"] = cluster_list[index]['name']
 
+    children = []
+    for child in cluster_list[index]['outEdge']:
+        # recursively do this for children
+        children.append(clusterBuild(child, cluster_list))
+    # if there were children, add them
+    if children:
+        node['children'] = children
+
+    return node

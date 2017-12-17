@@ -41,16 +41,20 @@
 
         var update_form = function() {
           selected_algo = algos[$('#algorithms-select').val()];
-          // make hidden field that actually submits the value match the 
-          $('#algorithm').val(selected_algo.name);
-          console.log(JSON.stringify(selected_algo.form));
-          $('#algorithm-form').jsonForm(selected_algo.form);
+          if (selected_algo !== undefined) {
+            // make hidden field that actually submits the value match the 
+            $('#algorithm').val(selected_algo.name);
+            console.log(JSON.stringify(selected_algo.form));
+            $('#algorithm-form').jsonForm(selected_algo.form);
+          } else {
+            console.log('Got no selection');
+          }
         }
-        $('#algorithms-select').change(update_form);
         // to deal with users clicking 'back' correctly
         if ($('#algorithms-select').val() != '') {
           update_form();
         }
+        $('#algorithms-select').change(update_form);
     });
   </script>
 {% endblock %}

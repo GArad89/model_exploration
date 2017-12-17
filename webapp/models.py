@@ -4,6 +4,10 @@ import time
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 
+import logging
+
+log = logging.getLogger(__name__)
+
 from engine.baisc_entities.graph import DGraph
 
 EXTENSION = '.dot'
@@ -42,7 +46,7 @@ class Models:
 
     @staticmethod
     def filename_to_model_name(filename):
-        # basename does  /path/to/file -> file
+        # basename does /path/to/file -> file
         return os.path.basename(_remove_ext(filename))
 
 class Results:
@@ -74,6 +78,7 @@ class Results:
         # format as YYYY_mm_dd__HH_MM_SS_XXX where XXX is milliseconds
         new_result_id = time.strftime("%Y_%m_%d__%H_%M_%S_") + '_{:03}'.format(int(current_time*1000) % 1000)
         result_path = self._result_id_to_path(new_result_id)
+        log.info("Saving result into %s", result_path)
         # open create-only. This will disallow overwriting results due to parallel executions
         with open(result_path, 'x') as output_file:
             output_file.write(serialized)

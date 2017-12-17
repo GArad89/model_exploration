@@ -16,7 +16,7 @@ class Test_DGraph(unittest.TestCase):
         g.add_node('4')
 
         self.assertEqual(len(g.nodes()),4, "wrong number of nodes ")
-        self.assertEqual(str(g.nodes()),"['1', '2', '3', '4']", "wrong string output for nodes")
+        self.assertEqual(set(g.nodes()),{'1', '2', '3', '4'}, "wrong set of nodes")
 
     def test_edges(self):
         g=DGraph(nx.DiGraph())

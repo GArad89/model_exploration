@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from random import *
-from _functools import partial
+from itertools import chain
 
 class DGraph:
     dgraph = None
@@ -10,8 +10,6 @@ class DGraph:
 
     def __init__(self, nx_graph):
         self.dgraph = nx_graph
-
-    
 
     def add_node(self, node, label=None, **attr):
         self.dgraph.add_node(node,label=label, attr = attr)
@@ -51,40 +49,55 @@ class DGraph:
     def subgraph(self, vertices):
         return self.dgraph.subgraph(vertices)  #subgraph is read only. probably a useless method
 
-  
-
     @staticmethod
     def read_dot(path):
-        return DGraph(nx.DiGraph(nx.drawing.nx_pydot.read_dot(path)))
+        nx_graph = nx.DiGraph(nx.drawing.nx_pydot.read_dot(path))
+
+        # deal with ""-encapsulated strings in properties
+        # e.g. java.net.DatagramSocket.dot
+        for item, attrs in chain(nx_graph.nodes.items(), nx_graph.edges.items()):
+            for key in ('label', 'style'):
+                if key in attrs:
+                    # remove surrounding double-quotes
+                    attrs[key] = attrs[key].strip('"')
+
+        return DGraph(nx_graph)
 
     def project(self, vertices):   #, inNode, outNode
-       # partialGraph = self.subgraph(vertices)
-        projectedGraph=DGraph(nx.DiGraph()) #couldn't get DGraph(self) to work for some reason.
+        #partialGraph = self.subgraph(vertices)
+        return DGraph(self.subgraph(vertices))
+        #projectedGraph=DGraph(nx.DiGraph()) #couldn't get DGraph(self) to work for some reason.
           
-       # partialGraph.add_node("inNode") #gives error: SubGraph Views are readonly. Mutations not allowed
+        # partialGraph.add_node("inNode") #gives error: SubGraph Views are readonly. Mutations not allowed
+        # TODO: check that original graph doesn't contain inNode, outNode
+        #for bad_node in ("inNode", "outNode"):
+        #    if bad_node in vertices:
+        #        vertices.remove(bad_node)
 
-       #naive solution for now:
-        for node in vertices:
-           temp=self.dgraph.node[node].get('label',None)
-           if(temp!=None):
-               projectedGraph.add_node(node,label=self.dgraph.node[node]['label'])
-           else:
-               projectedGraph.add_node(node)
-              
-        projectedGraph.add_node("inNode")
-        projectedGraph.add_node("outNode")
+        #naive solution for now:
+        #for node in vertices:
+        #   if(node!="inNode")and(node!="outNode"): 
+        #       temp=self.dgraph.node[node].get('label',None)
+        #       if(temp!=None):
+        #           projectedGraph.add_node(node,label=self.dgraph.node[node]['label'])
+        #       else:
+        #           projectedGraph.add_node(node)
+       
+        #projectedGraph.add_node("inNode")
+        #projectedGraph.add_node("outNode")
 
-        for edge1,edge2,dic in list(self.dgraph.edges(data=True)):
-            weight=dic.get('weight', 1)
-            
-            if (edge1 in vertices):
-                if (edge2 in vertices):
-                    projectedGraph.add_edge(edge1, edge2, weight)
-                else:
-                    projectedGraph.add_edge(edge1, "outNode", weight)
-            else:
-                if(edge2 in vertices):
-                    projectedGraph.add_edge("inNode", edge2, weight)
+        #for edge1,edge2,dic in list(self.dgraph.edges(data=True)):
+        #    weight=dic.get('weight', 1)
+        #    
+        #    if (edge1 in vertices):
+        #        if (edge2 in vertices):
+        #            projectedGraph.add_edge(edge1, edge2, weight)
+            #    else:
+            #        projectedGraph.add_edge(edge1, "outNode", weight)
+            #else:
+            #    if(edge2 in vertices):
+            #        projectedGraph.add_edge("inNode", edge2, weight)
+                
         
         
         """   #previous code:

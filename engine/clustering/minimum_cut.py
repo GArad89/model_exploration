@@ -6,8 +6,8 @@ import networkx as nx
 class MinimumCut(Cluster):
 
     def getParams():
-        form = [{}]
-        schema = { {} }
+        form = []
+        schema = {}
         return schema, form
                
     def cluster(dgraph):
