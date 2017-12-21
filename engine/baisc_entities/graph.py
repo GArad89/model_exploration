@@ -23,11 +23,17 @@ class DGraph:
     def nodes(self):
         return self.dgraph.nodes()
 
+    def get_edge_data(self, edge):
+        return self.dgraph.get_edge_data(edge[0], edge[1])
+
     def edges(self, data=None):
         return self.dgraph.edges(data=data)
     
     def edges_of_node(self, node): 
         return self.dgraph.edges(node)
+
+    def in_edges(self, node):
+        return self.dgraph.in_edges(node)
 
     def draw(self):
         nx.draw(self.dgraph)
