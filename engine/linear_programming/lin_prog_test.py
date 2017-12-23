@@ -1,6 +1,7 @@
 import networkx as nx
 import lin_prog_solver as lps
 import matplotlib.pyplot as plt
+import sys
 
 def generate_toy_example(draw=False):
     G = nx.Graph()
@@ -32,10 +33,11 @@ if __name__ == '__main__':
     G = generate_toy_example()
     res = lps.compute_lower_bound(G)
     cut, value = lps.generate_cut_from_relaxed_solution(res.x, G)
+    print("best cut:", cut, "value:", value)
 
     # case 2
     G = generate_toy_example()
-    partial_assignment_dict = {0: 1, 3: 0}
+    partial_assignment_dict = {0: 1, 2: 1}
     res = lps.compute_lower_bound(G, partial_assignment_dict)
     cut, value = lps.generate_cut_from_relaxed_solution(res.x, G, partial_assignment_dict)
     print("best cut:", cut, "value:", value)
