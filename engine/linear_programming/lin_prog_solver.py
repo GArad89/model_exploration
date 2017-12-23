@@ -21,22 +21,37 @@ def compute_lower_bound(G, partial_assignment_dict={}):
     edge = G.edges()
     weights = nx.get_edge_attributes(G, "weight")
 
-    N = len(G.nodes())
+    N = len(G.nodes()) #+2
 
     # Add weight constraints
     C = np.zeros(shape=(1, N ** 2))
 
+    #putting all nodes in a dictionary. in order to remove assumption that all node names are numbers.
+    #dic[1st_node]=0 , dic[2nd_node]=1 and so on.
+    i=0
+    dic={}
+    for node in G.nodes():
+        dic[str(node)]=i
+        i+=1
+
     ## Minimize sum_(i,j) c_(i,j) d_(u,v)
     for e in edge:
-        C[0][N * (e[0]) + (e[1])] = weights[e]
-        C[0][N * (e[1]) + (e[0])] = weights[e]
+        C[0][N * (dic[str(e[0])]) + (dic[str(e[1])])] = weights.get(e,1)
+        C[0][N * (dic[str(e[1])]) + (dic[str(e[0])])] = weights.get(e,1)
 
     for n1 in partial_assignment_dict:
+##        if(partial_assignment_dict[n1]==1):
+##            C[0][N * dic[str(n1)] + N-1] = sys.maxsize
+##            C[0][N * (N-1) + dic[str(n1)]] = sys.maxsize
+##        if(partial_assignment_dict[n1]==0):
+##            C[0][N * dic[str(n1)] + N-2] = sys.maxsize
+##            C[0][N * (N-2) + dic[str(n1)]] = sys.maxsize
+            
         for n2 in partial_assignment_dict:
             if n1 != n2:
                 if partial_assignment_dict[n1] == partial_assignment_dict[n2]:
-                    C[0][N * n1 + n2] = sys.maxsize
-                    C[0][N * n2 + n1] = sys.maxsize
+                    C[0][N * dic[str(n1)] + dic[str(n2)]] = sys.maxsize
+                    C[0][N * dic[str(n2)] + dic[str(n1)]] = sys.maxsize
 
     ## S.T. traingle inquality
     A1 = None
@@ -58,7 +73,7 @@ def compute_lower_bound(G, partial_assignment_dict={}):
                     row[0][i * N + j] += -1
                     row[0][j * N + k] += -1
                     A1 = np.concatenate((A1, row))
-                    # print(row)
+            #print(row)
 
     B1 = np.zeros(shape=(A1.shape[0], 1))
 
@@ -66,10 +81,21 @@ def compute_lower_bound(G, partial_assignment_dict={}):
     A2 = np.ones(shape=(1, N ** 2))
     for i in range(N):
         A2[0][i * N + i] = 0
+    #print(A2)
+      
     B2 = np.ones(shape=(1, 1))
+##    for i in range(N):
+##        for j in range(N):
+##            if(j>i):
+##                row=np.zeros(shape=(1, N ** 2))
+##                row[0][i*N+j]=1
+##                row[0][j*N+i]=-1
+##                A2=np.concatenate((A2, row))
+##                B2=np.concatenate((B2, np.zeros(shape=(1, 1))))
+    #print(B2)
 
-    res = linprog(C[0], A_ub=A1, b_ub=B1, A_eq=A2, b_eq=B2, bounds=(0, None))
-    print('Optimal value:', res.fun, '\nX:', res.x)
+    res = linprog(C[0], A_ub=A1, b_ub=B1, A_eq=A2, b_eq=B2, bounds=(0, None),options={'maxiter':20,'tol':0.4,'bland':True})
+    #print('Optimal value:', res.fun, '\nX:', res.x)
     return res
 
 
@@ -127,7 +153,7 @@ def generate_cut_from_relaxed_solution(d, org_G, partial_assignment_dict = {}):
         print('Trying embedding method: ', embedding._method_name)
         Y, t = embedding.learn_embedding(graph=G, edge_f=None, is_weighted=True, no_python=True)
         sorted_values = np.unique(Y)
-
+        print(Y) 
         # Try ALL possible threshold cuts - see lecture notes:
         # Sparsest Cut Computational and Metric Geometry Instructor: Yury Makarychev
         for v in sorted_values[:-1]:
@@ -139,11 +165,13 @@ def generate_cut_from_relaxed_solution(d, org_G, partial_assignment_dict = {}):
                 if partial_assignment_dict.get(i) == 0:
                     current_cut.append(False)
                 elif partial_assignment_dict.get(i):
+                    
                     current_cut.append(True)
                     st += str(node_id) + ", "
-                current_cut.append(node[0])
-                if node[0]:
-                    st += str(node_id) + ", "
+                else:
+                    current_cut.append(node[0])
+                    if node[0]:
+                        st += str(node_id) + ", "
                 node_id += 1
 
             val = compute_cut_value(org_G, current_cut)
