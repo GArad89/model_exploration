@@ -41,6 +41,10 @@ class DGraph:
 
     def number_of_nodes(self):
         return self.dgraph.number_of_nodes()
+    
+    def number_of_edges(self):
+        return self.dgraph.size()
+
 
     def node_attr(self, node, attr):
         return self.dgraph.nodes[node]['attr'][attr]
@@ -54,6 +58,16 @@ class DGraph:
 
     def subgraph(self, vertices):
         return self.dgraph.subgraph(vertices)  #subgraph is read only. probably a useless method
+
+
+    def maxInOutDegree(self):
+        maxdeg = 0
+            for node in self.dgraph.nodes():
+                maxdeg = max(max,max(self.in_degree(node), self.out_degree(node)))
+                return maxdeg
+
+    def numberOfComponenets(self):
+        return nx.number_connected_components(self)
 
     @staticmethod
     def read_dot(path):
