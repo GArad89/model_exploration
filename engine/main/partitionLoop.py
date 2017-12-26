@@ -37,32 +37,3 @@ def partition(dgraph, state_subset=None, clustering_algo = SpectralCluster.Spect
         partition(dgraph, cluster_iter, clustering_algo, stopCri , dendrogram , rootnode )
 
     return dendrogram
-
-def partition_test():
-
-    den = None
-    g = DGraph.read_dot("./dot/weighted_g2.dot")
-    #den=partition(g,g.nodes()) 
-    #print(len(den.node_list))  #should be 1 (root node only)
-    print("testing partition on g2.dot for threshold=4:")
-    den = partition(g,g.nodes(), SpectralCluster.SpectralCluster, SizeCriteria(4))
-    print("the number of super-nodes in the dendogram (including the root):")
-    print(len(den.node_list))  #should be 3.
-    
-    if(len(den.node_list)>1):
-        print("the number of nodes in the 1st node (1st one after the root):")
-        print(den.node_list[1].subset)
-        
-    print("testing partition on g2.dot for threshold=2:")
-    den = partition(g,g.nodes(), SpectralCluster.SpectralCluster, SizeCriteria(2),dendrogram=None)
-    print("the number of super-nodes in the dendogram (including the root):")
-    print(len(den.node_list))  #should be 7.
-    
-    if(len(den.node_list)>1):
-        print("the number of nodes in the 6th node (6th one after the root):")
-        print(den.node_list[6].subset)
-     
-
-       
-#spectralcluster_test()
-#partition_test()
