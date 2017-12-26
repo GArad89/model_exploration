@@ -8,7 +8,7 @@ from engine.stopping_criteria import stopCriteria
 class Test_DGraph(unittest.TestCase):
 
     def test_labeling(self):
-        g = DGraph.read_dot("/home/yaron/Desktop/academy/2018/workshop/workshop_new/model_exploration/engine/dot/ssh.net.dot")
+        g = DGraph.read_dot("engine/dot/ssh.net.dot")
         den = partitionLoop.partition(g, g.nodes(), SpectralCluster.SpectralCluster, stopCriteria.SizeCriteria(4))
         labeler = TfIdfLabeler.TfIdfLabeler(g, den)
         labeler.label()
