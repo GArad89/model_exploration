@@ -394,7 +394,6 @@ function supergraphToSvg(supergraphNodes, superEdges) {
 				// this can happen if supernode contains multiple vertices that
 				// had edges to vertices in the same dst supernode
 				// here is where we de-duplicate
-				// TODO: weight, labels
 				if (seenDsts[edgeTarget.dst]) {
 					return;
 				}
