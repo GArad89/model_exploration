@@ -17,6 +17,8 @@ class PrefixLabeler(GraphLabeler):
                         itertools.chain(subgraph.edges.items(), subgraph.nodes.items())]
             # filter out empty ones
             labels = list(filter(None, labels))
+            # uniqify
+            labels = set(labels)
 
             # shortest common prefix 
             prefix = os.path.commonprefix(labels)
