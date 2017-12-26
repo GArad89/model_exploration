@@ -46,7 +46,6 @@
             // make hidden field that actually submits the value match the 
             $('#algorithm').val(selected_algo.name);
             console.log(JSON.stringify(selected_algo.form));
-
             $('#json-form').empty().jsonForm(selected_algo.form);
           } else {
             console.log('Got no selection');
