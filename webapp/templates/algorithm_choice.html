@@ -17,6 +17,7 @@
     <!-- pass selected model id to next stage -->
   </div>
   <form id="algorithm-form" method="post">
+    <div id="json-form"></div>
     <!-- jsonform will insert its fields before the button and hidden fields,
           hidden algorithm field will match the select above, which is outside the form -->
     <input id="algorithm" name="algorithm" type="hidden">
@@ -45,7 +46,8 @@
             // make hidden field that actually submits the value match the 
             $('#algorithm').val(selected_algo.name);
             console.log(JSON.stringify(selected_algo.form));
-            $('#algorithm-form').jsonForm(selected_algo.form);
+
+            $('#json-form').empty().jsonForm(selected_algo.form);
           } else {
             console.log('Got no selection');
           }
