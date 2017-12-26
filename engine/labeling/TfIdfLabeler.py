@@ -41,10 +41,12 @@ class TfIdfLabeler(GraphLabeler):
         print(tfifd_scores)
 
 
+        unnamed_cluster = 1
         def top_labels(nodes, n = 1): #TODO: support n top labels
 
             nonlocal labels_dict
             nonlocal tfifd_scores
+            nonlocal unnamed_cluster
 
             nodes_labels = []
             for node in nodes:
@@ -59,7 +61,12 @@ class TfIdfLabeler(GraphLabeler):
                     top_labels_score = tfifd_scores[label]
                     top_label = label
 
-            tfifd_scores[top_label] = -1
+            if top_label:
+                tfifd_scores[top_label] = -1
+            else:
+                top_label = "Unnamed {}".format(unnamed_cluster)
+                unnamed_cluster += 1
+
             return top_label
 
         # label the dendrogram's nodes
