@@ -322,6 +322,10 @@ function updateGraph(source) {
 	document.getElementById('supergraph').innerHTML = supergraphToSvg(supergraphNodes, superEdges);
 }
 
+function graphvizEscape(str) {
+    return '"' + str.replace('\n', '\\n') + '"';
+}
+
 function attributesToGraphViz(attributes) {
     // add attributes
     var attributeList = [];
@@ -333,11 +337,11 @@ function attributesToGraphViz(attributes) {
     }
     if (attributes.style !== undefined) {
       // wrap with quotes
-      attributeList.push({name: 'style', value: `"${attributes.style}"`});
+      attributeList.push({name: 'style', value: graphvizEscape(attributes.style)});
     }
     if (attributes.label !== undefined) {
       // wrap with quotes
-      attributeList.push({name: 'label', value: `"${attributes.label}"`});
+      attributeList.push({name: 'label', value: graphvizEscape(attributes.label)});
     }
 
     if (attributeList.length > 0) {
@@ -376,7 +380,7 @@ function supergraphToSvg(supergraphNodes, superEdges) {
       attributes = attributesToGraphViz(node.data.attrs)
     } else {
       // no server-side attributes
-      attributes = '[label="' + node.data.name + '" shape=rectangle]'
+      attributes = '[label=' + graphvizEscape(node.data.name) + ' shape=rectangle]'
     }
     // write node to graphviz;
     graphvizOutput += '' + index + ' ' + attributes + ';\n';
