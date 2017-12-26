@@ -67,16 +67,23 @@ console.log(data);
 
 // mapping of: cluster i name -> [vertex i1, vertex i2, ..., ik];
 var nameToCluster = {};
-data['clusters'].forEach(function(cluster, index) {
+data.clusters.forEach(function(cluster, index) {
 	nameToCluster[cluster.name] = cluster;
 });
 // TODO(roee): hack! get better data from server-side
 // create fake, unconnected clusters for stand-alone vertices for the super-state graph
 // to allow us to treat them the same when creating the super-state graph
-data['vertices'].forEach(function(vertex) {
-	if (!nameToCluster[vertex]) {
+data.vertices.forEach(function(vertex) {
+  var vertexId = vertex[0],
+      attrs = vertex[1]
+
+	if (!nameToCluster[vertexId]) {
 		// TODO: name from real graph!
-		nameToCluster[vertex] = {vertices:[vertex], name:vertex}
+		nameToCluster[vertexId] = {
+        vertices:[vertexId],
+        name: vertexId,
+        attrs: attrs
+    };
 	}
 });
 
@@ -315,6 +322,35 @@ function updateGraph(source) {
 	document.getElementById('supergraph').innerHTML = supergraphToSvg(supergraphNodes, superEdges);
 }
 
+function attributesToGraphViz(attributes) {
+    // add attributes
+    var attributeList = [];
+    if (attributes.color !== undefined) {
+      attributeList.push({name: 'color', value: attributes.color});
+    }
+    if (attributes.shape !== undefined) {
+      attributeList.push({name: 'shape', value: attributes.shape});
+    }
+    if (attributes.style !== undefined) {
+      // wrap with quotes
+      attributeList.push({name: 'style', value: `"${attributes.style}"`});
+    }
+    if (attributes.label !== undefined) {
+      // wrap with quotes
+      attributeList.push({name: 'label', value: `"${attributes.label}"`});
+    }
+
+    if (attributeList.length > 0) {
+      // transform attributes to strings
+      var attributeStrings = attributeList.map(function (item) {
+        return item.name + '=' + item.value;
+      });
+
+      return '[' + attributeStrings.join(',') + ']';
+    }
+    return '';
+}
+
 // convert supergraphNodes, superEdges into a .dot file, render to svg
 // NOTE: to style the graph use CSS (see '.node text' above for example)
 function supergraphToSvg(supergraphNodes, superEdges) {
@@ -331,10 +367,19 @@ function supergraphToSvg(supergraphNodes, superEdges) {
 
 	supergraphNodes.forEach(function (node, index) {
 		// update mapping for edge lookups
-		supernodeToGraph[node.data.name] = index + 1;
+		supernodeToGraph[node.data.name] = index;
 
-		// TODO: get extra properties (e.g. weight, shape) (NOTE: generate them server-side)
-		graphvizOutput += '' + (index + 1) + ' [label="' + node.data.name + '"];\n';
+    // prepare graphviz node
+    var attributes;
+    if (node.data.hasOwnProperty('attrs')) {
+      // server-side attributes, use these
+      attributes = attributesToGraphViz(node.data.attrs)
+    } else {
+      // no server-side attributes
+      attributes = '[label="' + node.data.name + '" shape=rectangle]'
+    }
+    // write node to graphviz;
+    graphvizOutput += '' + index + ' ' + attributes + ';\n';
 	});
 
 	for (var srcNode in superEdges) {
@@ -352,33 +397,12 @@ function supergraphToSvg(supergraphNodes, superEdges) {
 				seenDsts[edgeTarget.dst] = true;
 
         // add attributes
-        var attributes = edgeTarget.attrs;
-        var attributeList = [];
-        if (attributes.color !== undefined) {
-          attributeList.push({name: 'color', value: attributes.color});
-        }
-        if (attributes.style !== undefined) {
-          // wrap with quotes
-          attributeList.push({name: 'style', value: `"${attributes.style}"`});
-        }
-        if (attributes.label !== undefined) {
-          // wrap with quotes
-          attributeList.push({name: 'label', value: `"${attributes.label}"`});
-        }
+        var attributes = attributesToGraphViz(edgeTarget.attrs);
 
         // add the edge to the total output
         graphvizOutput += '' + supernodeToGraph[srcNode] + ' -> ' + supernodeToGraph[edgeTarget.dst];
 
-        if (attributeList.length > 0) {
-          // transform attributes to strings
-          var attributeStrings = attributeList.map(function (item) {
-            return item.name + '=' + item.value;
-          });
-
-          graphvizOutput += ' [' + attributeStrings.join(',') + ']';
-        }
-
-        graphvizOutput += ';\n';
+        graphvizOutput += ' ' + attributes + ';\n';
 			});
 		}
 	}

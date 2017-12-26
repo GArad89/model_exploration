@@ -15,7 +15,7 @@ def createAlgoParamsJSON():
 
 def dendrogramToJSON(dendro):
     jsondata = {}
-    jsondata['vertices'] = list(dendro.dgraph.nodes())
+    jsondata['vertices'] = list(dendro.dgraph.nodes().items())
     jsondata['edges'] = list(dendro.dgraph.edges())
     #print(list(dendro.dgraph.edges()))
     clusters = []
@@ -23,8 +23,8 @@ def dendrogramToJSON(dendro):
         clusters +=[ {'name' : node.get_label(), 'inEdge' : node.parent(), 'outEdge' : node.child(), 'vertices' : node.vertices()}]        
     #print(clusters)
     jsondata['clusters'] = clusters
-    result=jsondata['clusters']
-    jsondata['cluster_struct']=clusterBuild(0,result)
+
+    jsondata['cluster_struct']=clusterBuild(0,clusters)
     #print(jsondata['cluster_struct'])
 
     return jsondata
