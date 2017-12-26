@@ -62,9 +62,9 @@ class DGraph:
 
     def maxInOutDegree(self):
         maxdeg = 0
-            for node in self.dgraph.nodes():
-                maxdeg = max(max,max(self.in_degree(node), self.out_degree(node)))
-                return maxdeg
+        for node in self.dgraph.nodes():
+            maxdeg = max(max,max(self.in_degree(node), self.out_degree(node)))
+            return maxdeg
 
     def numberOfComponenets(self):
         return nx.number_connected_components(self)
