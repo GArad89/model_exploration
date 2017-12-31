@@ -62,7 +62,7 @@ def algorithm_choice_form():
         # result = run_algo(get_models().open(model_id), **params)
 
         log.info("Running algorithm")
-        result = run_algo(graph, "SpectralCluster", None, stopCriteria="SizeCriteria")
+        result = run_algo(graph, "SpectralCluster", {'n':2,'threshold':2}, stopCriteria="SizeCriteria")
         result_id = get_results().save(result)
 
         return redirect(url_for('show_results', result_id=result_id))

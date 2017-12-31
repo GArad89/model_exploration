@@ -1,5 +1,5 @@
 from ..baisc_entities.graph import *
-from ..clustering import SpectralCluster, minimum_cut, Kmeans, Branch_and_Bound
+from ..clustering import SpectralCluster, minimum_cut, KmeansClustering, Branch_and_Bound
 from ..stopping_criteria.stopCriteria import *
 from ..baisc_entities.dendrogram import Node,Dendrogram
 
@@ -15,7 +15,7 @@ def cluster(dgraph,  clustertype = SpectralCluster, **params):
 """
 
 #need to check if we want to add a stop critrea for after x runs.    
-def partition(dgraph, state_subset=None, clustering_algo = SpectralCluster.SpectralCluster, stopCri = SizeCriteria(20), dendrogram = None, rootnode = 0):
+def partition(dgraph,params, state_subset=None, clustering_algo = SpectralCluster.SpectralCluster, stopCri = SizeCriteria(20), dendrogram = None, rootnode = 0):
     projected_graph = dgraph.project(state_subset)
     #print(projected_graph.nodes())
     #print(projected_graph.edges())
@@ -31,9 +31,9 @@ def partition(dgraph, state_subset=None, clustering_algo = SpectralCluster.Spect
         #print("check2")
         return dendrogram
     #print(clustering_algo.cluster)
-    clusters = clustering_algo.cluster(projected_graph)
+    clusters = clustering_algo.cluster(projected_graph,params)
     #print("clusters: ", clusters)
     for cluster_iter in clusters:
-        partition(dgraph, cluster_iter, clustering_algo, stopCri , dendrogram , rootnode )
+        partition(dgraph, params,cluster_iter, clustering_algo, stopCri , dendrogram , rootnode )
 
     return dendrogram
