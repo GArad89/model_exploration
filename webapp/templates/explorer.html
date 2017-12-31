@@ -17,7 +17,7 @@
    stroke-width: 1.5px;
  }
 
- .node text {
+ .node text, .edge text {
    font: 10px sans-serif;
  }
 
@@ -67,16 +67,23 @@ console.log(data);
 
 // mapping of: cluster i name -> [vertex i1, vertex i2, ..., ik];
 var nameToCluster = {};
-data['clusters'].forEach(function(cluster) {
+data.clusters.forEach(function(cluster, index) {
 	nameToCluster[cluster.name] = cluster;
 });
 // TODO(roee): hack! get better data from server-side
 // create fake, unconnected clusters for stand-alone vertices for the super-state graph
 // to allow us to treat them the same when creating the super-state graph
-data['vertices'].forEach(function(vertex) {
-	if (!nameToCluster[vertex]) {
+data.vertices.forEach(function(vertex) {
+  var vertexId = vertex[0],
+      attrs = vertex[1]
+
+	if (!nameToCluster[vertexId]) {
 		// TODO: name from real graph!
-		nameToCluster[vertex] = {vertices:[vertex], name:vertex}
+		nameToCluster[vertexId] = {
+        vertices:[vertexId],
+        name: vertexId,
+        attrs: attrs
+    };
 	}
 });
 
@@ -306,8 +313,8 @@ function updateGraph(source) {
 			//console.log('First edge for', srcNode);
 			existingEdges = [];
 		}
-		// TODO: get extra properties (e.g. label)
-		existingEdges.push({dst : dstNode});
+
+		existingEdges.push({dst : dstNode, attrs : edge[2]});
 		superEdges[srcNode] = existingEdges;
 	});
 
@@ -315,47 +322,96 @@ function updateGraph(source) {
 	document.getElementById('supergraph').innerHTML = supergraphToSvg(supergraphNodes, superEdges);
 }
 
+function graphvizEscape(str) {
+    return '"' + str.replace('\n', '\\n') + '"';
+}
+
+function attributesToGraphViz(attributes) {
+    // add attributes
+    var attributeList = [];
+    if (attributes.color !== undefined) {
+      attributeList.push({name: 'color', value: attributes.color});
+    }
+    if (attributes.shape !== undefined) {
+      attributeList.push({name: 'shape', value: attributes.shape});
+    }
+    if (attributes.style !== undefined) {
+      // wrap with quotes
+      attributeList.push({name: 'style', value: graphvizEscape(attributes.style)});
+    }
+    if (attributes.label !== undefined) {
+      // wrap with quotes
+      attributeList.push({name: 'label', value: graphvizEscape(attributes.label)});
+    }
+
+    if (attributeList.length > 0) {
+      // transform attributes to strings
+      var attributeStrings = attributeList.map(function (item) {
+        return item.name + '=' + item.value;
+      });
+
+      return '[' + attributeStrings.join(',') + ']';
+    }
+    return '';
+}
+
 // convert supergraphNodes, superEdges into a .dot file, render to svg
+// NOTE: to style the graph use CSS (see '.node text' above for example)
 function supergraphToSvg(supergraphNodes, superEdges) {
 	var graphvizOutput = '';
 	//console.log(supergraphNodes)
 	//console.log(superEdges);
 
 	// TODO: get node shape from original graph potentially
-	// TODO: get smart name for result
-	graphvizOutput += 'Digraph "Supergraph" {\n' 
+	// TODO: get smart name for result (e.g. model name)
+	graphvizOutput += 'Digraph "Supergraph" {\n';
 
 	// assign a number to every cluster for the graphviz graph, which is 
 	var supernodeToGraph = {};
 
 	supergraphNodes.forEach(function (node, index) {
 		// update mapping for edge lookups
-		supernodeToGraph[node.data.name] = index + 1;
+		supernodeToGraph[node.data.name] = index;
 
-		// TODO: get extra properties (e.g. weight, shape)
-		graphvizOutput += '' + (index + 1) + ' [label="' + node.data.name + '"];\n';
+    // prepare graphviz node
+    var attributes;
+    if (node.data.hasOwnProperty('attrs')) {
+      // server-side attributes, use these
+      attributes = attributesToGraphViz(node.data.attrs)
+    } else {
+      // no server-side attributes
+      attributes = '[label=' + graphvizEscape(node.data.name) + ' shape=rectangle]'
+    }
+    // write node to graphviz;
+    graphvizOutput += '' + index + ' ' + attributes + ';\n';
 	});
 
 	for (var srcNode in superEdges) {
 		if (superEdges.hasOwnProperty(srcNode)) {
 			var seenDsts = {};
-			superEdges[srcNode].forEach(function (target) {
+			superEdges[srcNode].forEach(function (edgeTarget) {
 				// check if this edge is inserted already
 				// this can happen if supernode contains multiple vertices that
 				// had edges to vertices in the same dst supernode
 				// here is where we de-duplicate
-				// TODO: weight, labels
-				if (seenDsts[target.dst]) {
+				if (seenDsts[edgeTarget.dst]) {
 					return;
 				}
-				seenDsts[target.dst] = true;
+				seenDsts[edgeTarget.dst] = true;
 
-				graphvizOutput += '' + supernodeToGraph[srcNode] + ' -> ' + supernodeToGraph[target.dst] + ';\n';
+        // add attributes
+        var attributes = attributesToGraphViz(edgeTarget.attrs);
+
+        // add the edge to the total output
+        graphvizOutput += '' + supernodeToGraph[srcNode] + ' -> ' + supernodeToGraph[edgeTarget.dst];
+
+        graphvizOutput += ' ' + attributes + ';\n';
 			});
 		}
 	}
 
 	graphvizOutput += '}\n';
+  console.log(graphvizOutput);
 	//console.log(graphvizOutput);
 	// use Viz (graphviz in emscripten) to render the .dot file
 	return Viz(graphvizOutput);

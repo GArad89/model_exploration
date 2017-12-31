@@ -68,7 +68,7 @@ class Dendrogram:
         #label_list=
         #print(label_list)
         for graph_node in node.subset:
-            temp=node.projected_graph.dgraph.node[graph_node]['label']
+            temp=node.projected_graph.dgraph.node[graph_node].get('label','')
             if temp:
                 label_temp.append(str(temp))
             else: #TODO: something better

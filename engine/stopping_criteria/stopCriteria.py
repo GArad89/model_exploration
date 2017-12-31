@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
 
-
 class StopCriteria(ABC):
 
     @abstractmethod
@@ -10,35 +9,43 @@ class StopCriteria(ABC):
         procedure needs to be stopped
         """
 
+
 class SizeCriteria(StopCriteria):
 
     threshold = 1
+
     def __init__(self, threshold):
         self.threshold = threshold
 
     def check(self, dgraph, **params):
+
         #print("the dgraph number of nodes is: ",dgraph.number_of_nodes())
-        if("inNode" in dgraph.nodes()):
+
+        if "inNode" in dgraph.nodes():
             return dgraph.number_of_nodes()-2 <= self.threshold
         return dgraph.number_of_nodes() <= self.threshold
-    
+
+
 class InOutDegreeCriteria(StopCriteria):
 
-    threshold = 1
+    threshold = 3
+
     def __init__(self, threshold):
         self.threshold = threshold
 
     def check(self, dgraph, **params):
-        pass #TODO: implement
+       return dgraph.maxInOutDegree() <= threshold
+
 
 class CyclometricCriteria(StopCriteria):
 
     threshold = 1
+
     def __init__(self, threshold):
         self.threshold = threshold
 
     def check(self, dgraph, **params):
-        pass #TODO: implement
+        return ( dgraph.number_of_nodes() - dgraph.number_of_edges() + 2*dgraph.numberOfComponenets()) < threshold
 
 
         

@@ -1,5 +1,5 @@
 import networkx as nx
-import lin_prog_solver as lps
+import engine.linear_programming.lin_prog_solver as lps
 import matplotlib.pyplot as plt
 import sys
 
@@ -26,9 +26,7 @@ def generate_toy_example(draw=False):
 
     return G
 
-
-if __name__ == '__main__':
-
+def test_linear_programming():
     # case 1
     G = generate_toy_example()
     res = lps.compute_lower_bound(G)
