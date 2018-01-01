@@ -1,8 +1,8 @@
-from lin_prog_solver import LPS
-from NxGraphUtil import draw
-from NxGraphUtil import write_nx_graph_to_file
-from FileWriter import log
-from IOUtils import delete_files_from_folder
+from engine.linear_programming.lin_prog_solver import LPS
+from engine.utils.NxGraphUtil import draw
+from engine.utils.NxGraphUtil import write_nx_graph_to_file
+from engine.utils.FileWriter import log
+from engine.utils.IOUtils import delete_files_from_folder
 
 import networkx as nx
 from random import randint

@@ -1,4 +1,4 @@
-from FileWriter import log
+from engine.utils.FileWriter import log
 
 import numpy as np
 from scipy.optimize import linprog
