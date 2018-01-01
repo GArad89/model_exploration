@@ -7,10 +7,10 @@ from engine.utils.IOUtils import delete_files_from_folder
 import networkx as nx
 from random import randint
 import unittest
-
+import os
 
 class LPTest(unittest.TestCase):
-    OUT_FOLDER = '../results/linear_programming/'
+    OUT_FOLDER = os.path.join(os.path.dirname(__file__),'../results/linear_programming/')
     GRAPH_PLOTS_PATH = OUT_FOLDER + 'plots/'
     GRAPH_DOT_PATH = OUT_FOLDER + 'dot/'
     CLICKS_EXPERIMENT_LOG_PATH = OUT_FOLDER + 'click_graph_results.txt'
