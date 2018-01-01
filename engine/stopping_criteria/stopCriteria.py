@@ -8,7 +8,7 @@ class StopCriteria(ABC):
         """Returns a boolean indicating if the partitioning
         procedure needs to be stopped
         """
-        pass
+        raise NotImplementedError
 
 
 class SizeCriteria(StopCriteria):
