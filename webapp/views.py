@@ -22,6 +22,7 @@ from webapp.models import Models, Results
 from engine.main.engineMainFlow import run_algo
 from engine.utils.jsonWorker import createAlgoParamsJSON, parse_parameters
 from engine.baisc_entities.graph import DGraph
+from engine import labeling, stopping_criteria
 
 # get instances of Models, Results according to current config
 # this is lightweight for now, but in the future we may want to cache this in the application context
@@ -75,8 +76,11 @@ def algorithm_choice_form():
         parameters = {parameter : request.values[parameter] for parameter in schema if request.values[parameter]}
         # turn them from strings into typed values
         parameters = parse_parameters(parameters, schema)
-        log.info(parameters)
-        result = run_algo(graph, algorithm_name, parameters, stopCriteria="SizeCriteria")
+        log.debug(parameters)
+
+        stopping_criterion = request.values['stopping-criterion']
+        labeling_method = request.values['labeling-method']
+        result = run_algo(graph, algorithm_name, parameters, stopping_criterion, labeling_method)
         result_id = get_results().save(result)
 
         return redirect(url_for('show_results', result_id=result_id))
@@ -84,7 +88,12 @@ def algorithm_choice_form():
     # get list of algorithms from engine
     log.debug("got list of algorithms: %s", [a['name'] for a in algo_data])
 
-    return render_template('algorithm_choice.html', model_id=model_id, errors=errors, algo_data=algo_data)
+    return render_template('algorithm_choice.html', 
+                           model_id=model_id,
+                           errors=errors,
+                           algo_data=algo_data,
+                           labeling_methods=labeling.get_methods(),
+                           stopping_criteria=stopping_criteria.get_criteria())
 
 
 @app.route('/explore/<result_id>')

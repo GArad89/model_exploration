@@ -21,7 +21,7 @@ class PrefixLabeler(GraphLabeler):
             labels = set(labels)
 
             # shortest common prefix 
-            prefix = os.path.commonprefix(labels)
+            prefix = os.path.commonprefix(list(labels))
             if not prefix:
                 # NOTE ESCAPED \n for graphviz happiness
                 node.label = "\n".join(labels)
