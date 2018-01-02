@@ -184,6 +184,7 @@ class BranchAndBoundCluster (Cluster):
     sorted_nodes_by_edge_weight=[]
     adj_mat=[]
     
+    @staticmethod
     def get_params():
         return {},[] #TODO
 

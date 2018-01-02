@@ -4,7 +4,12 @@ from sklearn.cluster import SpectralClustering, KMeans
 import numpy as np
 
 
-class SpectralCluster (Cluster):
+class SpectralCluster(Cluster):
+
+    def __init__(self, n = 2, affinity='precomputed'):
+        super().__init__()
+        self.n = n
+        self.affinity = affinity
 
     @staticmethod
     def get_params():
@@ -17,7 +22,7 @@ class SpectralCluster (Cluster):
 
 
         
-    def cluster(self, dgraph, n = 2, affinity='precomputed'):
+    def cluster(self, dgraph):
         """
         just the basics required for the SpectralClustering algorithm for now.
         need to test what kind of output it gives.
@@ -25,14 +30,10 @@ class SpectralCluster (Cluster):
         #adjacency matrix
         adj_mat =dgraph.adjacency_matrix()
         #print(adj_mat)
-        if("inNode" in dgraph.nodes()):
-            adj_mat=np.delete(adj_mat, np.s_[-2::], 1)
-            adj_mat=np.delete(adj_mat, np.s_[-2::], 0)
-        #print(adj_mat)
 
         
         #SpectralClustering
-        sc = SpectralClustering(2,affinity=affinity)
+        sc = SpectralClustering(self.n,affinity=self.affinity)
         sc.fit(adj_mat)
         result=sc.labels_
         #seperating the result list to lists for each cluster (1= the node is in the substae 0= the node is not in the state)
