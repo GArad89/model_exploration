@@ -21,7 +21,7 @@ def run_algo(graph,algo_name,params,stopCriteria):
     module=getattr(module, 'stopCriteria')
     class_ = getattr(module, stopCriteria) 
     stopCri = class_(2) #now we have an object #the 20 is the threshold TODO change later
-    dendro=partition(graph,graph.nodes(), algo_class, stopCri)
+    dendro=partition(graph, algo_class(), stopCri)
 
     labeler = TfIdfLabeler.TfIdfLabeler(graph, dendro)
     labeler.label()

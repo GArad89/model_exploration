@@ -6,20 +6,18 @@ import numpy as np
 
 class SpectralCluster (Cluster):
 
-    def getParams(self):
+    @staticmethod
+    def get_params():
         form = [{'key': 'n', 'type': 'text'},{'key': 'affinity', 'type': 'text'}]
         schema = {
             'n' : {'type': 'integer', 'title': 'number of clusters', 'minimum' : 2, 'required' : True},
             'affinity' : {'type': 'string', 'title': 'affinity'}
             }
         return schema, form
-        
-
-
 
 
         
-    def cluster(dgraph, n = 2, affinity='precomputed'):
+    def cluster(self, dgraph, n = 2, affinity='precomputed'):
         """
         just the basics required for the SpectralClustering algorithm for now.
         need to test what kind of output it gives.

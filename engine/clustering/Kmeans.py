@@ -7,7 +7,7 @@ import numpy as np
 ##running but not giving desired results
 class KmeansClustering (Cluster):
 
-    def getParams():
+    def get_params():
         form = [{'key': 'n', 'type': 'text'},{'key': 'affinity', 'type': 'text'}]
         schema = {
             'n' : {'type': 'integer', 'title': 'number of clusters', 'minimum' : 2, 'required' : True},
