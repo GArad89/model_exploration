@@ -37,6 +37,7 @@
 
 <button id='btn_reset'>Reset</button>
 <button id='btn_export'>Export Super Graph</button>
+<button id='btn_expand_all'>Expand All</button>
 
 
 <svg id="d3-main" style="border: 1px dashed black;"></svg>
@@ -86,6 +87,21 @@ $('#btn_reset').click(function() {
    zoom.transform(svg, d3.zoomIdentity.scale(1))
 });
 
+
+
+function expandAll(){
+    expand(root);
+}
+
+function expand(d){
+    var children = (d.children)?d.children:d._children;
+    if (d._children) {
+        d.children = d._children;
+        d._children = null;
+    }
+    if(children)
+      children.forEach(expand);
+}
 
 // declares a tree layout and assigns the size
 var treemap = d3.tree().size([height, width]);
@@ -471,6 +487,11 @@ function getActiveClusters(root) {
 	getRecursive(root);
 	return active;
 }
+
+$('#btn_expand_all').click(function() {
+    expandAll(root);
+    update(root);
+});
 
 }); // d3.json
 
