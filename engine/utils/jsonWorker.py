@@ -8,7 +8,7 @@ def createAlgoParamsJSON():
     jsonlist = []
     algos = Cluster.__subclasses__()
     for algo in algos:
-        schema, form = algo.getParams()
+        schema, form = algo.get_params()
         algo_form = {'name' : algo.__name__ , 'form' : {'schema' : schema, 'form' : form}}
         jsonlist += [algo_form]
     return jsonlist

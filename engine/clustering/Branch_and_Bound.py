@@ -3,7 +3,6 @@ from ..baisc_entities.graph import DGraph
 import numpy as np
 import networkx as nx
 import copy
-import __main__
 from ..linear_programming.lin_prog_solver import *
 
 def Sparset_Cut_Target(bound,graph_node_num):
@@ -185,7 +184,7 @@ class BranchAndBoundCluster (Cluster):
     sorted_nodes_by_edge_weight=[]
     adj_mat=[]
     
-    def getParams():
+    def get_params():
         return {},[] #TODO
 
     

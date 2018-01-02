@@ -7,7 +7,7 @@ from engine.main.partitionLoop import partition
 
 def test_partition():
     den = None
-    g = DGraph.read_dot("./engine/dot/weighted_g2.dot")
+    g = DGraph.read_dot("../engine/dot/weighted_g2.dot")
     print("testing partition on g2.dot for threshold=4:")
     den = partition(g,g.nodes(), SpectralCluster.SpectralCluster, SizeCriteria(4))
 
