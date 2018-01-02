@@ -10,7 +10,7 @@ class MinimumCut(Cluster):
         schema = {}
         return schema, form
                
-    def cluster(dgraph):
+    def cluster(self, dgraph):
         cop=dgraph.dgraph.copy()
         cop=cop.to_undirected()
         cut_edges=nx.minimum_edge_cut(cop)
@@ -21,7 +21,7 @@ class MinimumCut(Cluster):
         output=[]
 
         for sg in sub_graphs:
-            output+=[sg.nodes()]
+            output+=[list(sg.nodes())]
 
         return output
             
