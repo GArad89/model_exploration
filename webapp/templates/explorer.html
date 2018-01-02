@@ -35,9 +35,10 @@
 
 {% block body %}
 
-<button id='btn_reset'>Reset</button>
-<button id='btn_export'>Export Super Graph</button>
-<button id='btn_expand_all'>Expand All</button>
+<button id='btn_reset' class="btn btn-primary">Reset</button>
+<button id='btn_export' class="btn btn-primary">Export Super Graph</button>
+<button id='btn_expand_all' class="btn btn-primary">Expand All</button>
+<button id='btn_collapse_all' class="btn btn-primary">Collapse All</button>
 
 
 <svg id="d3-main" style="border: 1px dashed black;"></svg>
@@ -83,10 +84,13 @@ function zoomed() {
   g_root.attr("transform", d3.event.transform);
 }
 
+function zoomed_supergraph() {
+    d3.select('#graph0').attr("transform", d3.event.transform);
+}
+
 $('#btn_reset').click(function() {
    zoom.transform(svg, d3.zoomIdentity.scale(1))
 });
-
 
 
 function expandAll(){
@@ -367,6 +371,22 @@ function updateGraph(source) {
 
 
 	document.getElementById('supergraph').innerHTML = supergraphToSvg(supergraphNodes, superEdges);
+	supergraph_svg_elem = $("#supergraph").find("svg")[0];
+	supergraph_svg_elem.id = 'svg_supergraph';
+
+	svg_supergraph = d3.select('#svg_supergraph');
+	svg_supergraph.append("rect")
+
+	zoom_supergraph = d3.zoom()
+        .scaleExtent([1 / 2, 4])
+        .on("zoom", zoomed_supergraph);
+
+    svg_supergraph.attr("width", width)
+    .attr("height", height)
+    .style("fill", "none")
+    .style("pointer-events", "all")
+    .call(zoom_supergraph);
+
 }
 
 function graphvizEscape(str) {
@@ -491,6 +511,12 @@ function getActiveClusters(root) {
 $('#btn_expand_all').click(function() {
     expandAll(root);
     update(root);
+});
+
+$('#btn_collapse_all').click(function() {
+   root.children.forEach(collapse);
+   collapse(root);
+   update(root);
 });
 
 }); // d3.json
