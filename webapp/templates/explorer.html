@@ -34,6 +34,11 @@
 {% block title %}Explore!{% endblock %}
 
 {% block body %}
+
+<button id='btn_reset'>Reset</button>
+<button id='btn_export'>Export Super Graph</button>
+
+
 <svg id="d3-main" style="border: 1px dashed black;"></svg>
 <div id="supergraph"></div>
 {% endblock %}
@@ -56,14 +61,16 @@ var svg = d3.select("#d3-main")
     .attr("height", height + margin.top + margin.bottom)
     .style("fill", "none")
 
+var zoom = d3.zoom()
+        .scaleExtent([1 / 2, 4])
+        .on("zoom", zoomed);
+
 svg.append("rect")
     .attr("width", width)
     .attr("height", height)
     .style("fill", "none")
     .style("pointer-events", "all")
-    .call(d3.zoom()
-        .scaleExtent([1 / 2, 4])
-        .on("zoom", zoomed));
+    .call(zoom);
 
 var g_container = svg.append("g")
      .attr("transform", "translate("+ margin.left + "," + margin.top + ")");
@@ -74,6 +81,10 @@ var g_root = g_container.append("g");
 function zoomed() {
   g_root.attr("transform", d3.event.transform);
 }
+
+$('#btn_reset').click(function() {
+   zoom.transform(svg, d3.zoomIdentity.scale(1))
+});
 
 
 // declares a tree layout and assigns the size
@@ -170,7 +181,7 @@ function updateTree(source) {
   // Add labels for the nodes
   nodeEnter.append('text')
       .attr("dy", ".35em")
-      .attr("fill", "black")
+      .attr("fill", "#202020")
       .attr("x", function(d) {
           return d.children || d._children ? -13 : 13;
       })
@@ -462,6 +473,7 @@ function getActiveClusters(root) {
 }
 
 }); // d3.json
+
 
 </script>
 {% endblock %}
