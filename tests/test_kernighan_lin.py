@@ -4,13 +4,15 @@ from engine.main.partitionLoop import partition
 from engine.stopping_criteria.stopCriteria import SizeCriteria
 import unittest
 
+import os
+from utils import project_root
 
 class Test_KL(unittest.TestCase):
 
     def test_kerningham_lin(self):
-        g = DGraph.read_dot("../engine/dot/cvs.net.mutated.dot")
+        g = DGraph.read_dot(os.path.join(project_root(), "engine/dot/cvs.net.mutated.dot"))
         KL = KernighanLinCluster()
-        dendrogram = partition(g, clustering_algo=KL, stopCri=SizeCriteria(3))
+        dendrogram = partition(g, clustering_algo=KL, stop_criterion=SizeCriteria(3))
         print("foo")
 
 

@@ -1,12 +1,27 @@
-from engine.clustering import *
-from engine.clustering.cluster_abstract import Cluster
-from engine.baisc_entities.dendrogram import *
+from engine import clustering
 import json
 
+
+type_parsers = {
+    'integer' : int,
+    'number' : float,
+    'text' : str,
+}
+
+def parse_parameters(parameters, schema):
+    "parse parameters returned from form according to json schema"
+    parsed = {}
+    for name, value in parameters.items():
+        parser = type_parsers.get(schema[name]['type'], None)
+        if parser is None:
+            raise Exception('unsupported schema type: ' + schema[name]['type'])
+        parsed[name] = parser(value)
+    return parsed
+
+
 def createAlgoParamsJSON():
-    
     jsonlist = []
-    algos = Cluster.__subclasses__()
+    algos = clustering.get_algorithms()
     for algo in algos:
         schema, form = algo.get_params()
         algo_form = {'name' : algo.__name__ , 'form' : {'schema' : schema, 'form' : form}}
@@ -20,7 +35,7 @@ def dendrogramToJSON(dendro):
     #print(list(dendro.dgraph.edges()))
     clusters = []
     for node in dendro.nodes():
-        clusters +=[ {'name' : node.get_label(), 'inEdge' : node.parent(), 'outEdge' : node.child(), 'vertices' : node.vertices()}]        
+        clusters +=[ {'name' : node.get_label(), 'inEdge' : node.parent(), 'outEdge' : node.child(), 'vertices' : list(node.vertices())}]
     #print(clusters)
     jsondata['clusters'] = clusters
 
