@@ -5,11 +5,13 @@
 <!-- minified at https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.min.js -->
 <!-- graphviz in javascript -->
 <script type="text/javascript" src="{{ url_for('static', filename='viz/viz-1.8.0.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='d3-zoom/d3-zoom.js') }}"></script>
 
 <style>
  .node {
    cursor: pointer;
  }
+
 
  .node circle {
    fill: #fff;
@@ -32,8 +34,8 @@
 {% block title %}Explore!{% endblock %}
 
 {% block body %}
-<svg id="d3-main"></svg>
-<div id="supergraph"></svg>
+<svg id="d3-main" style="border: 1px dashed black;"></svg>
+<div id="supergraph"></div>
 {% endblock %}
 
 {% block end_of_body %}
@@ -48,13 +50,30 @@ var margin = {top: 20, right: 120, bottom: 20, left: 120},
         duration = 750,
         root;
 
+
 var svg = d3.select("#d3-main")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate("
-          + margin.left + "," + margin.top + ")");
+    .style("fill", "none")
 
+svg.append("rect")
+    .attr("width", width)
+    .attr("height", height)
+    .style("fill", "none")
+    .style("pointer-events", "all")
+    .call(d3.zoom()
+        .scaleExtent([1 / 2, 4])
+        .on("zoom", zoomed));
+
+var g_container = svg.append("g")
+     .attr("transform", "translate("+ margin.left + "," + margin.top + ")");
+
+var g_root = g_container.append("g");
+
+
+function zoomed() {
+  g_root.attr("transform", d3.event.transform);
+}
 
 
 // declares a tree layout and assigns the size
@@ -129,7 +148,7 @@ function updateTree(source) {
   // ****************** Nodes section ***************************
 
   // Update the nodes...
-  var node = svg.selectAll('g.node')
+  var node = g_root.selectAll('g.node')
       .data(nodes, function(d) {return d.id || (d.id = ++i); });
 
   // Enter any new modes at the parent's previous position.
@@ -151,6 +170,7 @@ function updateTree(source) {
   // Add labels for the nodes
   nodeEnter.append('text')
       .attr("dy", ".35em")
+      .attr("fill", "black")
       .attr("x", function(d) {
           return d.children || d._children ? -13 : 13;
       })
@@ -197,7 +217,7 @@ function updateTree(source) {
   // ****************** links section ***************************
 
   // Update the links...
-  var link = svg.selectAll('path.link')
+  var link = g_root.selectAll('path.link')
       .data(links, function(d) { return d.id; });
 
   // Enter any new links at the parent's previous position.
