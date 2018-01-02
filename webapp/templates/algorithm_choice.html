@@ -14,7 +14,7 @@
     <select id="algorithms-select" class="form-control col-sm-6">
       <option disabled selected value> -- select an option -- </option>
       {% for algo in algo_data %}
-      <option value="{{ loop.index }}">{{ algo.name }}</option>
+      <option value="{{ loop.index0 }}">{{ algo.name }}</option>
       {% endfor %}
     </select>
     <!-- pass selected model id to next stage -->
@@ -61,6 +61,7 @@
         console.log(algos);
 
         var update_form = function() {
+          console.log($('#algorithms-select').val());
           selected_algo = algos[$('#algorithms-select').val()];
           if (selected_algo !== undefined) {
             // make hidden field that actually submits the value match the 
