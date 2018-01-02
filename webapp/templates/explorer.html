@@ -128,7 +128,8 @@ data.vertices.forEach(function(vertex) {
 		nameToCluster[vertexId] = {
         vertices:[vertexId],
         name: vertexId,
-        attrs: attrs
+        attrs: attrs,
+        isConcrete: true
     };
 	}
 });
@@ -333,10 +334,6 @@ function updateGraph(source) {
 	// generated from map of edges 
 	var superEdges = {};
 
-	// mapping: cluster name -> internal edges
-	// TODO: remove the need once cluster names are real
-	var internalEdges = {};
-
 	// for each edge in the original graph, create/update superedge or discard
 	// if the edge is internal to a cluster
 	data.edges.forEach(function(edge) {
@@ -346,13 +343,10 @@ function updateGraph(source) {
 			dstNode = vertexToNode[edge[1]];
 
 		if (srcNode === dstNode) {
-			//console.log('edge within node: ', srcNode, edge);
-			var edges = internalEdges[srcNode];
-			if (edges === undefined) {
-				edges = [];
-			}
-			edges.push(edge);
-			return;
+      // self-edges are ok only for concrete vertices
+      if (!nameToCluster[srcNode].isConcrete) {
+  			return;
+      }
 		}
 
 		var existingEdges = superEdges[srcNode];
@@ -371,6 +365,24 @@ function updateGraph(source) {
 
 function graphvizEscape(str) {
     return '"' + str.replace('\n', '\\n') + '"';
+}
+
+function mergeAttributes(attributes) {
+    // single edge, use its attributes
+    if (attributes.length == 1) {
+        return attributes[0];
+    }
+
+    // multiple edges, do our thing
+    // merge labels from multiple edges
+    // TODO: merge weights?
+    var labels = attributes.map(function (item){
+        return item.label;
+    }).filter(function(v){return v !== undefined; });
+
+    var uniqueLabels = Array.from(new Set(labels));
+
+    return {label: uniqueLabels.join('\n')};
 }
 
 function attributesToGraphViz(attributes) {
@@ -435,25 +447,35 @@ function supergraphToSvg(supergraphNodes, superEdges) {
 
 	for (var srcNode in superEdges) {
 		if (superEdges.hasOwnProperty(srcNode)) {
-			var seenDsts = {};
+      // join together edges from the original graph to form edges from/to clusters
+      // for each target vertex, store array of attributes from edges contributing to this super-edge
+			var finalEdges = {};
 			superEdges[srcNode].forEach(function (edgeTarget) {
 				// check if this edge is inserted already
 				// this can happen if supernode contains multiple vertices that
 				// had edges to vertices in the same dst supernode
 				// here is where we de-duplicate
-				if (seenDsts[edgeTarget.dst]) {
-					return;
-				}
-				seenDsts[edgeTarget.dst] = true;
+				if (finalEdges[edgeTarget.dst] !== undefined) {
+          // existing edge, add attributes
+					finalEdges[edgeTarget.dst].push(edgeTarget.attrs)
+				} else {
+          // new edge
+          finalEdges[edgeTarget.dst] = [edgeTarget.attrs];
+        }
+      });
+      // write out the final super-edges for this source node
+      for (var target in finalEdges) {
+        if (finalEdges.hasOwnProperty(target)) {
+          // add attributes string
+          var merged = mergeAttributes(finalEdges[target]);
+          var attributes = attributesToGraphViz(merged);
 
-        // add attributes
-        var attributes = attributesToGraphViz(edgeTarget.attrs);
+          // add the edge to the total output
+          graphvizOutput += '' + supernodeToGraph[srcNode] + ' -> ' + supernodeToGraph[target];
 
-        // add the edge to the total output
-        graphvizOutput += '' + supernodeToGraph[srcNode] + ' -> ' + supernodeToGraph[edgeTarget.dst];
-
-        graphvizOutput += ' ' + attributes + ';\n';
-			});
+          graphvizOutput += ' ' + attributes + ';\n';
+        }
+      }
 		}
 	}
 
@@ -479,7 +501,9 @@ function getActiveClusters(root) {
 				//console.log(node);
 				nameToCluster[node.data.name].vertices.forEach(function(vertex) {
 					// TODO(roee): massive hack, wrap fake cluster with extra fake cluster
-					active.push({data: nameToCluster[vertex]});
+          // mark it as a concrete vertex so that we don't eliminate self-edges
+          // during display
+					active.push({data: nameToCluster[vertex], isConcrete:true});
 				});
 			}
 		}
