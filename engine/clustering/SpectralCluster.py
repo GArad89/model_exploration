@@ -6,7 +6,7 @@ import numpy as np
 
 class SpectralCluster (Cluster):
 
-    def getParams():
+    def getParams(self):
         form = [{'key': 'n', 'type': 'text'},{'key': 'affinity', 'type': 'text'}]
         schema = {
             'n' : {'type': 'integer', 'title': 'number of clusters', 'minimum' : 2, 'required' : True},
