@@ -1,10 +1,9 @@
 from .cluster_abstract import Cluster
-from ..baisc_entities.graph import DGraph
+from engine.baisc_entities.graph import DGraph
 import numpy as np
 import networkx as nx
 import copy
-import __main__
-from ..linear_programming.lin_prog_solver import *
+from engine.linear_programming.lin_prog_solver import *
 
 def Sparset_Cut_Target(bound,graph_node_num):
     return bound/graph_node_num
@@ -184,14 +183,22 @@ class BranchAndBoundCluster (Cluster):
     
     sorted_nodes_by_edge_weight=[]
     adj_mat=[]
+    
+    def __init__(self,target=Sparset_Cut_Target,heru_LB=LB_Greedy_Simple,heru_UB=UB_lps,heru_order=Sort_Nodes_byDegree):
+        self.target = target
+        self.heru_LB = heru_LB
+        self.heru_UB = heru_UB
+        self.heru_order = heru_order
 
-    def getParams():
+
+    @staticmethod
+    def get_params():
         return {},[] #TODO
 
+    
+    def cluster(self, dgraph, debug_print=False):
 
-    def cluster(self, dgraph,target=Sparset_Cut_Target,heru_LB=LB_Greedy_Simple,heru_UB=UB_lps,heru_order=Sort_Nodes_byDegree):
-
-        heru_dict={'target':target,'heru_LB':heru_LB,'heru_UB':heru_UB,'heru_order':heru_order}
+        heru_dict={'target':self.target,'heru_LB':self.heru_LB,'heru_UB':self.heru_UB,'heru_order':self.heru_order}
         bnb_tree=BnBSearchTree(dgraph,heru_dict)
         current_best_sol_cut=bnb_tree.best_sol_cut
         
@@ -208,8 +215,8 @@ class BranchAndBoundCluster (Cluster):
             if(bnb_tree.best_sol_cut<current_best_sol_cut): current_best_sol_cut=bnb_tree.best_sol_cut
             bnb_tree.Check_Live()
             
-        main_name=__main__.__file__.split('\\')
-        if(main_name[-1]=='BnB_test.py'):
+        #main_name=__main__.__file__.split('\\')
+        if debug_print:
             print("bnb search tree holds "+str(len(bnb_tree.node_list))+" nodes")
 ##            Print_Sol(bnb_tree)
             print(bnb_tree.best_solution. accepted)
