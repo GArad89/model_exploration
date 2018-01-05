@@ -13,12 +13,12 @@ class SpectralCluster (Cluster):
             'affinity' : {'type': 'string', 'title': 'affinity'}
             }
         return schema, form
-        
 
 
 
 
-        
+
+
     def cluster(dgraph, n = 2, affinity='precomputed'):
         """
         just the basics required for the SpectralClustering algorithm for now.

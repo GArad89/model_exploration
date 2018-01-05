@@ -9,7 +9,7 @@ class MinimumCut(Cluster):
         form = []
         schema = {}
         return schema, form
-               
+
     def cluster(dgraph):
         cop=dgraph.dgraph.copy()
         cop=cop.to_undirected()

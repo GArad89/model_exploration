@@ -15,7 +15,7 @@ class KmeansClustering (Cluster):
             }
         return schema, form
 
-    
+
     def cluster(dgraph, n = 2):
         """
         just the basics required for the Kmeans algorithm for now.

@@ -184,11 +184,11 @@ class BranchAndBoundCluster (Cluster):
     
     sorted_nodes_by_edge_weight=[]
     adj_mat=[]
-    
+
     def getParams():
         return {},[] #TODO
 
-    
+
     def cluster(self, dgraph,target=Sparset_Cut_Target,heru_LB=LB_Greedy_Simple,heru_UB=UB_lps,heru_order=Sort_Nodes_byDegree):
 
         heru_dict={'target':target,'heru_LB':heru_LB,'heru_UB':heru_UB,'heru_order':heru_order}
