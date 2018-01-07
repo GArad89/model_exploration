@@ -44,7 +44,7 @@ def LB_Greedy_Simple(dgraph, bnb_node):
     if(bnb_node.parent_bnb_node == None): return 0
     
     edge_list = []
-    
+    graph_node=None
     for node in bnb_node.checked:
         if node not in bnb_node.parent_bnb_node.checked:
             graph_node=node
@@ -141,7 +141,7 @@ class BnBSearchTree():
     weight_limit=-1
     node_list=[]
     live_nodes=[]
-    best_sol_cut=-1
+    best_sol_cut=0
     best_solution=None
     
     def __init__(self,dgraph,heru_dict):
@@ -149,7 +149,8 @@ class BnBSearchTree():
         self.graph=dgraph
         self.sorted_graph_nodes=heru_dict['heru_order'](dgraph)
         self.node_list+=[BnBNode(self.sorted_graph_nodes[0],True,heru_dict,dgraph)]
-        self.best_sol_cut=dgraph.dgraph.size()
+        for edge in self.graph.edges():
+            self.best_sol_cut+=int(edge[2].get('weight',1))
         self.live_nodes+=[self.node_list[0]]
         #print(self.live_nodes[0].checked)
         
@@ -161,9 +162,10 @@ class BnBSearchTree():
         bnb_parent.add_child(bnb_node)
         if((len(self.sorted_graph_nodes)==len(bnb_node.checked))or(len(bnb_node.accepted)==self.weight_limit)or(len(bnb_node.rejected)==self.weight_limit)):
            bnb_node.LB=check_final_cut(bnb_node,self.graph)
-           if(bnb_node.LB<self.best_sol_cut):
+           if(bnb_node.LB<=self.best_sol_cut):
                self.best_solution=bnb_node
                self.best_sol_cut=bnb_node.LB
+              # print(self.best_sol_cut)
            self.kill_node(bnb_node)
 
     def kill_node(self,bnb_node):
@@ -171,7 +173,7 @@ class BnBSearchTree():
 
     def Check_Live(self):     # run over the remaining BnB sub_problems and rejects according to the bounds
         rejected=[]
-        if(self.best_sol_cut>0):
+        if((self.best_sol_cut>0)and(self.best_solution!=None)):
             for node in self.live_nodes:
                 if(node.LB>self.best_sol_cut): rejected+=[node]
             for node in rejected:
@@ -184,7 +186,7 @@ class BranchAndBoundCluster (Cluster):
     sorted_nodes_by_edge_weight=[]
     adj_mat=[]
     
-    def __init__(self,target=Sparset_Cut_Target,heru_LB=LB_Greedy_Simple,heru_UB=UB_lps,heru_order=Sort_Nodes_byDegree):
+    def __init__(self,target=Sparset_Cut_Target,heru_LB=LB_Greedy_Simple,heru_UB=UB_Greedy_Simple,heru_order=Sort_Nodes_byDegree):
         self.target = target
         self.heru_LB = heru_LB
         self.heru_UB = heru_UB
@@ -197,7 +199,7 @@ class BranchAndBoundCluster (Cluster):
 
     
     def cluster(self, dgraph, debug_print=False):
-
+        #print(dgraph.nodes())
         heru_dict={'target':self.target,'heru_LB':self.heru_LB,'heru_UB':self.heru_UB,'heru_order':self.heru_order}
         bnb_tree=BnBSearchTree(dgraph,heru_dict)
         current_best_sol_cut=bnb_tree.best_sol_cut
@@ -207,7 +209,8 @@ class BranchAndBoundCluster (Cluster):
             
             if(len(live_node.checked)<=len(bnb_tree.sorted_graph_nodes)):   
                 graph_node=bnb_tree.sorted_graph_nodes[len(live_node.checked)]
-                #print(live_node.accepted)
+               # print(live_node.accepted)
+                #print(live_node.LB)
                 bnb_tree.add_node(BnBNode(graph_node,True,heru_dict,dgraph,live_node),live_node)
                 bnb_tree.add_node(BnBNode(graph_node,False,heru_dict,dgraph,live_node),live_node)
                 
@@ -259,14 +262,13 @@ def check_final_cut(bnbnode,dgraph):
     LB=0
     #if((min(len(bnbnode.accepted),len(bnbnode.rejected)))>0): LB*=(min(len(bnbnode.accepted),len(bnbnode.rejected)))
     for edge in graph_edges:
-        #print(edge)
         if((edge[0] in bnbnode.rejected)and(edge[1] in bnbnode.accepted)):
             LB+=int(edge[2].get('weight',1))
         elif ((edge[1] in bnbnode.rejected)and(edge[0] in bnbnode.accepted)):
              LB+=int(edge[2].get('weight',1))
 
    
-    if(min(len(bnbnode.accepted),len(bnbnode.rejected))>0): return LB/(min(len(bnbnode.accepted),len(bnbnode.rejected)))    
+    if(min(len(bnbnode.accepted),len(bnbnode.rejected))>0): return LB/(min(len(bnbnode.accepted),len(bnbnode.rejected)))
     return LB
 
  
