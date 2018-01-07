@@ -7,6 +7,10 @@
 <script type="text/javascript" src="{{ url_for('static', filename='viz/viz-1.8.0.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='d3-zoom/d3-zoom.js') }}"></script>
 
+<script type="text/javascript" src="{{ url_for('static', filename='saveSvgAsPng/saveSvgAsPng.js') }}"></script>
+
+
+
 <style>
  .node {
    cursor: pointer;
@@ -36,7 +40,8 @@
 {% block body %}
 
 <button id='btn_reset' class="btn btn-primary">Reset</button>
-<button id='btn_export' class="btn btn-primary">Export Super Graph</button>
+<button id='btn_export_dendrogram' class="btn btn-primary">Export Dendrogram</button>
+<button id='btn_export_supergraph' class="btn btn-primary">Export Super Graph</button>
 <button id='btn_expand_all' class="btn btn-primary">Expand All</button>
 <button id='btn_collapse_all' class="btn btn-primary">Collapse All</button>
 
@@ -90,6 +95,16 @@ function zoomed_supergraph() {
 
 $('#btn_reset').click(function() {
    zoom.transform(svg, d3.zoomIdentity.scale(1))
+});
+
+
+$('#btn_export_dendrogram').click(function() {
+    saveSvgAsPng(document.getElementById("d3-main"), "diagram.png", {scale: 1, backgroundColor: 'white'});
+});
+
+
+$('#btn_export_supergraph').click(function() {
+    saveSvgAsPng($('#supergraph').children().first()[0], "diagram.png", {scale: 1, backgroundColor: 'white'});
 });
 
 
