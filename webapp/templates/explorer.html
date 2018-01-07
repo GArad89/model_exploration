@@ -32,6 +32,22 @@
    stroke: #ccc;
    stroke-width: 1.5px;
  }
+
+
+ div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 60px;
+  height: 28px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+
 </style>
 {% endblock %}
 
@@ -67,6 +83,11 @@ var svg = d3.select("#d3-main")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
     .style("fill", "none")
+
+
+var tooltip_div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
 
 var zoom = d3.zoom()
         .scaleExtent([1 / 2, 4])
@@ -225,6 +246,21 @@ function updateTree(source) {
   // Add Circle for the nodes
   nodeEnter.append('circle')
       .attr('class', 'node')
+      .on("mouseover", function(d) {
+          console.log(d.data)
+          tooltip_div.transition()
+         .duration(200)
+         .style("opacity", .9);
+
+          tooltip_div.html("i am a tooltip")
+         .style("left", (d3.event.pageX) + "px")
+         .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function(d) {
+       tooltip_div.transition()
+          .duration(500)
+          .style("opacity", 0);
+      })
       .attr('r', 1e-6)
       .style("fill", function(d) {
           return d._children ? "lightsteelblue" : "#fff";
