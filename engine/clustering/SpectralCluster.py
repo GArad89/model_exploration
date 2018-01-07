@@ -13,10 +13,9 @@ class SpectralCluster(Cluster):
 
     @staticmethod
     def get_params():
-        form = [{'key': 'n', 'type': 'text'},{'key': 'affinity', 'type': 'text'}]
+        form = [{'key': 'n', 'type': 'text'}]
         schema = {
-            'n' : {'type': 'integer', 'title': 'number of clusters', 'minimum' : 2, 'required' : True},
-            'affinity' : {'type': 'string', 'title': 'affinity'}
+            'n' : {'type': 'integer', 'title': 'number of clusters', 'minimum' : 2, 'required' : True}
             }
         return schema, form
 
