@@ -107,6 +107,22 @@ $('#btn_export_supergraph').click(function() {
     saveSvgAsPng($('#supergraph').children().first()[0], "diagram.png", {scale: 1, backgroundColor: 'white'});
 });
 
+$(document).keydown(function(e) {
+    switch(e.which) {
+        case 38: // up
+        document.getElementById('btn_reset').scrollIntoView({block: 'start', behavior: 'smooth'});
+        break;
+
+        case 40: // down
+        document.getElementById('supergraph').scrollIntoView({block: 'start', behavior: 'smooth'});
+        break;
+
+        default: return; // exit this handler for other keys
+    }
+    e.preventDefault(); // prevent the default action (scroll / move caret)
+});
+
+
 
 function expandAll(){
     expand(root);
