@@ -1,5 +1,0 @@
-strict digraph  { 
-1 [attr="{'foo': 5, 'baz': 4}"]; 
-2 [attr="{'foo': 'a', 'baz': 'c'}"]; 
-1 -> 2; 
-} 
