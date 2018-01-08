@@ -1,0 +1,7 @@
+strict digraph  {
+1 [label=kekek, attr="{}"];
+2 [label=None, attr="{}"];
+3 [label=None, attr="{}"];
+4 [label=None, attr="{}"];
+1 -> 2  [weight=2];
+}
