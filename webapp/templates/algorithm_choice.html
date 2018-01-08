@@ -13,14 +13,53 @@
   <div class="form-group">
     <select id="algorithms-select" class="form-control col-sm-6">
       <option disabled selected value> -- select an option -- </option>
+      {% for algo in algo_data %}
+      <option value="{{ loop.index0 }}">{{ algo.name }}</option>
+      {% endfor %}
     </select>
     <!-- pass selected model id to next stage -->
   </div>
   <form id="algorithm-form" method="post">
+    <div id="json-form"></div>
     <!-- jsonform will insert its fields before the button and hidden fields,
           hidden algorithm field will match the select above, which is outside the form -->
     <input id="algorithm" name="algorithm" type="hidden">
     <input id="model_id" name="model_id" type="hidden" value="{{ model_id }}">
+    <div class="form-group row">
+      <label for="stopping-criterion" class="col-form-label col-sm-6">Select Stopping Criterion</label>
+      <div class="col-auto">
+        <select id="stopping-criterion" name="stopping-criterion" class="form-control">
+          <!--<option disabled selected value>Choose Criterion</option>-->
+        {% for criterion in stopping_criteria %}
+          <option>{{ criterion.__name__ }}</option>
+        {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="labeling-method" class="col-form-label col-sm-6">Select Labeling Method</label>
+      <div class="col-auto">
+        <select id="labeling-method" name="labeling-method" class="form-control">
+          <!--<option disabled selected value>Choose Method</option>-->
+        {% for method in labeling_methods %}
+          <option>{{ method.__name__ }}</option>
+        {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="labeling-source" class="col-form-label col-sm-6">Select Labeling Source</label>
+      <div class="col-auto">
+        <select id="labeling-source" name="labeling-source" class="form-control">
+          <!--<option disabled selected value>Choose Method</option>-->
+        {% for source in ['Edges', 'Nodes'] %}
+          <option>{{ source }}</option>
+        {% endfor %}
+        </select>
+      </div>
+    </div>
+
     <div class="form-group">
       <button type="submit" class="btn btn-primary">Choose Algorithm</button>
     </div>
@@ -32,25 +71,24 @@
       function(){
         var algos = {{algo_data | tojson}};
         console.log(algos);
-        for (i in algos) {
-          $('#algorithms-select').append($('<option>', {
-            value: i,
-            text: algos[i].name
-          }));
-        }
 
         var update_form = function() {
+          console.log($('#algorithms-select').val());
           selected_algo = algos[$('#algorithms-select').val()];
-          // make hidden field that actually submits the value match the 
-          $('#algorithm').val(selected_algo.name);
-          console.log(JSON.stringify(selected_algo.form));
-          $('#algorithm-form').jsonForm(selected_algo.form);
+          if (selected_algo !== undefined) {
+            // make hidden field that actually submits the value match the 
+            $('#algorithm').val(selected_algo.name);
+            console.log(JSON.stringify(selected_algo.form));
+            $('#json-form').empty().jsonForm(selected_algo.form);
+          } else {
+            console.log('Got no selection');
+          }
         }
-        $('#algorithms-select').change(update_form);
         // to deal with users clicking 'back' correctly
         if ($('#algorithms-select').val() != '') {
           update_form();
         }
+        $('#algorithms-select').change(update_form);
     });
   </script>
 {% endblock %}
