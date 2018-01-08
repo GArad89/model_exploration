@@ -32,7 +32,7 @@ class SpectralCluster(Cluster):
         #number of clusters can't be bigger than the number of nodes
         if(self.n>=len(dgraph.nodes())): n_clusters=len(dgraph.nodes())-1
         else: n_clusters=self.n
-        print(dgraph.nodes())
+  
 
         #adjacency matrix
         adj_mat =dgraph.adjacency_matrix()

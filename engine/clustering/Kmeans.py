@@ -20,7 +20,12 @@ class KmeansClustering (Cluster):
         return schema, form 
  
      
-    def cluster(self,dgraph): 
+    def cluster(self,dgraph):
+
+        #number of clusters can't be bigger than the number of nodes
+        if(self.n>=len(dgraph.nodes())): n_clusters=len(dgraph.nodes())-1
+        else: n_clusters=self.n
+     
 
         ## graph embedding (from node to 2 dimensional vectors))
         embedding=spectral_layout(dgraph.dgraph) 
