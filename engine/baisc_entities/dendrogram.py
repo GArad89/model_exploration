@@ -21,7 +21,6 @@ class Node:
         self.child_indexes=[]
 
     def add_child(self, child):
-        #print("child indexes of ",self.get_label()," ,is: ",self.child_indexes)
         self.child_indexes+=[child]
 
     def parent(self):
@@ -57,7 +56,7 @@ class Dendrogram:
     def nodes(self):
         return self.node_list
 
-    def add_child(self,parent,child):  #only used right after add_node. need to merge methods if there are no further uses
+    def add_child(self,parent,child): 
         self.node_list[parent].add_child(child)
 
     def label_by_order(self,node):

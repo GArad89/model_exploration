@@ -27,10 +27,6 @@ def run_algo(graph, algo_name, params, stopping_criterion, labeling_method):
 def get_info_list():
     return createAlgoParamsJSON();
 
-###tests###
 
-
-#print(run_algo(DGraph.read_dot("./dot/g2.dot"),"SpectralCluster",None,stopCriteria="SizeCriteria"))
-#print(get_info_list())
 
     
