@@ -9,32 +9,65 @@ def Sparset_Cut_Target(bound,graph_node_num):
     return bound/graph_node_num
 
 def LB_lps(dgraph,bnb_node):
+     if(len(bnb_node.checked)==len(dgraph.nodes())): return check_final_cut(bnb_node,dgraph)
+     a,bnb_node.res= LPS().solve_LB(dgraph.dgraph)
+     return a
 
-     return bnb_node.res.fun
-            
+def LB_lps_simple(dgraph,bnb_node):
+     if(bnb_node.parent_bnb_node==None):
+         a,bnb_node.res= LPS().solve_LB(dgraph.dgraph)
+         return a
+     return LB_Greedy_Simple(dgraph,bnb_node)
 
-def UB_lps(dgraph,bnb_node):
+def UB_lps_simple(dgraph,bnb_node,new_graph_node,is_accepted):
+    if(bnb_node.parent_bnb_node==None): return UB_lps(dgraph,bnb_node,new_graph_node,is_accepted)
+    if((new_graph_node in bnb_node.parent_bnb_node.relaxed_a)and(is_accepted==False))or((new_graph_node in bnb_node.parent_bnb_node.relaxed_r)and(is_accepted)):
+        bnb_node.relaxed_a=bnb_node.parent_bnb_node.relaxed_a
+        bnb_node.relaxed_r=bnb_node.parent_bnb_node.relaxed_r
+        if (is_accepted==False):
+            bnb_node.relaxed_a.remove(new_graph_node)
+            bnb_node.relaxed_r+=[new_graph_node]
+        else:
+            bnb_node.relaxed_r.remove(new_graph_node)
+            bnb_node.relaxed_a+=[new_graph_node]
+    else: return bnb_node.parent_bnb_node.UB
+    temp= copy.deepcopy(bnb_node)
+    temp.accepted=bnb_node.relaxed_a
+    temp.rejected=bnb_node.relaxed_r
+    return check_final_cut(temp,dgraph)
+    
+def UB_lps(dgraph,bnb_node,new_graph_node,is_accepted):
+    if(bnb_node.parent_bnb_node==None):
+        bnb_node.relaxed_a,bnb_node.UB=LPS().solve_UB(dgraph.dgraph, bnb_node.res,{})
+    else:
+     if((new_graph_node in bnb_node.parent_bnb_node.relaxed_a)and(is_accepted==False))or((new_graph_node in bnb_node.parent_bnb_node.relaxed_r)and(is_accepted)):
+         for node in bnb_node.accepted:
+            bnb_node.partial_assignment_dict[node]=1
+         for node in bnb_node.rejected:
+            bnb_node.partial_assignment_dict[node]=0
+         print(bnb_node.partial_assignment_dict)
+         if(len(bnb_node.partial_assignment_dict)==len(dgraph.nodes())):
+            bnb_node.LB=check_final_cut(bnb_node,dgraph)
+            return bnb_node.LB
+         if(len(bnb_node.partial_assignment_dict)==len(dgraph.nodes())-1):
+            bnb_node.LB=LB_Greedy_Simple(dgraph, bnb_node) 
+            return bnb_node.LB
+         bnb_node.relaxed_a,bnb_node.UB=LPS().solve_UB(dgraph.dgraph,bnb_node.bnb_node.res,partial_assignment_dict)
+     else:
+        bnb_node.relaxed_a=bnb_node.parent_bnb_node.relaxed_a
+        bnb_node.relaxed_r=bnb_node.parent_bnb_node.relaxed_r
+        bnb_node.UB=bnb_node.parent_bnb_node.UB
+
+    if(len(bnb_node.relaxed_r)==0):
+        for node in dgraph.nodes():
+            if node not in bnb_node.relaxed_a: bnb_node.relaxed_r+=[node]
+    #print("UB is "+str(bnb_node.UB))
+    return bnb_node.UB
   
-    accepted=[]
-    rejected=[]
-    i=0
-    for node in dgraph.nodes():
-        if (bnb_node.res.x[i]>0): accepted+=[node]
-        else: rejected+=[node]
-        i+=1
-    bnb_node.relaxed_a=accepted
-    bnb_node.relaxed_r=rejected
-    graph_edges=dgraph.dgraph.edges(data=True)
-    UB=0
-    for edge in graph_edges:
-        if((edge[0] in rejected)and(edge[1] in accepted)):
-            UB+=int(edge[2].get('weight',1))
-        elif ((edge[1] in rejected)and(edge[0] in accepted)):
-             UB+=int(edge[2].get('weight',1))
-    if(min(len(accepted),len(rejected))>0): return UB/min(len(accepted),len(rejected))
-    return UB
 
-def UB_Greedy_Simple(dgraph,bnb_node):  #not the actual UB, it replace the sorting by UB to sorting by LB
+def UB_Greedy_Simple(dgraph,bnb_node,new_graph_node,is_accepted):
+    #not the actual UB, it replace the sorting by UB to sorting by LB
+    #the input is only in order to have the same input as UB_lps
     return bnb_node.LB
 
 def LB_Greedy_Simple(dgraph, bnb_node):
@@ -106,18 +139,7 @@ class BnBNode():
             self.weight=parent_bnb_node.weight
             self.checked+=parent_bnb_node.checked
             self.LB=parent_bnb_node.LB
-            self.relaxed_a+=parent_bnb_node.relaxed_a
-            self.relaxed_r+=parent_bnb_node.relaxed_r
-            if(heru_dict['heru_LB']==LB_lps)or(heru_dict['heru_UB']==UB_lps):
-                #print('check')
-                if((new_graph_node in self.relaxed_a)and(is_accepted==False))or((new_graph_node in self.relaxed_r)and(is_accepted)):
-                     for node in self.accepted:
-                         self.partial_assignment_dict[node]=1
-                     for node in self.rejected:
-                         self.partial_assignment_dict[node]=0  
-                     self.res=compute_lower_bound(dgraph.dgraph.to_undirected(),self.partial_assignment_dict)
-                else: self.res=parent_bnb_node.res
-        elif(heru_dict['heru_LB']==LB_lps)or(heru_dict['heru_UB']==UB_lps): self.res=compute_lower_bound(dgraph.dgraph.to_undirected(),self.partial_assignment_dict)
+
         self.parent_bnb_node=parent_bnb_node
         if(is_accepted==True):
             self.weight+=1
@@ -126,7 +148,7 @@ class BnBNode():
            self.rejected+=[new_graph_node]
         self.checked+=[new_graph_node]
         self.LB=heru_dict['heru_LB'](dgraph,self)
-        self.UB=heru_dict['heru_UB'](dgraph,self)
+        self.UB=heru_dict['heru_UB'](dgraph,self,new_graph_node,is_accepted)
         
     def add_child(self, child_node):
         
