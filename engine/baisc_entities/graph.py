@@ -46,7 +46,7 @@ class DGraph:
 
 
     def node_attr(self, node, attr):
-        return self.dgraph.nodes[node]['attr'][attr]
+        return self.dgraph.nodes[node][attr]
 
     def write_dot(self, path):
         print("write_dot called")
