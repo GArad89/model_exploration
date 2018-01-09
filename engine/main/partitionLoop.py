@@ -1,5 +1,5 @@
 from ..baisc_entities.graph import *
-from ..clustering import SpectralCluster, minimum_cut, Kmeans, Branch_and_Bound
+from ..clustering import SpectralCluster, minimum_cut, KmeansClustering, Branch_and_Bound
 from ..stopping_criteria.stopCriteria import *
 from ..baisc_entities.dendrogram import Node,Dendrogram
 
