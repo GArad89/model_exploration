@@ -13,16 +13,23 @@ class SpectralCluster(Cluster):
     """
 
 
-    def __init__(self, n = 2):
+    def __init__(self, n = 2, affinity='precomputed'):
         super().__init__()
         self.n = n
+        self.affinity = affinity
 
 
     @staticmethod
     def get_params():
-        form = [{'key': 'n', 'type': 'text'}]
+        form = [{'key': 'n', 'type': 'text'}, {'key' : 'affinity'}]
         schema = {
-            'n' : {'type': 'integer', 'title': 'number of clusters', 'minimum' : 2, 'required' : True}  }
+            'n' : {'type': 'integer', 'title': 'Number of Clusters', 'minimum' : 2, 'required' : True},
+            'affinity' : {
+                'type' : 'string',
+                'title': 'Affinity',
+                'enum': ['precomputed', 'rbf', 'sigmoid', 'polynomial', 'poly', 'linear', 'cosine', 'nearest_neighbors'],
+            },
+        }
         return schema, form
 
 
@@ -39,7 +46,7 @@ class SpectralCluster(Cluster):
         adj_mat=np.maximum(adj_mat,adj_mat.transpose())
 
         #SpectralClustering
-        sc = SpectralClustering(n_clusters,affinity='precomputed')
+        sc = SpectralClustering(n_clusters,affinity=self.affinity)
         sc.fit(adj_mat)
         result=sc.labels_
         

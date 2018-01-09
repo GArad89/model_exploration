@@ -189,16 +189,16 @@ var initializeTabs = function (tabs) {
 
 // Twitter bootstrap-friendly HTML boilerplate for standard inputs
 jsonform.fieldTemplate = function(inner) {
-  return '<div class="form-group jsonform-error-<%= keydash %>' +
+  return '<div class="form-group row jsonform-error-<%= keydash %>' +
     '<%= elt.htmlClass ? " " + elt.htmlClass : "" %>' +
     '<%= (node.schemaElement && node.schemaElement.required && (node.schemaElement.type !== "boolean") ? " jsonform-required" : "") %>' +
     '<%= (node.readOnly ? " jsonform-readonly" : "") %>' +
     '<%= (node.disabled ? " jsonform-disabled" : "") %>' +
     '">' +
     '<% if (node.title && !elt.notitle) { %>' +
-      '<label class="form-label" for="<%= node.id %>"><%= node.title %></label>' +
+      '<label class="col-form-label col-sm-3" for="<%= node.id %>"><%= node.title %></label>' +
     '<% } %>' +
-    '<div class="controls">' +
+    '<div class="controls col-auto">' +
       '<% if (node.prepend || node.append) { %>' +
       '<div class="<% if (node.prepend) { %>input-prepend<% } %>' +
         '<% if (node.append) { %> input-append<% } %>">' +
@@ -1075,7 +1075,7 @@ jsonform.elementTypes = {
     'template': '<%= elt.msg %>'
   },
   'fieldset':{
-    'template': '<fieldset class="form-group jsonform-error-<%= keydash %> <% if (elt.expandable) { %>expandable<% } %> <%= elt.htmlClass?elt.htmlClass:"" %>" ' +
+    'template': '<fieldset class="form-group row jsonform-error-<%= keydash %> <% if (elt.expandable) { %>expandable<% } %> <%= elt.htmlClass?elt.htmlClass:"" %>" ' +
       '<% if (id) { %> id="<%= id %>"<% } %>' +
       '>' +
       '<% if (node.title || node.legend) { %><legend><%= node.title || node.legend %></legend><% } %>' +
@@ -1089,7 +1089,7 @@ jsonform.elementTypes = {
       '<% if (id) { %> id="<%= id %>"<% } %>' +
       ' class="expandable <%= elt.htmlClass?elt.htmlClass:"" %>">' +
       '<legend>Advanced options</legend>' +
-      '<div class="form-group">' +
+      '<div class="form-group row">' +
       '<%= children %>' +
       '</div>' +
       '</fieldset>'
@@ -1099,7 +1099,7 @@ jsonform.elementTypes = {
       '<% if (id) { %> id="<%= id %>"<% } %>' +
       ' class="expandable <%= elt.htmlClass?elt.htmlClass:"" %>">' +
       '<legend>Authentication settings</legend>' +
-      '<div class="form-group">' +
+      '<div class="form-group row">' +
       '<%= children %>' +
       '</div>' +
       '</fieldset>'
@@ -1123,9 +1123,9 @@ jsonform.elementTypes = {
       '<% if (node.formElement.key) { %><input type="hidden" id="<%= node.id %>" name="<%= node.name %>" value="<%= escape(value) %>" /><% } else { %>' +
         '<a id="<%= node.id %>"></a><% } %>' +
       '<div class="tabbable">' +
-        '<div class="form-group<%= node.formElement.hideMenu ? " hide" : "" %>">' +
-          '<% if (node.title && !elt.notitle) { %><label class="form-label" for="<%= node.id %>"><%= node.title %></label><% } %>' +
-          '<div class="controls"><%= tabs %></div>' +
+        '<div class="form-group row<%= node.formElement.hideMenu ? " hide" : "" %>">' +
+          '<% if (node.title && !elt.notitle) { %><label class="col-form-label col-sm-3" for="<%= node.id %>"><%= node.title %></label><% } %>' +
+          '<div class="controls col-auto"><%= tabs %></div>' +
         '</div>' +
         '<div class="tab-content">' +
           '<%= children %>' +
@@ -2601,7 +2601,7 @@ formNode.prototype.generate = function () {
   });
   data.children = childrenhtml;
 
-  data.fieldHtmlClass = 'col-sm-6';
+  data.fieldHtmlClass = 'form-control';
   if (this.ownerTree &&
       this.ownerTree.formDesc &&
       this.ownerTree.formDesc.params &&

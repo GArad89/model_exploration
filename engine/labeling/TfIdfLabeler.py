@@ -6,8 +6,8 @@ from .label import GraphLabeler
 
 class TfIdfLabeler(GraphLabeler):
 
-    def __init__(self, graph, dendrogram):
-        super().__init__(graph, dendrogram)
+    def __init__(self, graph, dendrogram, source):
+        super().__init__(graph, dendrogram, source)
 
     def label(self):
         # for every node, map list of labels of inside edges
@@ -72,6 +72,6 @@ class TfIdfLabeler(GraphLabeler):
         # label the dendrogram's nodes
         for node in self.dendrogram.nodes():
             print(node.subset)
-             top_label = top_labels(node.subset)
+            top_label = top_labels(node.subset)
             print("top_label = ", top_label)
             node.label = top_label

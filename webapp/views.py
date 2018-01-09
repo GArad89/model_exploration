@@ -58,6 +58,8 @@ def algorithm_choice_form():
 
     algo_data = createAlgoParamsJSON()
 
+    labeling_sources = labeling.get_sources()
+
     errors = {} #TODO: server-side form validation too (use same json schema)
     if request.method == 'POST':
         #TODO: get params from form
@@ -80,8 +82,10 @@ def algorithm_choice_form():
 
         stopping_criterion = request.values['stopping-criterion']
         labeling_method = request.values['labeling-method']
+        labeling_source = request.values['labeling-source']
+        #TODO: if labeling_source not in labeling_sources: raise Exception('aaah')
 
-        result = run_algo(graph, algorithm_name, parameters, stopping_criterion, labeling_method)
+        result = run_algo(graph, algorithm_name, parameters, stopping_criterion, labeling_method, labeling_source)
         result_id = get_results().save(result)
 
         return redirect(url_for('show_results', result_id=result_id))
@@ -94,6 +98,7 @@ def algorithm_choice_form():
                            errors=errors,
                            algo_data=algo_data,
                            labeling_methods=labeling.get_methods(),
+                           labeling_sources=labeling_sources,
                            stopping_criteria=stopping_criteria.get_criteria())
 
 

@@ -5,22 +5,22 @@ import networkx as nx
 import copy
 from engine.linear_programming.lin_prog_solver import *
 
-def Sparset_Cut_Target(bound,graph_node_num):
+def sparset_cut_target(bound,graph_node_num):
     return bound/graph_node_num
 
-def LB_lps(dgraph,bnb_node):
+def lower_bound_lps(dgraph,bnb_node):
      if(len(bnb_node.checked)==len(dgraph.nodes())): return check_final_cut(bnb_node,dgraph)
      a,bnb_node.res= LPS().solve_LB(dgraph.dgraph)
      return a
 
-def LB_lps_simple(dgraph,bnb_node):
+def lower_bound_lps_simple(dgraph,bnb_node):
      if(bnb_node.parent_bnb_node==None):
          a,bnb_node.res= LPS().solve_LB(dgraph.dgraph)
          return a
-     return LB_Greedy_Simple(dgraph,bnb_node)
+     return lower_bound_greedy_simple(dgraph,bnb_node)
 
-def UB_lps_simple(dgraph,bnb_node,new_graph_node,is_accepted):
-    if(bnb_node.parent_bnb_node==None): return UB_lps(dgraph,bnb_node,new_graph_node,is_accepted)
+def upper_bound_lps_simple(dgraph,bnb_node,new_graph_node,is_accepted):
+    if(bnb_node.parent_bnb_node==None): return upper_bound_lps(dgraph,bnb_node,new_graph_node,is_accepted)
     if((new_graph_node in bnb_node.parent_bnb_node.relaxed_a)and(is_accepted==False))or((new_graph_node in bnb_node.parent_bnb_node.relaxed_r)and(is_accepted)):
         bnb_node.relaxed_a=bnb_node.parent_bnb_node.relaxed_a
         bnb_node.relaxed_r=bnb_node.parent_bnb_node.relaxed_r
@@ -36,7 +36,7 @@ def UB_lps_simple(dgraph,bnb_node,new_graph_node,is_accepted):
     temp.rejected=bnb_node.relaxed_r
     return check_final_cut(temp,dgraph)
     
-def UB_lps(dgraph,bnb_node,new_graph_node,is_accepted):
+def upper_bound_lps(dgraph,bnb_node,new_graph_node,is_accepted):
     if(bnb_node.parent_bnb_node==None):
         bnb_node.relaxed_a,bnb_node.UB=LPS().solve_UB(dgraph.dgraph, bnb_node.res,{})
     else:
@@ -50,7 +50,7 @@ def UB_lps(dgraph,bnb_node,new_graph_node,is_accepted):
             bnb_node.LB=check_final_cut(bnb_node,dgraph)
             return bnb_node.LB
          if(len(bnb_node.partial_assignment_dict)==len(dgraph.nodes())-1):
-            bnb_node.LB=LB_Greedy_Simple(dgraph, bnb_node) 
+            bnb_node.LB=lower_bound_greedy_simple(dgraph, bnb_node) 
             return bnb_node.LB
          bnb_node.relaxed_a,bnb_node.UB=LPS().solve_UB(dgraph.dgraph,bnb_node.bnb_node.res,partial_assignment_dict)
      else:
@@ -65,12 +65,12 @@ def UB_lps(dgraph,bnb_node,new_graph_node,is_accepted):
     return bnb_node.UB
   
 
-def UB_Greedy_Simple(dgraph,bnb_node,new_graph_node,is_accepted):
-    #not the actual UB, it replace the sorting by UB to sorting by LB
-    #the input is only in order to have the same input as UB_lps
+def upper_bound_greedy_simple(dgraph,bnb_node,new_graph_node,is_accepted):
+    #not an actual upper bound, it replace the sorting by upper bound to sorting by lowerbound
+    #the input is only in order to have the same input as upper_bound_lps
     return bnb_node.LB
 
-def LB_Greedy_Simple(dgraph, bnb_node):
+def lower_bound_greedy_simple(dgraph, bnb_node):
     graph_edges = dgraph.edges()
     is_accepted = True
     
@@ -101,7 +101,7 @@ def LB_Greedy_Simple(dgraph, bnb_node):
         if (bnb_node.rejected.count(edge[0])>0): LB+=is_accepted*int(edge[1])
     return LB/(len(dgraph.nodes())-len(bnb_node.checked)+2*min(len(bnb_node.accepted),len(bnb_node.rejected)))
 
-def Sort_Nodes_byDegree(dgraph, bnb_node=None):  #bnb_node added so Sort by degrees input variables will match other sort heruistics.  
+def sort_nodes_by_degree(dgraph, bnb_node=None):  #bnb_node added so Sort by degrees input variables will match other sort heruistics.  
     deg_dict=dgraph.dgraph.degree(dgraph.nodes())
     
     sorted_nodes_tuple=sorted(deg_dict, key=lambda tup: tup[1])
@@ -193,7 +193,7 @@ class BnBSearchTree():
     def kill_node(self,bnb_node):
         self.live_nodes.remove(bnb_node)
 
-    def Check_Live(self):     # run over the remaining BnB sub_problems and rejects according to the bounds
+    def _check_live(self):     # run over the remaining BnB sub_problems and rejects according to the bounds
         rejected=[]
         if((self.best_sol_cut>0)and(self.best_solution!=None)):
             for node in self.live_nodes:
@@ -208,7 +208,7 @@ class BranchAndBoundCluster (Cluster):
     sorted_nodes_by_edge_weight=[]
     adj_mat=[]
     
-    def __init__(self,target=Sparset_Cut_Target,heru_LB=LB_Greedy_Simple,heru_UB=UB_Greedy_Simple,heru_order=Sort_Nodes_byDegree):
+    def __init__(self,target=sparset_cut_target,heru_LB=lower_bound_greedy_simple,heru_UB=upper_bound_greedy_simple,heru_order=sort_nodes_by_degree):
         self.target = target
         self.heru_LB = heru_LB
         self.heru_UB = heru_UB
@@ -238,7 +238,7 @@ class BranchAndBoundCluster (Cluster):
                 
             bnb_tree.kill_node(live_node)
             if(bnb_tree.best_sol_cut<current_best_sol_cut): current_best_sol_cut=bnb_tree.best_sol_cut
-            bnb_tree.Check_Live()
+            bnb_tree._check_live()
             
         #main_name=__main__.__file__.split('\\')
         if debug_print:
