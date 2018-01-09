@@ -451,18 +451,29 @@ function updateGraph(source) {
   });
 
 	svg_supergraph = d3.select('#svg_supergraph');
-	svg_supergraph.append("rect")
+	svg_supergraph.append("rect");
 
 	zoom_supergraph = d3.zoom()
         .scaleExtent([1 / 2, 4])
         .on("zoom", zoomed_supergraph);
 
-    svg_supergraph.attr("width", width)
+  svg_supergraph.attr("width", width)
     .attr("height", height)
     .style("fill", "none")
     .style("pointer-events", "all")
     .call(zoom_supergraph);
 
+  // read SVG transform matrix, convert to d3-zoom object, set as initial zoom. ugh.
+  // this stops the super-state graph jumping on first zoom
+  var initialTransform = document.getElementById('graph0').transform.baseVal.consolidate().matrix;
+  console.log('initial transform from svg');
+  console.log(initialTransform);
+  if (initialTransform.a != initialTransform.d) {
+    alert('svg zoom on supergraph does not preserve aspect ratio. UNSUPPORTED!');
+  }
+  var asZoomTransform = d3.zoomIdentity.translate(initialTransform.e, initialTransform.f).scale(initialTransform.a);
+  // set initial transform
+  svg_supergraph.call(zoom_supergraph.transform, asZoomTransform);
 }
 
 function graphvizEscape(str) {
