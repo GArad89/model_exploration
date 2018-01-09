@@ -453,7 +453,7 @@ function updateGraph(source) {
 }
 
 function graphvizEscape(str) {
-    return '"' + str.replace('\n', '\\n') + '"';
+    return '"' + str.replace(/\n/g,'\\n') + '"';
 }
 
 function mergeAttributes(attributes) {
@@ -498,7 +498,7 @@ function attributesToGraphViz(attributes) {
         return item.name + '=' + item.value;
       });
 
-      return '[' + attributeStrings.join(',') + ']';
+      return attributeStrings.join(',');
     }
     return '';
 }
@@ -528,10 +528,17 @@ function supergraphToSvg(supergraphNodes, superEdges) {
       attributes = attributesToGraphViz(node.data.attrs)
     } else {
       // no server-side attributes
-      attributes = '[label=' + graphvizEscape(node.data.name) + ' shape=rectangle]'
+      attributes = 'label=' + graphvizEscape(node.data.name) + ',shape=rectangle'
+    }
+    // if node is a cluster and not a concrete vertex, give it an id so we can hook up to the dendrogram
+    if (!node.data.isConcrete) {
+      if (attributes.length > 0){
+        attributes += ','
+      }
+      attributes += 'id="' + node.data.id + '"';
     }
     // write node to graphviz;
-    graphvizOutput += '' + index + ' ' + attributes + ';\n';
+    graphvizOutput += '' + index + ' [' + attributes + '];\n';
 	});
 
 	for (var srcNode in superEdges) {
@@ -562,7 +569,7 @@ function supergraphToSvg(supergraphNodes, superEdges) {
           // add the edge to the total output
           graphvizOutput += '' + supernodeToGraph[srcNode] + ' -> ' + supernodeToGraph[target];
 
-          graphvizOutput += ' ' + attributes + ';\n';
+          graphvizOutput += ' [' + attributes + '];\n';
         }
       }
 		}
