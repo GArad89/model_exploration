@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block title %}Choose Algorithms{% endblock %}
+{% block title %}Choose Clustering Method{% endblock %}
 
 {% block head %}
 {{ super() }}
@@ -9,14 +9,17 @@
 {% endblock %}
 
 {% block body %}
-  <h3>Select an Algorithm:</h3>
-  <div class="form-group">
-    <select id="algorithms-select" class="form-control col-sm-6">
-      <option disabled selected value> -- select an option -- </option>
-      {% for algo in algo_data %}
-      <option value="{{ loop.index0 }}">{{ algo.name }}</option>
-      {% endfor %}
-    </select>
+  <h3>Select a Clustering Method:</h3>
+  <div class="form-group row">
+    <label for="algorithms-select" class="col-form-label col-sm-3">Select Labeling Method</label>
+    <div class="col-auto">
+      <select id="algorithms-select" class="form-control">
+        <option disabled selected value> -- select an option -- </option>
+        {% for algo in algo_data %}
+        <option value="{{ loop.index0 }}">{{ algo.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
     <!-- pass selected model id to next stage -->
   </div>
   <form id="algorithm-form" method="post">
@@ -26,7 +29,7 @@
     <input id="algorithm" name="algorithm" type="hidden">
     <input id="model_id" name="model_id" type="hidden" value="{{ model_id }}">
     <div class="form-group row">
-      <label for="stopping-criterion" class="col-form-label col-sm-6">Select Stopping Criterion</label>
+      <label for="stopping-criterion" class="col-form-label col-sm-3">Select Stopping Criterion</label>
       <div class="col-auto">
         <select id="stopping-criterion" name="stopping-criterion" class="form-control">
           <!--<option disabled selected value>Choose Criterion</option>-->
@@ -37,7 +40,7 @@
       </div>
     </div>
     <div class="form-group row">
-      <label for="labeling-method" class="col-form-label col-sm-6">Select Labeling Method</label>
+      <label for="labeling-method" class="col-form-label col-sm-3">Select Labeling Method</label>
       <div class="col-auto">
         <select id="labeling-method" name="labeling-method" class="form-control">
           <!--<option disabled selected value>Choose Method</option>-->
@@ -49,7 +52,7 @@
     </div>
 
     <div class="form-group row">
-      <label for="labeling-source" class="col-form-label col-sm-6">Select Labeling Source</label>
+      <label for="labeling-source" class="col-form-label col-sm-3">Select Labeling Source</label>
       <div class="col-auto">
         <select id="labeling-source" name="labeling-source" class="form-control">
           <!--<option disabled selected value>Choose Method</option>-->
