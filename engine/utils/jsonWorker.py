@@ -5,17 +5,23 @@ import json
 type_parsers = {
     'integer' : int,
     'number' : float,
-    'text' : str,
+    'string' : str,
 }
 
 def parse_parameters(parameters, schema):
     "parse parameters returned from form according to json schema"
     parsed = {}
     for name, value in parameters.items():
-        parser = type_parsers.get(schema[name]['type'], None)
+        item_schema = schema[name]
+        parser = type_parsers.get(item_schema['type'], None)
         if parser is None:
             raise Exception('unsupported schema type: ' + schema[name]['type'])
-        parsed[name] = parser(value)
+        real_value = parser(value)
+        if 'enum' in item_schema:
+            if real_value not in item_schema['enum']:
+                raise Exception('Invalid enum value {} not in allowed values {}'.format(
+                                    real_value, item_schema['enum']))
+        parsed[name] = real_value
     return parsed
 
 
