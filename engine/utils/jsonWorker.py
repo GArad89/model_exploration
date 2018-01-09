@@ -9,7 +9,7 @@ type_parsers = {
 }
 
 def parse_parameters(parameters, schema):
-    "parse parameters returned from form according to json schema"
+    "parse parameters returned from form according to json schema. VERY LIMITED"
     parsed = {}
     for name, value in parameters.items():
         item_schema = schema[name]
@@ -51,12 +51,13 @@ def dendrogramToJSON(dendro):
     #print(clusters)
     jsondata['clusters'] = clusters
 
-    jsondata['cluster_struct']=clusterBuild(0,clusters)
-    #print(jsondata['cluster_struct'])
+    jsondata['cluster_tree']= _build_cluster_tree(0,clusters)
+    #print(jsondata['cluster_tree'])
 
     return jsondata
 
-def clusterBuild(index,cluster_list):
+def _build_cluster_tree(index,cluster_list):
+    "turn cluster graph to tree"
     node = {}
 
     node["name"] = cluster_list[index]['name']
@@ -65,7 +66,7 @@ def clusterBuild(index,cluster_list):
     children = []
     for child in cluster_list[index]['outEdge']:
         # recursively do this for children
-        children.append(clusterBuild(child, cluster_list))
+        children.append(_build_cluster_tree(child, cluster_list))
     # if there were children, add them
     if children:
         node['children'] = children

@@ -193,7 +193,7 @@ data.vertices.forEach(function(vertex) {
 });
 
 // set up tree view
-treeData = data['cluster_struct'];
+treeData = data['cluster_tree'];
 // Assigns parent, children, height, depth
 root = d3.hierarchy(treeData, function(d) { return d.children; });
 console.log(root);

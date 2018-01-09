@@ -6,8 +6,8 @@ np.set_printoptions(precision=5)
 
 class RandomWalkLabeler(GraphLabeler):
 
-    def __init__(self, graph, dendrogram):
-        super().__init__(graph, dendrogram)
+    def __init__(self, graph, dendrogram, source):
+        super().__init__(graph, dendrogram, source)
         self.laplacian_mat = np.array(nx.directed_laplacian_matrix(self.graph.dgraph))
 
     def label(self, iterations=1000):

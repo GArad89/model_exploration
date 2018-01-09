@@ -8,7 +8,7 @@ from .partitionLoop import partition
 
 import importlib
 
-def run_algo(graph, algo_name, params, stopping_criterion, labeling_method):
+def run_algo(graph, algo_name, params, stopping_criterion, labeling_method, labeling_source):
     #parsing from string + paramsto algo object
     algo_class = get_cluster_algorithm(algo_name) #we want the algorithm class
     algo = algo_class(**params) #now we have an object
@@ -19,7 +19,7 @@ def run_algo(graph, algo_name, params, stopping_criterion, labeling_method):
     stopCri = class_(2) #now we have an object #the 20 is the threshold TODO change later
     dendro=partition(graph, algo, stopCri)
 
-    labeler = get_labeling_method(labeling_method)(graph, dendro)
+    labeler = get_labeling_method(labeling_method)(graph, dendro, labeling_source)
     labeler.label()
     
     return dendrogramToJSON(dendro)

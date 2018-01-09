@@ -56,7 +56,7 @@
       <div class="col-auto">
         <select id="labeling-source" name="labeling-source" class="form-control">
           <!--<option disabled selected value>Choose Method</option>-->
-        {% for source in ['Edges', 'Nodes'] %}
+        {% for source in labeling_sources %}
           <option>{{ source }}</option>
         {% endfor %}
         </select>

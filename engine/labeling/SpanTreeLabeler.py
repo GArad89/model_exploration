@@ -2,8 +2,8 @@ from ..baisc_entities.graph import *
 from .label import GraphLabeler
 
 class STLabeling(SuperstateGraphLabeler):
-    def __init__(self, graph, dendrogram):
-        super().__init__(graph, dendrogram)
+    def __init__(self, graph, dendrogram, source):
+        super().__init__(graph, dendrogram, source)
     
     def label(self):
         for node in self.dendrogram.nodes():
