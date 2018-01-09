@@ -2,19 +2,18 @@ from .graph import DGraph
 import networkx as nx
 
 class Node:
-    parent_index=-1
     child_indexes=[]
     label=None
     subset=[]
     projected_graph=None
     
-    def __init__(self, parent=None, subset=[],dgraph=None, label=None):
-        if(parent==None):
+    def __init__(self, parent=-1, subset=[],dgraph=None, label=None):
+        if(parent==-1):
             if(label==None):
                 self.label='root'
-        else:
-            self.parent_index=parent
-            self.label=label
+
+        self.parent_index=parent
+        self.label=label if label is not None else ''
                 
         self.subset=subset
         self.projected_graph=dgraph
@@ -48,40 +47,11 @@ class Dendrogram:
         self.dgraph=dgraph
 
     def add_node(self,node):
-        print()
-        if(node.get_label()==None):
-            self.label_by_sum_names(node)
         self.node_list+=[node]
 
     def nodes(self):
         return self.node_list
 
     def add_child(self,parent,child): 
-        self.node_list[parent].add_child(child)
-
-    def label_by_order(self,node):
-        node.label='Node '+str(len(self.node_list))
-    
-    def label_by_sum_names(self, node):
-        label_temp=[]
-        #label_list=
-        #print(label_list)
-        for graph_node in node.subset:
-            temp=node.projected_graph.dgraph.node[graph_node].get('label','')
-            if temp:
-                label_temp.append(str(temp))
-            else: #TODO: something better
-                label_temp.append(str(graph_node))
-
-        #for edge in node.projected_graph.dgraph.edges():
-
-        if label_temp:        
-            node.label = "_".join(label_temp)
-        else:
-            self.label_by_order(node)
-
-    def edges_by_sum_names(self,node):
-        #TO DO
-        pass
-        
+        self.node_list[parent].add_child(child)        
 
