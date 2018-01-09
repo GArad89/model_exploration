@@ -167,10 +167,11 @@ console.log(data);
 
 // set up for graph view
 
-// mapping of: cluster i name -> [vertex i1, vertex i2, ..., ik];
-var nameToCluster = {};
+// mapping of: cluster i id -> cluster struct (e.g. verices: [vertex i1, vertex i2, ..., ik])
+var idToCluster = {};
 data.clusters.forEach(function(cluster, index) {
-	nameToCluster[cluster.name] = cluster;
+  // name -> cluster mapping
+  idToCluster[cluster.id] = cluster;
 });
 // TODO(roee): hack! get better data from server-side
 // create fake, unconnected clusters for stand-alone vertices for the super-state graph
@@ -178,16 +179,17 @@ data.clusters.forEach(function(cluster, index) {
 data.vertices.forEach(function(vertex) {
   var vertexId = vertex[0],
       attrs = vertex[1]
-
-	if (!nameToCluster[vertexId]) {
-		// TODO: name from real graph!
-		nameToCluster[vertexId] = {
+  // TODO: what if there is a cluster with the same name?!?!
+  if (!idToCluster[vertexId]) {
+    // TODO: name from real graph
+    idToCluster[vertexId] = {
         vertices:[vertexId],
         name: vertexId,
+        id: vertexId,
         attrs: attrs,
         isConcrete: true
     };
-	}
+  }
 });
 
 // set up tree view
@@ -381,7 +383,7 @@ function updateGraph(source) {
 	// the clusters with no children are the super-cut
 	var supergraphNodes = getActiveClusters(root);
 	//console.log(supergraphNodes);
-	//console.log(nameToCluster);
+	//console.log(idToCluster);
 
 	// To construct the edges, we'll map each edge in the original graph
 	// into an edge in the supergraph.
@@ -390,13 +392,13 @@ function updateGraph(source) {
 	var vertexToNode = {};
 
 	supergraphNodes.forEach(function (d3Node) {
-		var clusterName = d3Node.data.name;
+		var clusterId = d3Node.data.id;
 		// for every vertex in the cluster, map it to the cluster
-		nameToCluster[clusterName].vertices.forEach(function(vertex) {
+		idToCluster[clusterId].vertices.forEach(function(vertex) {
 			if (vertexToNode[vertex] !== undefined){
 				alert('vertex showed up in two clusters!');
 			}
-			vertexToNode[vertex] = clusterName;
+			vertexToNode[vertex] = clusterId;
 		});
 	}); // supergraphNodes.forEach
 
@@ -415,7 +417,7 @@ function updateGraph(source) {
 
 		if (srcNode === dstNode) {
       // self-edges are ok only for concrete vertices
-      if (!nameToCluster[srcNode].isConcrete) {
+      if (!idToCluster[srcNode].isConcrete) {
   			return;
       }
 		}
@@ -517,7 +519,7 @@ function supergraphToSvg(supergraphNodes, superEdges) {
 
 	supergraphNodes.forEach(function (node, index) {
 		// update mapping for edge lookups
-		supernodeToGraph[node.data.name] = index;
+		supernodeToGraph[node.data.id] = index;
 
     // prepare graphviz node
     var attributes;
@@ -585,12 +587,12 @@ function getActiveClusters(root) {
 				active.push(node);	
 			} else {
 				// leaf node, make all its contained vertices nodes in the super-state graph
-				//console.log(node);
-				nameToCluster[node.data.name].vertices.forEach(function(vertex) {
+				console.log(node);
+				idToCluster[node.data.id].vertices.forEach(function(vertex) {
 					// TODO(roee): massive hack, wrap fake cluster with extra fake cluster
           // mark it as a concrete vertex so that we don't eliminate self-edges
           // during display
-					active.push({data: nameToCluster[vertex], isConcrete:true});
+          active.push({data: idToCluster[vertex]});
 				});
 			}
 		}

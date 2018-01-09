@@ -34,8 +34,14 @@ def dendrogramToJSON(dendro):
     jsondata['edges'] = list(dendro.dgraph.edges())
     #print(list(dendro.dgraph.edges()))
     clusters = []
-    for node in dendro.nodes():
-        clusters +=[ {'name' : node.get_label(), 'inEdge' : node.parent(), 'outEdge' : node.child(), 'vertices' : list(node.vertices())}]
+    for index, node in enumerate(dendro.nodes()):
+        clusters.append({
+            'name' : node.get_label(),
+            'inEdge' : node.parent(),
+            'outEdge' : node.child(),
+            'vertices' : list(node.vertices()),
+            'id': 'cluster_{}'.format(index),
+            })
     #print(clusters)
     jsondata['clusters'] = clusters
 
@@ -48,6 +54,7 @@ def clusterBuild(index,cluster_list):
     node = {}
 
     node["name"] = cluster_list[index]['name']
+    node["id"] = cluster_list[index]['id']
 
     children = []
     for child in cluster_list[index]['outEdge']:
