@@ -1,9 +1,9 @@
 
-from . import PrefixLabeler, TfIdfLabeler
+from . import PrefixLabeler, TfIdfLabeler, PageRankLabeler
 
 def get_methods():
     "return list of all supported labeling method classes"
-    return [PrefixLabeler.PrefixLabeler, TfIdfLabeler.TfIdfLabeler]
+    return [PrefixLabeler.PrefixLabeler, TfIdfLabeler.TfIdfLabeler, PageRankLabeler.PageRankLabeler]
 
 def get_labeling_method(name):
     "return class for specific labeling method"
