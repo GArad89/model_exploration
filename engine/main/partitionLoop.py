@@ -3,37 +3,28 @@ from ..clustering import SpectralCluster, minimum_cut, KmeansClustering, Branch_
 from ..stopping_criteria.stopCriteria import *
 from ..baisc_entities.dendrogram import Node,Dendrogram
 
-###old code
-"""
-def is_simple(dgraph, simpletype = SizeCriteria ,threshold = 20):
-      
-     return simpletype(threshold).check(dgraph)
 
-def cluster(dgraph,  clustertype = SpectralCluster, **params):
-    
-    return clustertype.cluster(dgraph,**params)
-"""
-
-#need to check if we want to add a stop critrea for after x runs.    
-def partition(dgraph,params, state_subset=None, clustering_algo = SpectralCluster.SpectralCluster, stopCri = SizeCriteria(20), dendrogram = None, rootnode = 0):
+def _partition(dgraph, state_subset, clustering_algo, stop_criterion, dendrogram, rootnode):
     projected_graph = dgraph.project(state_subset)
-    #print(projected_graph.nodes())
-    #print(projected_graph.edges())
-    if dendrogram == None:  #in case no dendrogram was initiated
-        dendrogram = Dendrogram(dgraph)
-    else:
-        if len(projected_graph.nodes()) != len(dgraph.nodes()): #in case a dendrogram WAS initiated. making sure not to add the root twice
-            dendrogram.add_node(Node(rootnode,state_subset,projected_graph))
-            dendrogram.add_child(rootnode,len(dendrogram.nodes())-1)
-        rootnode = len(dendrogram.nodes())-1 
-    #print(dendrogram.nodes()[rootnode].child())
-    if stopCri.check(projected_graph):
-        #print("check2")
+
+    # if not first iteration
+    if len(projected_graph.nodes()) != len(dgraph.nodes()): #in case a dendrogram WAS initiated. making sure not to add the root twice
+        dendrogram.add_node(Node(rootnode,state_subset,projected_graph))
+        dendrogram.add_child(rootnode,len(dendrogram.nodes())-1)
+        rootnode = len(dendrogram.nodes())-1
+
+    # check if the iteration reached the stop criterion
+    if stop_criterion.check(projected_graph):
         return dendrogram
-    #print(clustering_algo.cluster)
-    clusters = clustering_algo.cluster(projected_graph,params)
-    #print("clusters: ", clusters)
+
+    #run clustering algorithm and run parition on each cluster
+    clusters = clustering_algo.cluster(projected_graph)
     for cluster_iter in clusters:
-        partition(dgraph, params,cluster_iter, clustering_algo, stopCri , dendrogram , rootnode )
+        _partition(dgraph, cluster_iter, clustering_algo, stop_criterion , dendrogram , rootnode )
 
     return dendrogram
+
+
+def partition(dgraph, clustering_algo, stop_criterion = SizeCriteria(20)):
+    dendrogram = Dendrogram(dgraph)
+    return _partition(dgraph, state_subset=dgraph.nodes(), clustering_algo=clustering_algo, stop_criterion=stop_criterion, dendrogram=dendrogram, rootnode = 0)

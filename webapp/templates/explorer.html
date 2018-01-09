@@ -5,11 +5,17 @@
 <!-- minified at https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.min.js -->
 <!-- graphviz in javascript -->
 <script type="text/javascript" src="{{ url_for('static', filename='viz/viz-1.8.0.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='d3-zoom/d3-zoom.js') }}"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='saveSvgAsPng/saveSvgAsPng.js') }}"></script>
+
+
 
 <style>
  .node {
    cursor: pointer;
  }
+
 
  .node circle {
    fill: #fff;
@@ -26,14 +32,38 @@
    stroke: #ccc;
    stroke-width: 1.5px;
  }
+
+
+ div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 60px;
+  height: 28px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+
 </style>
 {% endblock %}
 
 {% block title %}Explore!{% endblock %}
 
 {% block body %}
-<svg id="d3-main"></svg>
-<div id="supergraph"></svg>
+
+<button id='btn_reset' class="btn btn-primary">Reset</button>
+<button id='btn_export_dendrogram' class="btn btn-primary">Export Dendrogram</button>
+<button id='btn_export_supergraph' class="btn btn-primary">Export Super Graph</button>
+<button id='btn_expand_all' class="btn btn-primary">Expand All</button>
+<button id='btn_collapse_all' class="btn btn-primary">Collapse All</button>
+
+
+<svg id="d3-main" style="border: 1px dashed black;"></svg>
+<div id="supergraph"></div>
 {% endblock %}
 
 {% block end_of_body %}
@@ -48,14 +78,86 @@ var margin = {top: 20, right: 120, bottom: 20, left: 120},
         duration = 750,
         root;
 
+
 var svg = d3.select("#d3-main")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate("
-          + margin.left + "," + margin.top + ")");
+    .style("fill", "none")
 
 
+var tooltip_div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+var zoom = d3.zoom()
+        .scaleExtent([1 / 2, 4])
+        .on("zoom", zoomed);
+
+svg.append("rect")
+    .attr("width", width)
+    .attr("height", height)
+    .style("fill", "none")
+    .style("pointer-events", "all")
+    .call(zoom);
+
+var g_container = svg.append("g")
+     .attr("transform", "translate("+ margin.left + "," + margin.top + ")");
+
+var g_root = g_container.append("g");
+
+
+function zoomed() {
+  g_root.attr("transform", d3.event.transform);
+}
+
+function zoomed_supergraph() {
+    d3.select('#graph0').attr("transform", d3.event.transform);
+}
+
+$('#btn_reset').click(function() {
+   zoom.transform(svg, d3.zoomIdentity.scale(1))
+});
+
+
+$('#btn_export_dendrogram').click(function() {
+    saveSvgAsPng(document.getElementById("d3-main"), "diagram.png", {scale: 1, backgroundColor: 'white'});
+});
+
+
+$('#btn_export_supergraph').click(function() {
+    saveSvgAsPng($('#supergraph').children().first()[0], "diagram.png", {scale: 1, backgroundColor: 'white'});
+});
+
+$(document).keydown(function(e) {
+    switch(e.which) {
+        case 38: // up
+        document.getElementById('btn_reset').scrollIntoView({block: 'start', behavior: 'smooth'});
+        break;
+
+        case 40: // down
+        document.getElementById('supergraph').scrollIntoView({block: 'start', behavior: 'smooth'});
+        break;
+
+        default: return; // exit this handler for other keys
+    }
+    e.preventDefault(); // prevent the default action (scroll / move caret)
+});
+
+
+
+function expandAll(){
+    expand(root);
+}
+
+function expand(d){
+    var children = (d.children)?d.children:d._children;
+    if (d._children) {
+        d.children = d._children;
+        d._children = null;
+    }
+    if(children)
+      children.forEach(expand);
+}
 
 // declares a tree layout and assigns the size
 var treemap = d3.tree().size([height, width]);
@@ -82,7 +184,8 @@ data.vertices.forEach(function(vertex) {
 		nameToCluster[vertexId] = {
         vertices:[vertexId],
         name: vertexId,
-        attrs: attrs
+        attrs: attrs,
+        isConcrete: true
     };
 	}
 });
@@ -129,7 +232,7 @@ function updateTree(source) {
   // ****************** Nodes section ***************************
 
   // Update the nodes...
-  var node = svg.selectAll('g.node')
+  var node = g_root.selectAll('g.node')
       .data(nodes, function(d) {return d.id || (d.id = ++i); });
 
   // Enter any new modes at the parent's previous position.
@@ -143,6 +246,21 @@ function updateTree(source) {
   // Add Circle for the nodes
   nodeEnter.append('circle')
       .attr('class', 'node')
+      .on("mouseover", function(d) {
+          console.log(d.data)
+          tooltip_div.transition()
+         .duration(200)
+         .style("opacity", .9);
+
+          tooltip_div.html("i am a tooltip")
+         .style("left", (d3.event.pageX) + "px")
+         .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function(d) {
+       tooltip_div.transition()
+          .duration(500)
+          .style("opacity", 0);
+      })
       .attr('r', 1e-6)
       .style("fill", function(d) {
           return d._children ? "lightsteelblue" : "#fff";
@@ -151,6 +269,7 @@ function updateTree(source) {
   // Add labels for the nodes
   nodeEnter.append('text')
       .attr("dy", ".35em")
+      .attr("fill", "#202020")
       .attr("x", function(d) {
           return d.children || d._children ? -13 : 13;
       })
@@ -197,7 +316,7 @@ function updateTree(source) {
   // ****************** links section ***************************
 
   // Update the links...
-  var link = svg.selectAll('path.link')
+  var link = g_root.selectAll('path.link')
       .data(links, function(d) { return d.id; });
 
   // Enter any new links at the parent's previous position.
@@ -286,10 +405,6 @@ function updateGraph(source) {
 	// generated from map of edges 
 	var superEdges = {};
 
-	// mapping: cluster name -> internal edges
-	// TODO: remove the need once cluster names are real
-	var internalEdges = {};
-
 	// for each edge in the original graph, create/update superedge or discard
 	// if the edge is internal to a cluster
 	data.edges.forEach(function(edge) {
@@ -299,13 +414,10 @@ function updateGraph(source) {
 			dstNode = vertexToNode[edge[1]];
 
 		if (srcNode === dstNode) {
-			//console.log('edge within node: ', srcNode, edge);
-			var edges = internalEdges[srcNode];
-			if (edges === undefined) {
-				edges = [];
-			}
-			edges.push(edge);
-			return;
+      // self-edges are ok only for concrete vertices
+      if (!nameToCluster[srcNode].isConcrete) {
+  			return;
+      }
 		}
 
 		var existingEdges = superEdges[srcNode];
@@ -320,10 +432,44 @@ function updateGraph(source) {
 
 
 	document.getElementById('supergraph').innerHTML = supergraphToSvg(supergraphNodes, superEdges);
+	supergraph_svg_elem = $("#supergraph").find("svg")[0];
+	supergraph_svg_elem.id = 'svg_supergraph';
+
+	svg_supergraph = d3.select('#svg_supergraph');
+	svg_supergraph.append("rect")
+
+	zoom_supergraph = d3.zoom()
+        .scaleExtent([1 / 2, 4])
+        .on("zoom", zoomed_supergraph);
+
+    svg_supergraph.attr("width", width)
+    .attr("height", height)
+    .style("fill", "none")
+    .style("pointer-events", "all")
+    .call(zoom_supergraph);
+
 }
 
 function graphvizEscape(str) {
     return '"' + str.replace('\n', '\\n') + '"';
+}
+
+function mergeAttributes(attributes) {
+    // single edge, use its attributes
+    if (attributes.length == 1) {
+        return attributes[0];
+    }
+
+    // multiple edges, do our thing
+    // merge labels from multiple edges
+    // TODO: merge weights?
+    var labels = attributes.map(function (item){
+        return item.label;
+    }).filter(function(v){return v !== undefined; });
+
+    var uniqueLabels = Array.from(new Set(labels));
+
+    return {label: uniqueLabels.join('\n')};
 }
 
 function attributesToGraphViz(attributes) {
@@ -388,25 +534,35 @@ function supergraphToSvg(supergraphNodes, superEdges) {
 
 	for (var srcNode in superEdges) {
 		if (superEdges.hasOwnProperty(srcNode)) {
-			var seenDsts = {};
+      // join together edges from the original graph to form edges from/to clusters
+      // for each target vertex, store array of attributes from edges contributing to this super-edge
+			var finalEdges = {};
 			superEdges[srcNode].forEach(function (edgeTarget) {
 				// check if this edge is inserted already
 				// this can happen if supernode contains multiple vertices that
 				// had edges to vertices in the same dst supernode
 				// here is where we de-duplicate
-				if (seenDsts[edgeTarget.dst]) {
-					return;
-				}
-				seenDsts[edgeTarget.dst] = true;
+				if (finalEdges[edgeTarget.dst] !== undefined) {
+          // existing edge, add attributes
+					finalEdges[edgeTarget.dst].push(edgeTarget.attrs)
+				} else {
+          // new edge
+          finalEdges[edgeTarget.dst] = [edgeTarget.attrs];
+        }
+      });
+      // write out the final super-edges for this source node
+      for (var target in finalEdges) {
+        if (finalEdges.hasOwnProperty(target)) {
+          // add attributes string
+          var merged = mergeAttributes(finalEdges[target]);
+          var attributes = attributesToGraphViz(merged);
 
-        // add attributes
-        var attributes = attributesToGraphViz(edgeTarget.attrs);
+          // add the edge to the total output
+          graphvizOutput += '' + supernodeToGraph[srcNode] + ' -> ' + supernodeToGraph[target];
 
-        // add the edge to the total output
-        graphvizOutput += '' + supernodeToGraph[srcNode] + ' -> ' + supernodeToGraph[edgeTarget.dst];
-
-        graphvizOutput += ' ' + attributes + ';\n';
-			});
+          graphvizOutput += ' ' + attributes + ';\n';
+        }
+      }
 		}
 	}
 
@@ -432,7 +588,9 @@ function getActiveClusters(root) {
 				//console.log(node);
 				nameToCluster[node.data.name].vertices.forEach(function(vertex) {
 					// TODO(roee): massive hack, wrap fake cluster with extra fake cluster
-					active.push({data: nameToCluster[vertex]});
+          // mark it as a concrete vertex so that we don't eliminate self-edges
+          // during display
+					active.push({data: nameToCluster[vertex], isConcrete:true});
 				});
 			}
 		}
@@ -441,7 +599,19 @@ function getActiveClusters(root) {
 	return active;
 }
 
+$('#btn_expand_all').click(function() {
+    expandAll(root);
+    update(root);
+});
+
+$('#btn_collapse_all').click(function() {
+   root.children.forEach(collapse);
+   collapse(root);
+   update(root);
+});
+
 }); // d3.json
+
 
 </script>
 {% endblock %}

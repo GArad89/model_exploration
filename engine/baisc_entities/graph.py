@@ -1,6 +1,5 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-from random import *
 from itertools import chain
 
 class DGraph:
@@ -57,7 +56,7 @@ class DGraph:
         return nx.to_numpy_matrix(self.dgraph)
 
     def subgraph(self, vertices):
-        return self.dgraph.subgraph(vertices)  #subgraph is read only. probably a useless method
+        return self.dgraph.subgraph(vertices)  
 
 
     def maxInOutDegree(self):
@@ -83,61 +82,8 @@ class DGraph:
 
         return DGraph(nx_graph)
 
-    def project(self, vertices):   #, inNode, outNode
-        #partialGraph = self.subgraph(vertices)
-        return DGraph(self.subgraph(vertices))
-        #projectedGraph=DGraph(nx.DiGraph()) #couldn't get DGraph(self) to work for some reason.
-          
-        # partialGraph.add_node("inNode") #gives error: SubGraph Views are readonly. Mutations not allowed
-        # TODO: check that original graph doesn't contain inNode, outNode
-        #for bad_node in ("inNode", "outNode"):
-        #    if bad_node in vertices:
-        #        vertices.remove(bad_node)
-
-        #naive solution for now:
-        #for node in vertices:
-        #   if(node!="inNode")and(node!="outNode"): 
-        #       temp=self.dgraph.node[node].get('label',None)
-        #       if(temp!=None):
-        #           projectedGraph.add_node(node,label=self.dgraph.node[node]['label'])
-        #       else:
-        #           projectedGraph.add_node(node)
-       
-        #projectedGraph.add_node("inNode")
-        #projectedGraph.add_node("outNode")
-
-        #for edge1,edge2,dic in list(self.dgraph.edges(data=True)):
-        #    weight=dic.get('weight', 1)
-        #    
-        #    if (edge1 in vertices):
-        #        if (edge2 in vertices):
-        #            projectedGraph.add_edge(edge1, edge2, weight)
-            #    else:
-            #        projectedGraph.add_edge(edge1, "outNode", weight)
-            #else:
-            #    if(edge2 in vertices):
-            #        projectedGraph.add_edge("inNode", edge2, weight)
-                
-        
-        
-        """   #previous code:
-        for node in vertices:
-            for edge in self.out_edges(node):
-                if edge not in  projectedGraph.out_edges(node):
-                     projectedGraph.add_edge(node,outNode)
-            for edge in self.in_edges(node):
-                if edge not in  projectedGraph.in_edges(node):
-                     projectedGraph.add_edge(inNode,node)      
-        """        
-
-                    
-        return projectedGraph
-    
-
-       
-  
-                    
-
+    def project(self, vertices):  
+        return DGraph(self.subgraph(vertices))     
 
 
 # for testing purposes
@@ -146,7 +92,7 @@ def main():
     #for n in g.dgraph.nodes():
         #print(g.dgraph.node[n]['label'])
     g.draw() 
-    new_node = random() * 10000 
+    #new_node = random() * 10000 
     #g.add_node(new_node, weight=0.4)
     #g.add_edge(2, '1', weight=0.2)
     #DGraph.write_dot(g, "./dot/g1.dot") 

@@ -20,8 +20,9 @@ log = app.logger
 
 from webapp.models import Models, Results
 from engine.main.engineMainFlow import run_algo
-from engine.utils.jsonWorker import createAlgoParamsJSON
+from engine.utils.jsonWorker import createAlgoParamsJSON, parse_parameters
 from engine.baisc_entities.graph import DGraph
+from engine import labeling, stopping_criteria
 
 # get instances of Models, Results according to current config
 # this is lightweight for now, but in the future we may want to cache this in the application context
@@ -55,23 +56,45 @@ def algorithm_choice_form():
     # TODO: wrap with exception handling. Right now it's still more useful to see the exception in flask
     graph = get_models().open(model_id)
 
-    errors = {}
+    algo_data = createAlgoParamsJSON()
+
+    errors = {} #TODO: server-side form validation too (use same json schema)
     if request.method == 'POST':
         #TODO: get params from form
         # params = get_params(form)
         # result = run_algo(get_models().open(model_id), **params)
 
         log.info("Running algorithm")
-        result = run_algo(graph, "SpectralCluster", {'n':2,'threshold':2}, stopCriteria="SizeCriteria")
+        algorithm_name = request.values['algorithm']
+        # find algorithm in algo_data list
+        algorithm_index = [algo['name'] for algo in algo_data].index(algorithm_name)
+        #TODO: catch ValueError on failure, give legible error
+        algorithm_description = algo_data[algorithm_index]
+        schema = algorithm_description['form']['schema']
+        # take all non-empty parameters
+        # TODO: don't throw away int 0 this way
+        parameters = {parameter : request.values[parameter] for parameter in schema if request.values[parameter]}
+        # turn them from strings into typed values
+        parameters = parse_parameters(parameters, schema)
+        log.debug(parameters)
+
+        stopping_criterion = request.values['stopping-criterion']
+        labeling_method = request.values['labeling-method']
+
+        result = run_algo(graph, algorithm_name, parameters, stopping_criterion, labeling_method)
         result_id = get_results().save(result)
 
         return redirect(url_for('show_results', result_id=result_id))
 
     # get list of algorithms from engine
-    algo_data = createAlgoParamsJSON()
     log.debug("got list of algorithms: %s", [a['name'] for a in algo_data])
 
-    return render_template('algorithm_choice.html', model_id=model_id, errors=errors, algo_data=algo_data)
+    return render_template('algorithm_choice.html', 
+                           model_id=model_id,
+                           errors=errors,
+                           algo_data=algo_data,
+                           labeling_methods=labeling.get_methods(),
+                           stopping_criteria=stopping_criteria.get_criteria())
 
 
 @app.route('/explore/<result_id>')
