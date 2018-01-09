@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from itertools import chain
+from numpy import zeros
 
 class DGraph:
     dgraph = None
@@ -53,7 +54,17 @@ class DGraph:
         nx.drawing.nx_pydot.write_dot(self.dgraph, path)
 
     def adjacency_matrix(self):
-        return nx.to_numpy_matrix(self.dgraph)
+        adj_mat=zeros(shape=(len(self.nodes()),len(self.nodes())))
+        i=0
+        node_dict={}
+        for node in self.nodes():
+            node_dict[node]=i
+            i+=1
+            
+        for edge in self.edges():
+            adj_mat[node_dict[edge[0]]][node_dict[edge[1]]] += int(edge[2].get('weight',1))
+
+        return adj_mat
 
     def subgraph(self, vertices):
         return self.dgraph.subgraph(vertices)  

@@ -48,9 +48,9 @@ class Dendrogram:
         self.dgraph=dgraph
 
     def add_node(self,node):
-        print()
-        if(node.get_label()==None):
-            self.label_by_sum_names(node)
+##        print()
+##        if(node.get_label()==None):
+##            self.label_by_sum_names(node)
         self.node_list+=[node]
 
     def nodes(self):
@@ -59,29 +59,29 @@ class Dendrogram:
     def add_child(self,parent,child): 
         self.node_list[parent].add_child(child)
 
-    def label_by_order(self,node):
-        node.label='Node '+str(len(self.node_list))
-    
-    def label_by_sum_names(self, node):
-        label_temp=[]
-        #label_list=
-        #print(label_list)
-        for graph_node in node.subset:
-            temp=node.projected_graph.dgraph.node[graph_node].get('label','')
-            if temp:
-                label_temp.append(str(temp))
-            else: #TODO: something better
-                label_temp.append(str(graph_node))
-
-        #for edge in node.projected_graph.dgraph.edges():
-
-        if label_temp:        
-            node.label = "_".join(label_temp)
-        else:
-            self.label_by_order(node)
-
-    def edges_by_sum_names(self,node):
-        #TO DO
-        pass
+##    def label_by_order(self,node):
+##        node.label='Node '+str(len(self.node_list))
+##    
+##    def label_by_sum_names(self, node):
+##        label_temp=[]
+##        #label_list=
+##        #print(label_list)
+##        for graph_node in node.subset:
+##            temp=node.projected_graph.dgraph.node[graph_node].get('label','')
+##            if temp:
+##                label_temp.append(str(temp))
+##            else: #TODO: something better
+##                label_temp.append(str(graph_node))
+##
+##        #for edge in node.projected_graph.dgraph.edges():
+##
+##        if label_temp:        
+##            node.label = "_".join(label_temp)
+##        else:
+##            self.label_by_order(node)
+##
+##    def edges_by_sum_names(self,node):
+##        #TO DO
+##        pass
         
 
