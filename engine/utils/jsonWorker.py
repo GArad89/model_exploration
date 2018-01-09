@@ -5,17 +5,23 @@ import json
 type_parsers = {
     'integer' : int,
     'number' : float,
-    'text' : str,
+    'string' : str,
 }
 
 def parse_parameters(parameters, schema):
-    "parse parameters returned from form according to json schema"
+    "parse parameters returned from form according to json schema. VERY LIMITED"
     parsed = {}
     for name, value in parameters.items():
-        parser = type_parsers.get(schema[name]['type'], None)
+        item_schema = schema[name]
+        parser = type_parsers.get(item_schema['type'], None)
         if parser is None:
             raise Exception('unsupported schema type: ' + schema[name]['type'])
-        parsed[name] = parser(value)
+        real_value = parser(value)
+        if 'enum' in item_schema:
+            if real_value not in item_schema['enum']:
+                raise Exception('Invalid enum value {} not in allowed values {}'.format(
+                                    real_value, item_schema['enum']))
+        parsed[name] = real_value
     return parsed
 
 
@@ -34,25 +40,33 @@ def dendrogramToJSON(dendro):
     jsondata['edges'] = list(dendro.dgraph.edges())
     #print(list(dendro.dgraph.edges()))
     clusters = []
-    for node in dendro.nodes():
-        clusters +=[ {'name' : node.get_label(), 'inEdge' : node.parent(), 'outEdge' : node.child(), 'vertices' : list(node.vertices())}]
+    for index, node in enumerate(dendro.nodes()):
+        clusters.append({
+            'name' : node.get_label(),
+            'inEdge' : node.parent(),
+            'outEdge' : node.child(),
+            'vertices' : list(node.vertices()),
+            'id': 'cluster_{}'.format(index),
+            })
     #print(clusters)
     jsondata['clusters'] = clusters
 
-    jsondata['cluster_struct']=clusterBuild(0,clusters)
-    #print(jsondata['cluster_struct'])
+    jsondata['cluster_tree']= _build_cluster_tree(0,clusters)
+    #print(jsondata['cluster_tree'])
 
     return jsondata
 
-def clusterBuild(index,cluster_list):
+def _build_cluster_tree(index,cluster_list):
+    "turn cluster graph to tree"
     node = {}
 
     node["name"] = cluster_list[index]['name']
+    node["id"] = cluster_list[index]['id']
 
     children = []
     for child in cluster_list[index]['outEdge']:
         # recursively do this for children
-        children.append(clusterBuild(child, cluster_list))
+        children.append(_build_cluster_tree(child, cluster_list))
     # if there were children, add them
     if children:
         node['children'] = children

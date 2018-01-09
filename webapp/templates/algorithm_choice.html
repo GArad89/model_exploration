@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block title %}Choose Algorithms{% endblock %}
+{% block title %}Choose Clustering Method{% endblock %}
 
 {% block head %}
 {{ super() }}
@@ -9,14 +9,17 @@
 {% endblock %}
 
 {% block body %}
-  <h3>Select an Algorithm:</h3>
-  <div class="form-group">
-    <select id="algorithms-select" class="form-control col-sm-6">
-      <option disabled selected value> -- select an option -- </option>
-      {% for algo in algo_data %}
-      <option value="{{ loop.index0 }}">{{ algo.name }}</option>
-      {% endfor %}
-    </select>
+  <h3>Select a Clustering Method:</h3>
+  <div class="form-group row">
+    <label for="algorithms-select" class="col-form-label col-sm-3">Select Labeling Method</label>
+    <div class="col-auto">
+      <select id="algorithms-select" class="form-control">
+        <option disabled selected value> -- select an option -- </option>
+        {% for algo in algo_data %}
+        <option value="{{ loop.index0 }}">{{ algo.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
     <!-- pass selected model id to next stage -->
   </div>
   <form id="algorithm-form" method="post">
@@ -26,18 +29,23 @@
     <input id="algorithm" name="algorithm" type="hidden">
     <input id="model_id" name="model_id" type="hidden" value="{{ model_id }}">
     <div class="form-group row">
-      <label for="stopping-criterion" class="col-form-label col-sm-6">Select Stopping Criterion</label>
+      <label for="stopping-criterion" class="col-form-label col-sm-3">Select Stopping Criterion</label>
       <div class="col-auto">
         <select id="stopping-criterion" name="stopping-criterion" class="form-control">
-          <!--<option disabled selected value>Choose Criterion</option>-->
         {% for criterion in stopping_criteria %}
           <option>{{ criterion.__name__ }}</option>
         {% endfor %}
         </select>
       </div>
     </div>
+        <div class="form-group row">
+      <label id="parameter-label" for="stopping-criterion-parameter" class="col-form-label col-sm-3">Select Stopping Criterion</label>
+      <div class="col-auto">
+        <input type="text" id="stopping-criterion-parameter" name="stopping-criterion-parameter" class="form-control">
+      </div>
+    </div>
     <div class="form-group row">
-      <label for="labeling-method" class="col-form-label col-sm-6">Select Labeling Method</label>
+      <label for="labeling-method" class="col-form-label col-sm-3">Select Labeling Method</label>
       <div class="col-auto">
         <select id="labeling-method" name="labeling-method" class="form-control">
           <!--<option disabled selected value>Choose Method</option>-->
@@ -49,11 +57,11 @@
     </div>
 
     <div class="form-group row">
-      <label for="labeling-source" class="col-form-label col-sm-6">Select Labeling Source</label>
+      <label for="labeling-source" class="col-form-label col-sm-3">Select Labeling Source</label>
       <div class="col-auto">
         <select id="labeling-source" name="labeling-source" class="form-control">
           <!--<option disabled selected value>Choose Method</option>-->
-        {% for source in ['Edges', 'Nodes'] %}
+        {% for source in labeling_sources %}
           <option>{{ source }}</option>
         {% endfor %}
         </select>
@@ -72,9 +80,18 @@
         var algos = {{algo_data | tojson}};
         console.log(algos);
 
+        var update_stopping_criteria_form = function() {
+          selected_stopping_criteria = $('#stopping-criterion').val();
+          var paramNames = {SizeCriteria:'Size of Cluster', InOutDegreeCriteria: 'In/Out Rank', CyclometricCriteria: 'Cyclometric Complexity'};
+          if (selected_stopping_criteria !== undefined) {
+             $('#parameter-label').text(paramNames[selected_stopping_criteria]);
+          }
+        };
+
         var update_form = function() {
           console.log($('#algorithms-select').val());
           selected_algo = algos[$('#algorithms-select').val()];
+
           if (selected_algo !== undefined) {
             // make hidden field that actually submits the value match the 
             $('#algorithm').val(selected_algo.name);
@@ -89,6 +106,7 @@
           update_form();
         }
         $('#algorithms-select').change(update_form);
+        $('#stopping-criterion').change(update_stopping_criteria_form);
     });
   </script>
 {% endblock %}

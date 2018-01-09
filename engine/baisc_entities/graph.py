@@ -1,5 +1,4 @@
 import networkx as nx
-import matplotlib.pyplot as plt
 from itertools import chain
 from numpy import zeros
 
@@ -36,6 +35,7 @@ class DGraph:
         return self.dgraph.in_edges(node)
 
     def draw(self):
+        import matplotlib.pyplot as plt
         nx.draw(self.dgraph)
         plt.show()
 
@@ -47,7 +47,7 @@ class DGraph:
 
 
     def node_attr(self, node, attr):
-        return self.dgraph.nodes[node]['attr'][attr]
+        return self.dgraph.nodes[node][attr]
 
     def write_dot(self, path):
         print("write_dot called")
