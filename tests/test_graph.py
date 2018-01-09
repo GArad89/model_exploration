@@ -45,11 +45,11 @@ class Test_GraphImporter(unittest.TestCase):
 class Test_GraphExporter(unittest.TestCase):
 
     def test_import_and_export(self):
-        self.assertIsNotNone(DGraph.read_dot("../engine/dot/example.dot"),"import of example.dot failed")
-        g=DGraph.read_dot("../engine/dot/example.dot")
-        g.write_dot("../tests/dot_export/example.dot")
+        self.assertIsNotNone(DGraph.read_dot("./engine/dot/example.dot"),"import of example.dot failed")
+        g=DGraph.read_dot("./engine/dot/example.dot")
+        g.write_dot("./tests/dot_export/example.dot")
         self.assertIsNotNone(DGraph.read_dot("../tests/dot_export/example.dot"),"import of exported example.dot failed")
-        g=DGraph.read_dot("../tests/dot_export/example.dot")
+        g=DGraph.read_dot("./tests/dot_export/example.dot")
         self.assertEqual(len(g.nodes()),24, "wrong number of nodes after export")
         
     def test_builtgraph_export(self):
