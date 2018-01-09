@@ -3,6 +3,12 @@ import networkx as nx
    
         
 class MinimumCut(Cluster):
+    """ Returns a minimum cut partition of the input dgraph.
+        this clustering method uses networkx minimum_edge_cut method
+        in order to get the cut.
+        please note that the other clustering methods return a sparset cut and not a minimum cut.
+        the minimum cut most of the time will partition the graph to one node in one cluster and the rest of the graph in the 2nd cluster.
+    """
 
     @staticmethod
     def get_params():
@@ -11,12 +17,14 @@ class MinimumCut(Cluster):
         return schema, form
                
     def cluster(self, dgraph):
+
+        ## get edges in the cut
         cop=dgraph.dgraph.copy()
         cop=cop.to_undirected()
         cut_edges=nx.minimum_edge_cut(cop)
 
-        cop.remove_edges_from(cut_edges)
-        
+        ## remove edges in the cut and get connected subgraphs
+        cop.remove_edges_from(cut_edges) 
         sub_graphs = nx.connected_component_subgraphs(cop)
         output=[]
 

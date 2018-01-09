@@ -48,6 +48,18 @@
       </div>
     </div>
 
+    <div class="form-group row">
+      <label for="labeling-source" class="col-form-label col-sm-6">Select Labeling Source</label>
+      <div class="col-auto">
+        <select id="labeling-source" name="labeling-source" class="form-control">
+          <!--<option disabled selected value>Choose Method</option>-->
+        {% for source in ['Edges', 'Nodes'] %}
+          <option>{{ source }}</option>
+        {% endfor %}
+        </select>
+      </div>
+    </div>
+
     <div class="form-group">
       <button type="submit" class="btn btn-primary">Choose Algorithm</button>
     </div>

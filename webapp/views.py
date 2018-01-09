@@ -80,6 +80,7 @@ def algorithm_choice_form():
 
         stopping_criterion = request.values['stopping-criterion']
         labeling_method = request.values['labeling-method']
+
         result = run_algo(graph, algorithm_name, parameters, stopping_criterion, labeling_method)
         result_id = get_results().save(result)
 

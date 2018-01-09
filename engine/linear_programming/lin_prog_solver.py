@@ -6,6 +6,7 @@ import networkx as nx
 import sys
 import math
 from enum import Enum
+import time
 
 # Embeddings import:
 from gem.embedding.gf import GraphFactorization
@@ -46,8 +47,8 @@ class LPS:
         # You can comment out the methods you don't want to run
         models = list()
         for embed_method in self.embeddings:
-            if embed_method == EMEDDINGS.GRAPH_FACTORIZATIONE_MBEDDINGS:
-                models.append(GraphFactorization(embedding_space, 100000, 1 * 10 ** -4, 1.0))
+##            if embed_method == EMEDDINGS.GRAPH_FACTORIZATIONE_MBEDDINGS:
+##                models.append(GraphFactorization(embedding_space, 100000, 1 * 10 ** -4, 1.0))
             if embed_method == EMEDDINGS.LAPLACIAN_EIGENMAPS_EMBEDDINGS:
                 models.append(LaplacianEigenmaps(embedding_space))
             if embed_method == EMEDDINGS.LOCALLY_LINEAR_EMBEDDING:
@@ -70,6 +71,7 @@ class LPS:
         assumsing nodes are partitioned to S and S_hat, where partial_assignment_dict[n] == 1 if n in S
         unassigned nodes should not be included in the dict
         '''
+        t1=time.time()
         N = len(G.nodes())
         node2ind = {}
         for i, n in enumerate(G.nodes()):
@@ -84,9 +86,13 @@ class LPS:
         for e in G.edges():
             C[0][N * node2ind[str(e[0])] + node2ind[str(e[1])]] = weights[e]
             # C[0][N * node2ind[str(e[1])] + node2ind[str(e[0])]] = weights[e]
-
+            
+        t2=time.time()
+        print("   ")
+        print(int(t2)-int(t1))
         ## s.t. traingle inquality: d_i,w + d_w,j >= d_i,j && dxy > 0
         A1 = None
+        concat_list=[]
         for i in range(N):
             for j in range(N):
                 for w in range(N):
@@ -94,27 +100,31 @@ class LPS:
                     row[0][i * N + w] += -1
                     row[0][w * N + j] += -1
                     row[0][i * N + j] += 1
-                    if A1 is None:
-                        A1 = row
-                    else:
-                        A1 = np.concatenate((A1, row))
+                    concat_list.append(row)
+
+        A1 = np.concatenate((concat_list))
+        t3=time.time()
+        print("   ")
+        print(int(t3)-int(t2))
 
         B1 = np.zeros(shape=(A1.shape[0], 1))
 
         # d_x,x = 0
         B2 = np.zeros(shape=(N, 1))
         A2 = None
+        concat_list_A2=[]
         for i in range(N):
             row = np.zeros(shape=(1, N ** 2))
             row[0][i + i * N] = 1
-            if A2 is None:
-                A2 = row
-            else:
-                A2 = np.concatenate((A2, row))
+            concat_list_A2.append(row)
+            
+        A2=np.concatenate((concat_list_A2))
 
         # d_xy = d_yx
         A3 = None
         B3 = None
+        concat_list_A3=[]
+        concat_list_B3=[]
         for i in range(N):
             for j in range(N):
                 if i >= j:
@@ -123,26 +133,34 @@ class LPS:
                 row[0][i * N + j] = 1
                 row[0][j * N + i] = -1
                 row_v = np.zeros(shape=(1, 1))
-                if A3 is None:
-                    A3 = row
-                    B3 = row_v
-                else:
-                    A3 = np.concatenate((A3, row))
-                    B3 = np.concatenate((B3, row_v))
+                concat_list_A3.append(row)
+                concat_list_B3.append(row_v)
 
+        A3= np.concatenate((concat_list_A3))
+        B3= np.concatenate((concat_list_B3))
         A2 = np.concatenate((A3, A2))
         B2 = np.concatenate((B3, B2))
-
+      
         # sum_(x, y) d_x,x = n
         B3 = N * np.ones(shape=(1, 1))
         A3 = np.ones(shape=(1, N ** 2))
 
         A2 = np.concatenate((A3, A2))
         B2 = np.concatenate((B3, B2))
+        t4=time.time()
+       
+        
+        print("   ")
+        print(int(t4)-int(t3))
 
-        res = linprog(C[0], A_ub=A1, b_ub=B1, A_eq=A2, b_eq=B2, bounds=(0, None), method='simplex')  # 'interior-point'
+        res = linprog(C[0], A_ub=A1, b_ub=B1, A_eq=A2, b_eq=B2, bounds=(0, None), method='simplex',options={'tol':0.3,'maxiter':600})  # 'interior-point'
         msg = 'Optimal value:' + str(res.fun) + '\nX:' + str(res.x)
         log(msg, log_path)
+        t4=time.time()
+       
+        
+        print("   ")
+        print(int(t4)-int(t3))
         return res
 
     @staticmethod
@@ -161,7 +179,7 @@ class LPS:
         weights = nx.get_edge_attributes(G, 'weight')
         for e in G.edges():
             if cut_dic[str(e[0])] != cut_dic[str(e[1])]:
-                cut_weight += weights.get(e)
+                cut_weight += int(weights.get(e,1))
 
         if min(s_cut_nodes, len(G.nodes()) - s_cut_nodes) == 0:
             return math.inf
@@ -307,9 +325,9 @@ class LPS:
             if s == t:  # ignoring self loops!
                 continue
             if s > t:
-                edges_combined[(t, s)] = edges_combined.get((t, s), 0) + v
+                edges_combined[(t, s)] = edges_combined.get((t, s), 0) + int(v)
             else:
-                edges_combined[(s, t)] = edges_combined.get((s, t), 0) + v
+                edges_combined[(s, t)] = edges_combined.get((s, t), 0) + int(v)
 
         for e, v in edges_combined.items():
             if e[0] == e[1]:
@@ -341,8 +359,8 @@ class LPS:
                     v1 = partial_assignment[x]
                     v2 = partial_assignment[y]
                     if v1 != v2:
-                        partial_cut_weight += weights.get((x, y), 0)
-                        partial_cut_weight += weights.get((y, x), 0)
+                        partial_cut_weight += int(weights.get((x, y), 0))
+                        partial_cut_weight += int(weights.get((y, x), 0))
 
         left_nodes = N - p1_nodes - p2_nodes
         mid = int(min(N / 2, p1_nodes + left_nodes,
@@ -361,3 +379,25 @@ class LPS:
             new_cut.extend(new_node_to_old_nodes[x])
         real_value = self._compute_cut_value(G, new_cut)
         return lower_bound, new_cut, real_value
+
+    def solve_LB(self, G, partial_assignment_dict={}, log_path=None):
+
+        reg_G, old_nodes_to_new_nodes = LPS._graph_to_standard_form(G, partial_assignment_dict)
+        res = LPS._compute_LP_lower_bound(reg_G, log_path)
+        lower_bound = res.fun + LPS._compute_partial_assignment_cost(G, partial_assignment_dict)
+        
+        return lower_bound,res
+
+    def solve_UB(self, G, res,partial_assignment_dict={}, log_path=None):
+        
+        reg_G, old_nodes_to_new_nodes = LPS._graph_to_standard_form(G, partial_assignment_dict)
+        cut, value = self._generate_cut_from_relaxed_solution(res.x, reg_G, log_path)
+        new_cut = []
+        new_node_to_old_nodes = self._flip_dic(old_nodes_to_new_nodes)
+        for x in cut:
+            new_cut.extend(new_node_to_old_nodes[x])
+        real_value = self._compute_cut_value(G, new_cut)
+        
+        return new_cut,real_value
+
+

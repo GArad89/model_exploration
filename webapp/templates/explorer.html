@@ -7,6 +7,10 @@
 <script type="text/javascript" src="{{ url_for('static', filename='viz/viz-1.8.0.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='d3-zoom/d3-zoom.js') }}"></script>
 
+<script type="text/javascript" src="{{ url_for('static', filename='saveSvgAsPng/saveSvgAsPng.js') }}"></script>
+
+
+
 <style>
  .node {
    cursor: pointer;
@@ -28,6 +32,22 @@
    stroke: #ccc;
    stroke-width: 1.5px;
  }
+
+
+ div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 60px;
+  height: 28px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+
 </style>
 {% endblock %}
 
@@ -36,7 +56,8 @@
 {% block body %}
 
 <button id='btn_reset' class="btn btn-primary">Reset</button>
-<button id='btn_export' class="btn btn-primary">Export Super Graph</button>
+<button id='btn_export_dendrogram' class="btn btn-primary">Export Dendrogram</button>
+<button id='btn_export_supergraph' class="btn btn-primary">Export Super Graph</button>
 <button id='btn_expand_all' class="btn btn-primary">Expand All</button>
 <button id='btn_collapse_all' class="btn btn-primary">Collapse All</button>
 
@@ -62,6 +83,11 @@ var svg = d3.select("#d3-main")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
     .style("fill", "none")
+
+
+var tooltip_div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
 
 var zoom = d3.zoom()
         .scaleExtent([1 / 2, 4])
@@ -91,6 +117,32 @@ function zoomed_supergraph() {
 $('#btn_reset').click(function() {
    zoom.transform(svg, d3.zoomIdentity.scale(1))
 });
+
+
+$('#btn_export_dendrogram').click(function() {
+    saveSvgAsPng(document.getElementById("d3-main"), "diagram.png", {scale: 1, backgroundColor: 'white'});
+});
+
+
+$('#btn_export_supergraph').click(function() {
+    saveSvgAsPng($('#supergraph').children().first()[0], "diagram.png", {scale: 1, backgroundColor: 'white'});
+});
+
+$(document).keydown(function(e) {
+    switch(e.which) {
+        case 38: // up
+        document.getElementById('btn_reset').scrollIntoView({block: 'start', behavior: 'smooth'});
+        break;
+
+        case 40: // down
+        document.getElementById('supergraph').scrollIntoView({block: 'start', behavior: 'smooth'});
+        break;
+
+        default: return; // exit this handler for other keys
+    }
+    e.preventDefault(); // prevent the default action (scroll / move caret)
+});
+
 
 
 function expandAll(){
@@ -194,6 +246,21 @@ function updateTree(source) {
   // Add Circle for the nodes
   nodeEnter.append('circle')
       .attr('class', 'node')
+      .on("mouseover", function(d) {
+          console.log(d.data)
+          tooltip_div.transition()
+         .duration(200)
+         .style("opacity", .9);
+
+          tooltip_div.html("i am a tooltip")
+         .style("left", (d3.event.pageX) + "px")
+         .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function(d) {
+       tooltip_div.transition()
+          .duration(500)
+          .style("opacity", 0);
+      })
       .attr('r', 1e-6)
       .style("fill", function(d) {
           return d._children ? "lightsteelblue" : "#fff";

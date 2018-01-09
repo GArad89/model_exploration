@@ -72,6 +72,6 @@ class TfIdfLabeler(GraphLabeler):
         # label the dendrogram's nodes
         for node in self.dendrogram.nodes():
             print(node.subset)
-            top_label = top_labels(node.subset)
+             top_label = top_labels(node.subset)
             print("top_label = ", top_label)
             node.label = top_label
