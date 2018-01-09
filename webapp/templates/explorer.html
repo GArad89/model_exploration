@@ -240,6 +240,7 @@ function updateTree(source) {
   // Enter any new modes at the parent's previous position.
   var nodeEnter = node.enter().append('g')
       .attr('class', 'node')
+      .attr('id', function(d) { return 'tree-' + d.data.id; })
       .attr("transform", function(d) {
         return "translate(" + source.y0 + "," + source.x0 + ")";
     })
@@ -436,6 +437,18 @@ function updateGraph(source) {
 	document.getElementById('supergraph').innerHTML = supergraphToSvg(supergraphNodes, superEdges);
 	supergraph_svg_elem = $("#supergraph").find("svg")[0];
 	supergraph_svg_elem.id = 'svg_supergraph';
+
+  supergraphNodes.forEach(function(d3Node) {
+    if (!d3Node.data.isConcrete) {
+      console.log('setting click handler on ' + d3Node.data.id);
+      // node is a cluster, make it so click on node in super-state graph expands it
+      $('#' + d3Node.data.id).on('click', function(e) {
+          console.log('click on ' + d3Node.data.id);
+          var evt = new MouseEvent("click");
+          document.getElementById('tree-' + d3Node.data.id).dispatchEvent(evt);
+      });
+    }
+  });
 
 	svg_supergraph = d3.select('#svg_supergraph');
 	svg_supergraph.append("rect")
