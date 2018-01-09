@@ -13,7 +13,7 @@ class RandomWalkLabelerTest(unittest.TestCase):
         cwd = os.getcwd()
         print(cwd)
 
-        g = DGraph.read_dot("../engine/dot/ssh.net.dot")
+        g = DGraph.read_dot("../engine/dot/java.util.Formatter.dot")
         den = partitionLoop.partition(g, SpectralCluster.SpectralCluster(), stopCriteria.SizeCriteria(4))
         labeler = RandomWalkLabeler.RandomWalkLabeler(g, den)
         labeler.label()
