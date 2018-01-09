@@ -7,8 +7,8 @@ log = logging.getLogger(__name__)
 
 class PageRankLabeler(GraphLabeler):
     
-    def __init__(self, graph, dendrogram):
-        super().__init__(graph, dendrogram)
+    def __init__(self, graph, dendrogram, source):
+        super().__init__(graph, dendrogram, source)
 
     def label(self, label_size=3):
 
