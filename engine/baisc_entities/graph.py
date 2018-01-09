@@ -1,5 +1,4 @@
 import networkx as nx
-import matplotlib.pyplot as plt
 from itertools import chain
 
 class DGraph:
@@ -35,6 +34,7 @@ class DGraph:
         return self.dgraph.in_edges(node)
 
     def draw(self):
+        import matplotlib.pyplot as plt
         nx.draw(self.dgraph)
         plt.show()
 
