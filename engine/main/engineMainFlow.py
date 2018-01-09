@@ -5,6 +5,9 @@ from engine.stopping_criteria import get_stopping_criterion
 from engine.labeling import get_labeling_method
 from engine.utils.jsonWorker import *
 from .partitionLoop import partition
+import logging
+
+log = logging.getLogger(__name__)
 
 import importlib
 
@@ -21,7 +24,12 @@ def run_algo(graph, algo_name, params, stopping_criterion, labeling_method):
 
     labeler = get_labeling_method(labeling_method)(graph, dendro)
     labeler.label()
-    
+
+    log.info(len(dendro.nodes()))
+
+    for super_node in dendro.nodes():
+        log.info(super_node.label)
+
     return dendrogramToJSON(dendro)
 
 def get_info_list():

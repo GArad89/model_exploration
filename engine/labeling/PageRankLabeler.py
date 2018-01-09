@@ -1,26 +1,29 @@
 from .label import GraphLabeler
 import networkx as nx
 
+import logging
+
+log = logging.getLogger(__name__)
 
 class PageRankLabeler(GraphLabeler):
-
+    
     def __init__(self, graph, dendrogram):
         super().__init__(graph, dendrogram)
 
-
-    def label(self):
+    def label(self, label_size=3):
 
         ranks = nx.pagerank(self.graph.dgraph)
 
-        for super_node in self.dendrogram.nodes():
-            max_rank = -1
-            max_ranked_node = None
-            for node in super_node.subset:
-                if ranks[node] > max_rank:
-                    max_rank = ranks[node]
-                    max_ranked_node = self.graph.node_attr(node, 'label')
+        def n_important_nodes(subset, n):
+            nonlocal ranks
+            k = min(n, len(subset))
+            subset_sorted = sorted(subset, key=lambda node: ranks[node], reverse=True)
+            return subset_sorted[:k]
 
-            super_node.label = max_ranked_node
+        for super_node in self.dendrogram.nodes():
+            chosen_nodes = n_important_nodes(super_node.subset, label_size)
+            chosen_nodes_labels = [self.graph.node_attr(node, 'label') for node in chosen_nodes]
+            super_node.label = ','.join(chosen_nodes_labels)
 
 
 
