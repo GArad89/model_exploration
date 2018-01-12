@@ -435,8 +435,8 @@ function updateGraph(source) {
 		superEdges[srcNode] = existingEdges;
 	});
 
-
-	document.getElementById('supergraph').innerHTML = supergraphToSvg(supergraphNodes, superEdges);
+  var dotContent = supergraphToGraphviz(supergraphNodes, superEdges); // TODO: save dot for quick export
+	document.getElementById('supergraph').innerHTML = Viz(dotContent, {totalMemory: 128*1024*1024});
 	supergraph_svg_elem = $("#supergraph").find("svg")[0];
 	supergraph_svg_elem.id = 'svg_supergraph';
 
@@ -531,10 +531,10 @@ function attributesToGraphViz(attributes) {
 
 // convert supergraphNodes, superEdges into a .dot file, render to svg
 // NOTE: to style the graph use CSS (see '.node text' above for example)
-function supergraphToSvg(supergraphNodes, superEdges) {
+function supergraphToGraphviz(supergraphNodes, superEdges) {
 	var graphvizOutput = '';
-	//console.log(supergraphNodes)
-	//console.log(superEdges);
+	console.log(supergraphNodes)
+	console.log(superEdges);
 
 	// TODO: get node shape from original graph potentially
 	// TODO: get smart name for result (e.g. model name)
@@ -605,7 +605,8 @@ function supergraphToSvg(supergraphNodes, superEdges) {
   console.log(graphvizOutput);
 	//console.log(graphvizOutput);
 	// use Viz (graphviz in emscripten) to render the .dot file
-	return Viz(graphvizOutput);
+  // TODO
+  return graphvizOutput;
 }
 
 function getActiveClusters(root) {
