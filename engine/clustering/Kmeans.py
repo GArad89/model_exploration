@@ -4,7 +4,6 @@ from sklearn.cluster import KMeans
 from networkx import spectral_layout
  
  
-##running but not giving desired results 
 class KmeansClustering (Cluster):
 
     def __init__(self, n = 2):
