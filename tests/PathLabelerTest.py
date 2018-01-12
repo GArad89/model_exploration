@@ -12,5 +12,5 @@ class PathLabelerTest(unittest.TestCase):
 
         g = DGraph.read_dot("../engine/dot/large/ktails4.dot")
         den = partitionLoop.partition(g, SpectralCluster.SpectralCluster(), stopCriteria.SizeCriteria(4))
-        labeler = PathLabeler.PathLabeler(g, den)
+        labeler = PathLabeler.PathLabeler(g, den, None)
         labeler.label()
