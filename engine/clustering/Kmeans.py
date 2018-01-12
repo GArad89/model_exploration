@@ -11,7 +11,7 @@ class KmeansClustering (Cluster):
         self.n=n
         
     @staticmethod
-    def getParams(): 
+    def get_params(): 
         form = [{'key': 'n', 'type': 'text'}] 
         schema = { 
             'n' : {'type': 'integer', 'title': 'number of clusters', 'minimum' : 2, 'required' : True} 
