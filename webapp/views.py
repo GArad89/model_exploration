@@ -82,7 +82,7 @@ def algorithm_choice_form():
 
         stopping_criterion = request.values['stopping-criterion']
         labeling_method = request.values['labeling-method']
-        labeling_source = request.values['labeling-source']
+        labeling_source = labeling_sources[request.values['labeling-source']]
         #TODO: if labeling_source not in labeling_sources: raise Exception('aaah')
 
         result = run_algo(graph, algorithm_name, parameters, stopping_criterion, labeling_method, labeling_source)
