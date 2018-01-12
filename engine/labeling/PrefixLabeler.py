@@ -17,13 +17,13 @@ class PrefixLabeler(GraphLabeler):
             prefix = os.path.commonprefix(list(labels))
             if not prefix:
                 # NOTE ESCAPED \n for graphviz happiness
-                node.label = "\n".join(labels)
+                node.label = super().shortenlabel("\n".join(labels))
             else:
                 #TODO: deal with empty suffix and repeated labels
-                node.label = "{prefix}{{\n{suffixes}}}".format(
+                node.label = super().shortenlabel("{prefix}{{\n{suffixes}}}".format(
                     prefix=prefix,
                     suffixes=",\n".join(l[len(prefix):] for l in labels)
-                    )
+                    ))
 
             if not node.label:
                 #TODO:roee(hack)

@@ -27,6 +27,8 @@ Install dependencies by running `pip3 install -r requirements.txt`
 
 To develop and/or run unit tests, `pip3 install -r requirements-dev.txt` for additional, dev-only dependencies
 
+To run all tests run the following command from the main project folder: `python -m unittest discover -s tests`
+
 * Configuration
 
 `webapp_config.py` contains configuration for the web application:
