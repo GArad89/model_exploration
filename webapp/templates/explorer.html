@@ -240,6 +240,7 @@ function collapse(d) {
 }
 // Toggle children on click.
 function clickOnDendrogram(d) {
+  document.getElementById('tree-' + d.data.id).classList.remove('hover');
   if (d.children) {
       d._children = d.children;
       d.children = null;
@@ -341,6 +342,7 @@ function updateTree(source) {
     .classed('active', function(d) {
         return d._children !== undefined && d._children !== null;
     })
+    .classed('hover', false)
     .attr('cursor', 'pointer');
 
 
