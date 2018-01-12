@@ -1,10 +1,5 @@
-
 from . import PrefixLabeler, TfIdfLabeler, PageRankLabeler
-
-class labeling_on_type(Enum):
-    EDGES = 1
-    NODES = 2
-    EDGES_AND_NODES = 3
+from .label import labeling_on_type
 
 def get_methods():
     "return list of all supported labeling method classes"

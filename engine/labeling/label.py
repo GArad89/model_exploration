@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from enum import Enum
 import itertools
+from enum import Enum
+
 
 class labeling_on_type(Enum):
     EDGES = 1
     NODES = 2
     EDGES_AND_NODES = 3
-
 
 class GraphLabeler(ABC):
 
