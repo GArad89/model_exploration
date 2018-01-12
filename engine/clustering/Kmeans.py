@@ -4,7 +4,6 @@ from sklearn.cluster import KMeans
 from networkx import spectral_layout
  
  
-##running but not giving desired results 
 class KmeansClustering (Cluster):
 
     def __init__(self, n = 2):
@@ -12,7 +11,7 @@ class KmeansClustering (Cluster):
         self.n=n
         
     @staticmethod
-    def getParams(): 
+    def get_params(): 
         form = [{'key': 'n', 'type': 'text'}] 
         schema = { 
             'n' : {'type': 'integer', 'title': 'number of clusters', 'minimum' : 2, 'required' : True} 

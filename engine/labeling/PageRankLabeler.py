@@ -1,4 +1,4 @@
-from .label import GraphLabeler
+from .label import GraphLabeler, labeling_on_type
 import networkx as nx
 
 import logging
@@ -23,7 +23,7 @@ class PageRankLabeler(GraphLabeler):
         for super_node in self.dendrogram.nodes():
             chosen_nodes = n_important_nodes(super_node.subset, label_size)
             chosen_nodes_labels = [self.graph.node_attr(node, 'label') for node in chosen_nodes]
-            super_node.label = ','.join(chosen_nodes_labels)
+            super_node.label = super().shortenlabel(','.join(chosen_nodes_labels))
 
 
 
