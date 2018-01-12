@@ -1,4 +1,4 @@
-from .label import GraphLabeler
+from .label import GraphLabeler, labeling_on_type
 import networkx as nx
 
 import logging
