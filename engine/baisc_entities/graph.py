@@ -73,11 +73,11 @@ class DGraph:
     def maxInOutDegree(self):
         maxdeg = 0
         for node in self.dgraph.nodes():
-            maxdeg = max(max,max(self.in_degree(node), self.out_degree(node)))
+            maxdeg = max(maxdeg,max(self.dgraph.in_degree(node), self.dgraph.out_degree(node)))
             return maxdeg
 
     def numberOfComponenets(self):
-        return nx.number_connected_components(self)
+        return sum(1 for  _ in nx.strongly_connected_components(self.dgraph))
 
     @staticmethod
     def read_dot(path):
