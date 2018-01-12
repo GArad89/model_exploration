@@ -9,20 +9,31 @@
 
 <script type="text/javascript" src="{{ url_for('static', filename='saveSvgAsPng/saveSvgAsPng.js') }}"></script>
 
-
-
 <style>
  .node {
    cursor: pointer;
  }
 
-
  .node circle {
-   fill: #fff;
+   fill: grey;
    stroke: steelblue;
    stroke-width: 1.5px;
  }
 
+ .node:hover circle,
+ .node.hover circle {
+   fill: #fff;
+   stroke-width: 2px;
+ }
+
+ .node circle.node.active {
+  fill: lightsteelblue;
+ }
+ .node:hover circle.node.active,
+ .node.hover circle.node.active {
+  fill: white;
+ }
+ 
  .node text, .edge text {
    font: 10px sans-serif;
    pointer-events: none; /* don't block clicks on underlying node */
@@ -286,8 +297,8 @@ function updateTree(source) {
           .style("opacity", 0);
       })
       .attr('r', 1e-6)
-      .style("fill", function(d) {
-          return d._children ? "lightsteelblue" : "#fff";
+      .classed('active', function(d) {
+          return d._children !== undefined && d._children !== null;
       });
 
   // Add labels for the nodes
@@ -315,8 +326,8 @@ function updateTree(source) {
   // Update the node attributes and style
   nodeUpdate.select('circle.node')
     .attr('r', 10)
-    .style("fill", function(d) {
-        return d._children ? "lightsteelblue" : "grey";
+    .classed('active', function(d) {
+        return d._children !== undefined && d._children !== null;
     })
     .attr('cursor', 'pointer');
 
@@ -463,12 +474,30 @@ function updateGraph(source) {
   supergraphNodes.forEach(function(d3Node) {
     if (!d3Node.data.isConcrete) {
       console.log('setting click handler on ' + d3Node.data.id);
+      var nodeElement = $('#' + d3Node.data.id),
+          dendrogramElement = $('#tree-' + d3Node.data.id);
+
       // node is a cluster, make it so click on node in super-state graph expands it
-      $('#' + d3Node.data.id).on('click', function(e) {
+      nodeElement.on('click', function(e) {
           console.log('click on ' + d3Node.data.id);
           var evt = new MouseEvent("click");
-          document.getElementById('tree-' + d3Node.data.id).dispatchEvent(evt);
+          // [0] is for raw DOM node instead of jquery since d3 doesn't use jquery
+          // so dendrogramElement.click() doesn't work...
+          dendrogramElement[0].dispatchEvent(evt);
       });
+      nodeElement.on('mouseenter', function(e) {
+        // TODO: make sure all other fake-hovers are removed
+        console.log('hover on');
+        console.log(dendrogramElement);
+        // note: jquery addClass/removeClass don't work inside svg :(
+        dendrogramElement[0].classList.add('hover');
+      });
+      nodeElement.on('mouseleave', function(e) {
+        console.log('hover off');
+        console.log(dendrogramElement);
+        // note: jquery addClass/removeClass don't work inside svg :(
+        dendrogramElement[0].classList.remove('hover');
+      })
     }
   });
 
