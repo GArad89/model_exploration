@@ -1,5 +1,5 @@
 from .label import labeling_on_type
-from . import PrefixLabeler, TfIdfLabeler, PageRankLabeler, PathLabeler
+from . import PrefixLabeler, TfIdfLabeler, PageRankLabeler, PathLabeler, RandomWalkLableler
 
 def get_methods():
     "return list of all supported labeling method classes"
