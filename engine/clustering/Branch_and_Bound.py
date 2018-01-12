@@ -40,6 +40,7 @@ def upper_bound_lps(dgraph,bnb_node,new_graph_node,is_accepted):
     if(bnb_node.parent_bnb_node==None):
         bnb_node.relaxed_a,bnb_node.UB=LPS().solve_UB(dgraph.dgraph, bnb_node.res,{})
     else:
+     partial_assignment_dict={}
      if((new_graph_node in bnb_node.parent_bnb_node.relaxed_a)and(is_accepted==False))or((new_graph_node in bnb_node.parent_bnb_node.relaxed_r)and(is_accepted)):
          for node in bnb_node.accepted:
             bnb_node.partial_assignment_dict[node]=1
@@ -51,7 +52,7 @@ def upper_bound_lps(dgraph,bnb_node,new_graph_node,is_accepted):
          if(len(bnb_node.partial_assignment_dict)==len(dgraph.nodes())-1):
             bnb_node.LB=lower_bound_greedy_simple(dgraph, bnb_node) 
             return bnb_node.LB
-         bnb_node.relaxed_a,bnb_node.UB=LPS().solve_UB(dgraph.dgraph,bnb_node.bnb_node.res,partial_assignment_dict)
+         bnb_node.relaxed_a,bnb_node.UB=LPS().solve_UB(dgraph.dgraph,bnb_node.res,partial_assignment_dict)
      else:
         bnb_node.relaxed_a=bnb_node.parent_bnb_node.relaxed_a
         bnb_node.relaxed_r=bnb_node.parent_bnb_node.relaxed_r
@@ -210,12 +211,13 @@ class BranchAndBoundCluster (Cluster):
         
     """
     
-    def __init__(self,target=sparset_cut_target,heru_LB=lower_bound_greedy_simple,heru_UB=upper_bound_greedy_simple,heru_order=sort_nodes_by_degree):
-        self.target = target
-        self.heru_LB = heru_LB
-        self.heru_UB = heru_UB
-        self.heru_order = heru_order
-
+    def __init__(self,herustics='greedy_simple'):
+        self.target = sparset_cut_target
+        self.heru_order = sort_nodes_by_degree
+        heru_LB_dict={'greedy_simple':lower_bound_greedy_simple,'lps':lower_bound_lps, 'lps_simple': lower_bound_lps_simple}
+        heru_UB_dict={'greedy_simple':upper_bound_greedy_simple,'lps':upper_bound_lps, 'lps_simple': upper_bound_lps_simple}
+        self.heru_LB=heru_LB_dict.get(herustics,'greedy_simple')
+        self.heru_UB=heru_UB_dict.get(herustics,'greedy_simple')
 
     @staticmethod
     def get_params():
@@ -224,7 +226,7 @@ class BranchAndBoundCluster (Cluster):
             'herustics' : {
                 'type' : 'string',
                 'title': 'Herustics',
-                'enum': ['greedy_simple', 'lps', 'lps_simple'],
+                'enum': ['greedy_simple', 'lps', 'lps_simple']
             },
         }
         return schema, form
