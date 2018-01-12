@@ -10,11 +10,11 @@ class labeling_on_type(Enum):
 
 class GraphLabeler(ABC):
 
-    def __init__(self, graph, dendrogram, source, labeling_on = labeling_on_type.EDGES_AND_NODES):
+    def __init__(self, graph, dendrogram, source = labeling_on_type.EDGES_AND_NODES):
         self.graph = graph
         self.dendrogram = dendrogram
         self.source = source
-        self.labeling_on = labeling_on
+ 
 
 
     def get_labels(self,node):
@@ -33,7 +33,7 @@ class GraphLabeler(ABC):
             labeling_on_type.EDGES: itertools.chain(subgraph.edges.items()),
             labeling_on_type.NODES: itertools.chain(subgraph.nodes.items()),
             labeling_on_type.EDGES_AND_NODES: itertools.chain(subgraph.edges.items(), subgraph.nodes.items())
-        }.get(self.labeling_on, [])    
+        }.get(self.source, [])    
 
 
     @abstractmethod

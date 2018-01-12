@@ -4,8 +4,8 @@ import os
 
 class PrefixLabeler(GraphLabeler):
 
-    def __init__(self, graph, dendrogram, source, labeling_on = labeling_on_type.EDGES_AND_NODES):
-        super().__init__(graph, dendrogram, source,labeling_on)
+    def __init__(self, graph, dendrogram, source = labeling_on_type.EDGES_AND_NODES):
+        super().__init__(graph, dendrogram, source)
 
     def label(self):
         unnamed_cluster = 1
