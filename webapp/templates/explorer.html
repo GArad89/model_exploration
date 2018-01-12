@@ -92,6 +92,7 @@
 {% block end_of_body %}
 <script type="text/javascript">
 
+var shownDuplicateMessage = false; // only show duplicate vertex warning once
 
 var margin = {top: 20, right: 120, bottom: 20, left: 120},
     width = 960 - margin.right - margin.left,
@@ -431,7 +432,15 @@ function updateGraph(source) {
 		// for every vertex in the cluster, map it to the cluster
 		idToCluster[clusterId].vertices.forEach(function(vertex) {
 			if (vertexToNode[vertex] !== undefined){
-				alert('vertex showed up in two clusters!');
+        if (!shownDuplicateMessage) {
+  				alert('vertex showed up in two clusters!');
+          shownDuplicateMessage = true;
+        }
+        // if vertex is assiged to a cluster with an id smaller than ours
+        // leave it be. otherwise map the vertex to us
+        if (vertexToNode[vertex] < clusterId) {
+          return;
+        }
 			}
 			vertexToNode[vertex] = clusterId;
 		});

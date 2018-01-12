@@ -20,10 +20,28 @@ class PageRankLabeler(GraphLabeler):
             subset_sorted = sorted(subset, key=lambda node: ranks[node], reverse=True)
             return subset_sorted[:k]
 
-        for super_node in self.dendrogram.nodes():
-            chosen_nodes = n_important_nodes(super_node.subset, label_size)
-            chosen_nodes_labels = [self.graph.node_attr(node, 'label') for node in chosen_nodes]
-            super_node.label = super().shortenlabel(','.join(chosen_nodes_labels))
+        def n_important_edges(subset_edges, n):
+            nonlocal ranks
+            edges_ranks = {}
+            for edge in subset_edges:
+                out_node = edge[0]
+                out_node_rank = ranks[out_node]
+                edges_ranks[(edge[0], edge[1])] = out_node_rank / len(self.graph.dgraph.out_edges())
 
+            print(edges_ranks)
 
+            k = min(n, len(subset_edges))
+            subset_sorted = sorted(subset_edges, key=lambda edge: edges_ranks[(edge[0], edge[1])], reverse=True)
+            return subset_sorted[:k]
 
+        for super_node in self.dendrogram.nodes()[1:]:
+            if self.source == labeling_on_type.NODES:
+                chosen_nodes = n_important_nodes(super_node.subset, label_size)
+                chosen_labels = [self.graph.node_attr(node, 'label') for node in chosen_nodes]
+            elif self.source == labeling_on_type.EDGES \
+                or self.source == labeling_on_type.EDGES_AND_NODES:                 # TODO: something smarter on edges+nodes mode
+                chosen_edges = n_important_edges(super_node.projected_graph.edges(), label_size)
+                chosen_labels = [self.graph.dgraph.edges[(edge[0], edge[1])].get('label','') for edge in chosen_edges]
+            chosen_labels = [l for l in chosen_labels if l]
+            print(chosen_labels)
+            super_node.label = super().shortenlabel(','.join(chosen_labels))
