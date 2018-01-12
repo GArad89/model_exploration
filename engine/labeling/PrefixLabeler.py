@@ -1,17 +1,17 @@
-from .label import *
+from .label import GraphLabeler, labeling_on_type
 import os
 
 
 class PrefixLabeler(GraphLabeler):
 
-    def __init__(self, graph, dendrogram, source = labeling_on_type.EDGES_AND_NODES):
+    def __init__(self, graph, dendrogram, source):
         super().__init__(graph, dendrogram, source)
 
     def label(self):
         unnamed_cluster = 1
         # label the dendrogram's nodes
         for node in self.dendrogram.nodes()[1:]:
-            labels = super().get_labels(node)
+            labels = super().get_labels(node.projected_graph.dgraph)
 
             # shortest common prefix 
             prefix = os.path.commonprefix(list(labels))

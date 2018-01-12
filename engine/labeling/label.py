@@ -17,8 +17,8 @@ class GraphLabeler(ABC):
  
 
 
-    def get_labels(self,node):
-         subgraph = node.projected_graph.dgraph
+    def get_labels(self,subgraph):
+         # subgraph = node.projected_graph.dgraph
          # get all inner labels (nodes and edges)
          
          labels = [attrs.get('label','') for _, attrs in self.get_list_of_lables(subgraph)]
