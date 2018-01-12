@@ -13,5 +13,5 @@ class Test_DGraph(unittest.TestCase):
     def test_labeling(self):
         g = DGraph.read_dot(os.path.join(project_root(), "engine/dot/ssh.net.dot"))
         den = partitionLoop.partition(g, SpectralCluster.SpectralCluster(), stopCriteria.SizeCriteria(4))
-        labeler = TfIdfLabeler.TfIdfLabeler(g, den, None)
+        labeler = TfIdfLabeler.TfIdfLabeler(g, den, 'Both')
         labeler.label()

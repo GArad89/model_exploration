@@ -69,7 +69,7 @@
     </div>
 
     <div class="form-group">
-      <button type="submit" class="btn btn-primary">Choose Algorithm</button>
+      <button type="submit" class="btn btn-primary">Run</button>
     </div>
   </form>
 
@@ -82,6 +82,7 @@
 
         var update_stopping_criteria_form = function() {
           selected_stopping_criteria = $('#stopping-criterion').val();
+          //console.log(selected_stopping_criteria);
           var paramNames = {SizeCriteria:'Size of Cluster', InOutDegreeCriteria: 'In/Out Rank', CyclometricCriteria: 'Cyclometric Complexity'};
           if (selected_stopping_criteria !== undefined) {
              $('#parameter-label').text(paramNames[selected_stopping_criteria]);
@@ -89,7 +90,7 @@
         };
 
         var update_form = function() {
-          console.log($('#algorithms-select').val());
+          //console.log($('#algorithms-select').val());
           selected_algo = algos[$('#algorithms-select').val()];
 
           if (selected_algo !== undefined) {
@@ -104,6 +105,9 @@
         // to deal with users clicking 'back' correctly
         if ($('#algorithms-select').val() != '') {
           update_form();
+        }
+        if ($('#stopping-criterion').val()) {
+          update_stopping_criteria_form();
         }
         $('#algorithms-select').change(update_form);
         $('#stopping-criterion').change(update_stopping_criteria_form);
