@@ -48,6 +48,16 @@
   pointer-events: none;
 }
 
+#supergraph {
+  border: 1px dashed black;
+  text-align: center;
+}
+
+#svg_supergraph {
+  width: 100%;
+  height: auto;
+
+}
 
 </style>
 {% endblock %}
@@ -454,6 +464,9 @@ function updateGraph(source) {
   });
 
 	svg_supergraph = d3.select('#svg_supergraph');
+  // remove width and height so we can use HTML's layout for them
+  // we have a viewBox defined so the SVG renderer will keep our aspect ratio
+  svg.supergraph.attr('width', undefined).attr('height',undefined);
 	svg_supergraph.append("rect");
 
 	zoom_supergraph = d3.zoom()
@@ -604,9 +617,6 @@ function supergraphToGraphviz(supergraphNodes, superEdges) {
 
 	graphvizOutput += '}\n';
   console.log(graphvizOutput);
-	//console.log(graphvizOutput);
-	// use Viz (graphviz in emscripten) to render the .dot file
-  // TODO
   return graphvizOutput;
 }
 
