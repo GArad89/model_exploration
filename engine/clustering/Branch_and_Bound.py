@@ -101,7 +101,7 @@ def lower_bound_greedy_simple(dgraph, bnb_node):
         if (bnb_node.rejected.count(edge[0])>0): LB+=is_accepted*int(edge[1])
     return LB/(len(dgraph.nodes())-len(bnb_node.checked)+2*min(len(bnb_node.accepted),len(bnb_node.rejected)))
 
-def sort_nodes_bydegree(dgraph, bnb_node=None):  #bnb_node added so Sort by degrees input variables will match other sort heruistics.  
+def sort_nodes_by_degree(dgraph, bnb_node=None):  #bnb_node added so Sort by degrees input variables will match other sort heruistics.  
     deg_dict=dgraph.dgraph.degree(dgraph.nodes())
     
     sorted_nodes_tuple=sorted(deg_dict, key=lambda tup: tup[1])
@@ -208,7 +208,7 @@ class BranchAndBoundCluster (Cluster):
     sorted_nodes_by_edge_weight=[]
     adj_mat=[]
     
-    def __init__(self,target=sparset_cut_target,heru_LB=lower_bound_greedy_simple,heru_UB=upper_bound_greedy_simple,heru_order=sort_nodes_bydegree):
+    def __init__(self,target=sparset_cut_target,heru_LB=lower_bound_greedy_simple,heru_UB=upper_bound_greedy_simple,heru_order=sort_nodes_by_degree):
         self.target = target
         self.heru_LB = heru_LB
         self.heru_UB = heru_UB

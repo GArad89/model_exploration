@@ -1,5 +1,4 @@
 import networkx as nx
-import matplotlib.pyplot as plt
 from itertools import chain
 from numpy import zeros
 
@@ -36,6 +35,7 @@ class DGraph:
         return self.dgraph.in_edges(node)
 
     def draw(self):
+        import matplotlib.pyplot as plt
         nx.draw(self.dgraph)
         plt.show()
 
@@ -47,7 +47,7 @@ class DGraph:
 
 
     def node_attr(self, node, attr):
-        return self.dgraph.nodes[node]['attr'][attr]
+        return self.dgraph.nodes[node][attr]
 
     def write_dot(self, path):
         print("write_dot called")
@@ -73,11 +73,11 @@ class DGraph:
     def maxInOutDegree(self):
         maxdeg = 0
         for node in self.dgraph.nodes():
-            maxdeg = max(max,max(self.in_degree(node), self.out_degree(node)))
+            maxdeg = max(maxdeg,max(self.dgraph.in_degree(node), self.dgraph.out_degree(node)))
             return maxdeg
 
     def numberOfComponenets(self):
-        return nx.number_connected_components(self)
+        return sum(1 for  _ in nx.strongly_connected_components(self.dgraph))
 
     @staticmethod
     def read_dot(path):
