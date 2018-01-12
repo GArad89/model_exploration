@@ -111,6 +111,8 @@
         }
         $('#algorithms-select').change(update_form);
         $('#stopping-criterion').change(update_stopping_criteria_form);
+
+        update_stopping_criteria_form() // update on document ready
     });
   </script>
 {% endblock %}
