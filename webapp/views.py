@@ -62,9 +62,6 @@ def algorithm_choice_form():
 
     errors = {} #TODO: server-side form validation too (use same json schema)
     if request.method == 'POST':
-        #TODO: get params from form
-        # params = get_params(form)
-        # result = run_algo(get_models().open(model_id), **params)
 
         log.info("Running algorithm")
         algorithm_name = request.values['algorithm']
