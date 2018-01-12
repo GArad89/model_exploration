@@ -1,5 +1,5 @@
 
-from . import PrefixLabeler, TfIdfLabeler, PageRankLabeler
+from . import PrefixLabeler, TfIdfLabeler, PageRankLabeler, PathLabeler
 
 def get_methods():
     "return list of all supported labeling method classes"
