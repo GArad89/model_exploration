@@ -9,9 +9,10 @@ class STLabeling(SuperstateGraphLabeler):
         for node in self.dendrogram.nodes():
             node.label = get_label_for_subset(node.subset)
 
-def get_label_for_subset(self, subset):
-    subgraph = self.graph.subgraph(subset)
+    def get_label_for_subset(self, subset):
+        subgraph = self.graph.subgraph(subset)
         spanning_tree=nx.minimum_spanning_tree(subgraph)
+        return label_spanning_tree(spanning_tree)
     
     
     def label_spanning_tree(self, spanningtree):
@@ -20,3 +21,4 @@ def get_label_for_subset(self, subset):
             edge_data = spanningtree.get_edge_data(edge)
                 if 'label' in edge_data:
                     label += edge_data['label']
+        return label
