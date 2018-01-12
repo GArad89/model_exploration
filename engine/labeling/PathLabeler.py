@@ -5,8 +5,8 @@ import random
 
 class PathLabeler(GraphLabeler):
 
-    def __init__(self, graph, dendrogram):
-        super().__init__(graph, dendrogram, None)
+    def __init__(self, graph, dendrogram, labeling_source):
+        super().__init__(graph, dendrogram, labeling_source)
         self.ranks = nx.pagerank(self.graph.dgraph)
 
     def get_sink_nodes(self):
@@ -85,4 +85,4 @@ class PathLabeler(GraphLabeler):
     def label(self):
         for super_node in self.dendrogram.nodes():
             start_nodes, end_nodes = self.get_strategic_nodes(super_node)
-            return str(self.traverse_cluster(start_nodes, end_nodes))
+            super_node.label = str(self.traverse_cluster(start_nodes, end_nodes))
