@@ -38,7 +38,10 @@ def upper_bound_lps_simple(dgraph,bnb_node,new_graph_node,is_accepted):
     
 def upper_bound_lps(dgraph,bnb_node,new_graph_node,is_accepted):
     if(bnb_node.parent_bnb_node==None):
-        bnb_node.relaxed_a,bnb_node.UB=LPS().solve_UB(dgraph.dgraph, bnb_node.res,{})
+        if(len(dgraph.nodes())>3):
+            bnb_node.relaxed_a,bnb_node.UB=LPS().solve_UB(dgraph.dgraph, bnb_node.res,{})
+        else:
+            bnb_node.UB=upper_bound_greedy_simple(dgraph,bnb_node,new_graph_node,is_accepted)
     else:
      partial_assignment_dict={}
      if((new_graph_node in bnb_node.parent_bnb_node.relaxed_a)and(is_accepted==False))or((new_graph_node in bnb_node.parent_bnb_node.relaxed_r)and(is_accepted)):

@@ -153,7 +153,7 @@ class LPS:
         print("   ")
         print(int(t4)-int(t3))
 
-        res = linprog(C[0], A_ub=A1, b_ub=B1, A_eq=A2, b_eq=B2, bounds=(0, None), method='simplex',options={'tol':0.3,'maxiter':600})  # 'interior-point'
+        res = linprog(C[0], A_ub=A1, b_ub=B1, A_eq=A2, b_eq=B2, bounds=(0, None), method='simplex',options={'tol':0.3,'maxiter':700})  # 'interior-point'
         msg = 'Optimal value:' + str(res.fun) + '\nX:' + str(res.x)
         log(msg, log_path)
         t4=time.time()
