@@ -85,6 +85,4 @@ class PathLabeler(GraphLabeler):
     def label(self):
         for super_node in self.dendrogram.nodes():
             start_nodes, end_nodes = self.get_strategic_nodes(super_node)
-
-            if len(start_nodes) > 0 and len(end_nodes) > 0:
-                print("path = ", self.traverse_cluster(start_nodes, end_nodes))
+            return self.traverse_cluster(start_nodes, end_nodes)
