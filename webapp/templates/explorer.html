@@ -69,6 +69,7 @@
 <button id='btn_reset' class="btn btn-primary">Reset</button>
 <button id='btn_export_dendrogram' class="btn btn-primary">Export Dendrogram</button>
 <button id='btn_export_supergraph' class="btn btn-primary">Export Super Graph</button>
+<button id='btn_export_supergraph_dot' class="btn btn-primary">Export Super Graph .dot</button>
 <button id='btn_expand_all' class="btn btn-primary">Expand All</button>
 <button id='btn_collapse_all' class="btn btn-primary">Collapse All</button>
 
@@ -139,6 +140,11 @@ $('#btn_export_supergraph').click(function() {
     saveSvgAsPng($('#supergraph').children().first()[0], "diagram.png", {scale: 1, backgroundColor: 'white'});
 });
 
+$('#btn_export_supergraph_dot').click(function() {
+    // NOTE: this function is exported by saveSvgAsPng.js
+    download("superstate_graph.dot", "data:text/vnd.graphviz," + lastSupergraphGraphviz);
+});
+
 $(document).keydown(function(e) {
     switch(e.which) {
         case 38: // up
@@ -169,6 +175,8 @@ function expand(d){
     if(children)
       children.forEach(expand);
 }
+
+var lastSupergraphGraphviz;
 
 // declares a tree layout and assigns the size
 var treemap = d3.tree().size([height, width]);
@@ -446,7 +454,8 @@ function updateGraph(source) {
 		superEdges[srcNode] = existingEdges;
 	});
 
-  var dotContent = supergraphToGraphviz(supergraphNodes, superEdges); // TODO: save dot for quick export
+  var dotContent = supergraphToGraphviz(supergraphNodes, superEdges);
+  lastSupergraphGraphviz = dotContent; // store raw .dot content so we can export it
 	document.getElementById('supergraph').innerHTML = Viz(dotContent, {totalMemory: 128*1024*1024});
 	supergraph_svg_elem = $("#supergraph").find("svg")[0];
 	supergraph_svg_elem.id = 'svg_supergraph';
@@ -466,7 +475,7 @@ function updateGraph(source) {
 	svg_supergraph = d3.select('#svg_supergraph');
   // remove width and height so we can use HTML's layout for them
   // we have a viewBox defined so the SVG renderer will keep our aspect ratio
-  svg.supergraph.attr('width', undefined).attr('height',undefined);
+  svg_supergraph.attr('width', undefined).attr('height',undefined);
 	svg_supergraph.append("rect");
 
 	zoom_supergraph = d3.zoom()
