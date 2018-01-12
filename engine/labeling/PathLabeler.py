@@ -2,12 +2,12 @@ from .label import GraphLabeler
 import networkx as nx
 import random
 
+
 class PathLabeler(GraphLabeler):
 
     def __init__(self, graph, dendrogram):
         super().__init__(graph, dendrogram, None)
         self.ranks = nx.pagerank(self.graph.dgraph)
-
 
     def get_sink_nodes(self):
         sink_nodes = []
