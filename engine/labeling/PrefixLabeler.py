@@ -11,14 +11,7 @@ class PrefixLabeler(GraphLabeler):
         unnamed_cluster = 1
         # label the dendrogram's nodes
         for node in self.dendrogram.nodes()[1:]:
-            subgraph = node.projected_graph.dgraph
-            # get all inner labels (nodes and edges)
-            labels = [attrs.get('label','') for _, attrs in 
-                        itertools.chain(subgraph.edges.items(), subgraph.nodes.items())]
-            # filter out empty ones
-            labels = list(filter(None, labels))
-            # uniqify
-            labels = set(labels)
+            labels = get_labels(node)
 
             # shortest common prefix 
             prefix = os.path.commonprefix(list(labels))
