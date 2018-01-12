@@ -10,7 +10,7 @@ class PathLabelerTest(unittest.TestCase):
 
     def test_labeling(self):
 
-        g = DGraph.read_dot("../engine/dot/cvs.net.loop_back.dot")
+        g = DGraph.read_dot("../engine/dot/large/ktails4.dot")
         den = partitionLoop.partition(g, SpectralCluster.SpectralCluster(), stopCriteria.SizeCriteria(4))
         labeler = PathLabeler.PathLabeler(g, den)
         labeler.label()
