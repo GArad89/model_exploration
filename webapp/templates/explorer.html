@@ -25,6 +25,7 @@
 
  .node text, .edge text {
    font: 10px sans-serif;
+   pointer-events: none; /* don't block clicks on underlying node */
  }
 
  .link {
@@ -47,6 +48,16 @@
   pointer-events: none;
 }
 
+#supergraph {
+  border: 1px dashed black;
+  text-align: center;
+}
+
+#svg_supergraph {
+  width: 100%;
+  height: auto;
+
+}
 
 </style>
 {% endblock %}
@@ -58,6 +69,7 @@
 <button id='btn_reset' class="btn btn-primary">Reset</button>
 <button id='btn_export_dendrogram' class="btn btn-primary">Export Dendrogram</button>
 <button id='btn_export_supergraph' class="btn btn-primary">Export Super Graph</button>
+<button id='btn_export_supergraph_dot' class="btn btn-primary">Export Super Graph .dot</button>
 <button id='btn_expand_all' class="btn btn-primary">Expand All</button>
 <button id='btn_collapse_all' class="btn btn-primary">Collapse All</button>
 
@@ -128,6 +140,11 @@ $('#btn_export_supergraph').click(function() {
     saveSvgAsPng($('#supergraph').children().first()[0], "diagram.png", {scale: 1, backgroundColor: 'white'});
 });
 
+$('#btn_export_supergraph_dot').click(function() {
+    // NOTE: this function is exported by saveSvgAsPng.js
+    download("superstate_graph.dot", "data:text/vnd.graphviz," + lastSupergraphGraphviz);
+});
+
 $(document).keydown(function(e) {
     switch(e.which) {
         case 38: // up
@@ -158,6 +175,8 @@ function expand(d){
     if(children)
       children.forEach(expand);
 }
+
+var lastSupergraphGraphviz;
 
 // declares a tree layout and assigns the size
 var treemap = d3.tree().size([height, width]);
@@ -435,8 +454,9 @@ function updateGraph(source) {
 		superEdges[srcNode] = existingEdges;
 	});
 
-
-	document.getElementById('supergraph').innerHTML = supergraphToSvg(supergraphNodes, superEdges);
+  var dotContent = supergraphToGraphviz(supergraphNodes, superEdges);
+  lastSupergraphGraphviz = dotContent; // store raw .dot content so we can export it
+	document.getElementById('supergraph').innerHTML = Viz(dotContent, {totalMemory: 128*1024*1024});
 	supergraph_svg_elem = $("#supergraph").find("svg")[0];
 	supergraph_svg_elem.id = 'svg_supergraph';
 
@@ -453,6 +473,9 @@ function updateGraph(source) {
   });
 
 	svg_supergraph = d3.select('#svg_supergraph');
+  // remove width and height so we can use HTML's layout for them
+  // we have a viewBox defined so the SVG renderer will keep our aspect ratio
+  svg_supergraph.attr('width', undefined).attr('height',undefined);
 	svg_supergraph.append("rect");
 
 	zoom_supergraph = d3.zoom()
@@ -531,10 +554,10 @@ function attributesToGraphViz(attributes) {
 
 // convert supergraphNodes, superEdges into a .dot file, render to svg
 // NOTE: to style the graph use CSS (see '.node text' above for example)
-function supergraphToSvg(supergraphNodes, superEdges) {
+function supergraphToGraphviz(supergraphNodes, superEdges) {
 	var graphvizOutput = '';
-	//console.log(supergraphNodes)
-	//console.log(superEdges);
+	console.log(supergraphNodes)
+	console.log(superEdges);
 
 	// TODO: get node shape from original graph potentially
 	// TODO: get smart name for result (e.g. model name)
@@ -603,9 +626,7 @@ function supergraphToSvg(supergraphNodes, superEdges) {
 
 	graphvizOutput += '}\n';
   console.log(graphvizOutput);
-	//console.log(graphvizOutput);
-	// use Viz (graphviz in emscripten) to render the .dot file
-	return Viz(graphvizOutput);
+  return graphvizOutput;
 }
 
 function getActiveClusters(root) {
