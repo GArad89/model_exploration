@@ -1,5 +1,4 @@
 from .label import labeling_on_type
-
 from . import PrefixLabeler, TfIdfLabeler, PageRankLabeler, PathLabeler
 
 def get_methods():
