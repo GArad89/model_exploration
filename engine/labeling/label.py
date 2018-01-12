@@ -10,11 +10,11 @@ class labeling_on_type(Enum):
 
 class GraphLabeler(ABC):
 
-    def __init__(self, graph, dendrogram, source = labeling_on_type.EDGES_AND_NODES, max_lables_per_node = 5):
+    def __init__(self, graph, dendrogram, source = labeling_on_type.EDGES_AND_NODES):
         self.graph = graph
         self.dendrogram = dendrogram
         self.source = source
-        self.max_lables_per_node = max_lables_per_node
+
  
 
 
@@ -36,15 +36,22 @@ class GraphLabeler(ABC):
             labeling_on_type.EDGES_AND_NODES: itertools.chain(subgraph.edges.items(), subgraph.nodes.items())
         }.get(self.source, [])
 
-    def shortenlabel(label):
-        lables_list = re.split(' |,|_|-',label)
+    def shortenlabel(self,label):
+        print("MAMAMA")
+        print(label)
+        lables_list = re.split(',|_|-|,\n|\n',label)
+        print(lables_list)
+        max_lables = 5
         l = len(lables_list)
-        if  l > max_lables_per_node:
-            newlist = []
-            newlist += lables_list[0]
-            for i in range(1,max_lables_per_node-1):
-                newlist += lables_list[(l/(max_lables_per_node-1))*i]
-            newlist += lables_lisst[-1]
+        if  l > max_lables:
+            newlist = [lables_list[0]]
+            print("HEREq")
+            print(newlist)
+            for i in range(1,max_lables-1):
+                newlist += [lables_list[(l//(max_lables-1))*i]]
+            newlist += [lables_list[-1]]
+            print("HERE")
+            print(newlist)
             return ','.join(newlist)
         else:
             return label
