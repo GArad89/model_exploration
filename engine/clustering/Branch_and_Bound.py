@@ -45,7 +45,7 @@ def upper_bound_lps(dgraph,bnb_node,new_graph_node,is_accepted):
             bnb_node.partial_assignment_dict[node]=1
          for node in bnb_node.rejected:
             bnb_node.partial_assignment_dict[node]=0
-         print(bnb_node.partial_assignment_dict)
+        # print(bnb_node.partial_assignment_dict)
          if(len(bnb_node.partial_assignment_dict)==len(dgraph.nodes())):
             bnb_node.LB=check_final_cut(bnb_node,dgraph)
             return bnb_node.LB
@@ -111,7 +111,7 @@ def sort_nodes_bydegree(dgraph, bnb_node=None):  #bnb_node added so Sort by degr
     for tup in sorted_nodes_tuple:
         sorted_nodes+=[tup[0]]
         
-    #print(sorted_nodes)
+ 
     return sorted_nodes
 
 class BnBNode():
@@ -132,18 +132,26 @@ class BnBNode():
         self.parent_bnb_node=None
         self.child_bnb_nodes=[]
         self.partial_assignment_dict={}
-        
         if (parent_bnb_node!=None):
+            #print("chk1:")
+            #print(self.accepted)
+            #print(parent_bnb_node.accepted)
             self.accepted+=parent_bnb_node.accepted
             self.rejected+=parent_bnb_node.rejected
             self.weight=parent_bnb_node.weight
             self.checked+=parent_bnb_node.checked
             self.LB=parent_bnb_node.LB
-
+            #print("chk2:")
+            #print(self.accepted)
+            
         self.parent_bnb_node=parent_bnb_node
         if(is_accepted==True):
+            #print("chk3:")
+           # print(self.accepted)
             self.weight+=1
             self.accepted+=[new_graph_node]
+           # print("chk4:")
+           # print(self.accepted)
         else:
            self.rejected+=[new_graph_node]
         self.checked+=[new_graph_node]
@@ -158,29 +166,36 @@ class BnBNode():
 
 class BnBSearchTree():
 
-    graph=None
-    initial_sorted_graph_nodes=None
-    weight_limit=-1
-    node_list=[]
-    live_nodes=[]
-    best_sol_cut=0
-    best_solution=None
+    
     
     def __init__(self,dgraph,heru_dict):
+        self.graph=None
+        self.initial_sorted_graph_nodes=None
+        self.sorted_graph_nodes=None
+        self.weight_limit=-1
+        self.node_list=[]
+        self.live_nodes=[]
+        self.best_sol_cut=0
+        self.best_solution=None
         self.weight_limit=len(dgraph.nodes())//2+1  ##anything more than half of the nodes+1 will only need to symmetrical solutions
         self.graph=dgraph
         self.sorted_graph_nodes=heru_dict['heru_order'](dgraph)
+        #print(self.sorted_graph_nodes)
         self.node_list+=[BnBNode(self.sorted_graph_nodes[0],True,heru_dict,dgraph)]
+        #print(self.node_list[0].accepted)
+        #print(len(self.node_list))
         for edge in self.graph.edges():
             self.best_sol_cut+=int(edge[2].get('weight',1))
         self.live_nodes+=[self.node_list[0]]
-        #print(self.live_nodes[0].checked)
+        
         
     def add_node(self, bnb_node,bnb_parent):
         self.node_list+=[bnb_node]
         self.live_nodes+=[bnb_node]
        # print(bnb_node.checked)
         self.live_nodes.sort(key=lambda x: (x.UB,x.LB,len(x.checked)))
+        #print("add node")
+        #print(self.live_nodes[0].accepted)
         bnb_parent.add_child(bnb_node)
         if((len(self.sorted_graph_nodes)==len(bnb_node.checked))or(len(bnb_node.accepted)==self.weight_limit)or(len(bnb_node.rejected)==self.weight_limit)):
            bnb_node.LB=check_final_cut(bnb_node,self.graph)
@@ -193,7 +208,7 @@ class BnBSearchTree():
     def kill_node(self,bnb_node):
         self.live_nodes.remove(bnb_node)
 
-    def _check_live(self):     # run over the remaining BnB sub_problems and rejects according to the bounds
+    def check_live(self):     # run over the remaining BnB sub_problems and rejects according to the bounds
         rejected=[]
         if((self.best_sol_cut>0)and(self.best_solution!=None)):
             for node in self.live_nodes:
@@ -205,8 +220,7 @@ class BnBSearchTree():
 
 class BranchAndBoundCluster (Cluster):
     
-    sorted_nodes_by_edge_weight=[]
-    adj_mat=[]
+
     
     def __init__(self,target=sparset_cut_target,heru_LB=lower_bound_greedy_simple,heru_UB=upper_bound_greedy_simple,heru_order=sort_nodes_bydegree):
         self.target = target
@@ -221,24 +235,21 @@ class BranchAndBoundCluster (Cluster):
 
     
     def cluster(self, dgraph, debug_print=False):
-        #print(dgraph.nodes())
+        print(dgraph.nodes())
         heru_dict={'target':self.target,'heru_LB':self.heru_LB,'heru_UB':self.heru_UB,'heru_order':self.heru_order}
         bnb_tree=BnBSearchTree(dgraph,heru_dict)
         current_best_sol_cut=bnb_tree.best_sol_cut
         
         while(len(bnb_tree.live_nodes)>0):
             live_node=bnb_tree.live_nodes[0]
-            
             if(len(live_node.checked)<=len(bnb_tree.sorted_graph_nodes)):   
                 graph_node=bnb_tree.sorted_graph_nodes[len(live_node.checked)]
-               # print(live_node.accepted)
-                #print(live_node.LB)
                 bnb_tree.add_node(BnBNode(graph_node,True,heru_dict,dgraph,live_node),live_node)
                 bnb_tree.add_node(BnBNode(graph_node,False,heru_dict,dgraph,live_node),live_node)
                 
             bnb_tree.kill_node(live_node)
             if(bnb_tree.best_sol_cut<current_best_sol_cut): current_best_sol_cut=bnb_tree.best_sol_cut
-            bnb_tree._check_live()
+            bnb_tree.check_live()
             
         #main_name=__main__.__file__.split('\\')
         if debug_print:
@@ -247,7 +258,8 @@ class BranchAndBoundCluster (Cluster):
             print(bnb_tree.best_solution. accepted)
             print(bnb_tree.best_solution. rejected)
             print("LB: "+str(bnb_tree.best_solution.LB))
-            
+       # print("output")
+        #print([bnb_tree.best_solution. accepted,bnb_tree.best_solution. rejected])    
         return [bnb_tree.best_solution. accepted,bnb_tree.best_solution. rejected]
         
 
