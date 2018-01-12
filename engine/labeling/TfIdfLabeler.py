@@ -74,4 +74,4 @@ class TfIdfLabeler(GraphLabeler):
             print(node.subset)
             top_label = top_labels(node.subset)
             print("top_label = ", top_label)
-            node.label = top_label
+            node.label = shortenlabel(top_label)

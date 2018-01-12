@@ -20,10 +20,10 @@ class PrefixLabeler(GraphLabeler):
                 node.label = "\n".join(labels)
             else:
                 #TODO: deal with empty suffix and repeated labels
-                node.label = "{prefix}{{\n{suffixes}}}".format(
+                node.label = shortenlabel("{prefix}{{\n{suffixes}}}".format(
                     prefix=prefix,
                     suffixes=",\n".join(l[len(prefix):] for l in labels)
-                    )
+                    ))
 
             if not node.label:
                 #TODO:roee(hack)
