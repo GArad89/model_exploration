@@ -238,6 +238,19 @@ function collapse(d) {
     d.children = null;
   }
 }
+// Toggle children on click.
+function clickOnDendrogram(d) {
+  document.getElementById('tree-' + d.data.id).classList.remove('hover');
+  if (d.children) {
+      d._children = d.children;
+      d.children = null;
+    } else {
+      d.children = d._children;
+      d._children = null;
+    }
+  update(d);
+}
+
 
 root.children.forEach(collapse);
 
@@ -274,7 +287,7 @@ function updateTree(source) {
       .attr("transform", function(d) {
         return "translate(" + source.y0 + "," + source.x0 + ")";
     })
-    .on('click', click);
+    .on('click', clickOnDendrogram);
 
   // Add Circle for the nodes
   nodeEnter.append('circle')
@@ -329,6 +342,7 @@ function updateTree(source) {
     .classed('active', function(d) {
         return d._children !== undefined && d._children !== null;
     })
+    .classed('hover', false)
     .attr('cursor', 'pointer');
 
 
@@ -395,18 +409,6 @@ function updateTree(source) {
 
     return path
   }
-
-  // Toggle children on click.
-  function click(d) {
-    if (d.children) {
-        d._children = d.children;
-        d.children = null;
-      } else {
-        d.children = d._children;
-        d._children = null;
-      }
-    update(d);
-  }
 }
 
 function updateGraph(source) {
@@ -472,10 +474,10 @@ function updateGraph(source) {
 	supergraph_svg_elem.id = 'svg_supergraph';
 
   supergraphNodes.forEach(function(d3Node) {
+    var nodeElement = $('#' + d3Node.data.id),
+        dendrogramElement = $('#tree-' + d3Node.data.id);
     if (!d3Node.data.isConcrete) {
       console.log('setting click handler on ' + d3Node.data.id);
-      var nodeElement = $('#' + d3Node.data.id),
-          dendrogramElement = $('#tree-' + d3Node.data.id);
 
       // node is a cluster, make it so click on node in super-state graph expands it
       nodeElement.on('click', function(e) {
@@ -499,6 +501,15 @@ function updateGraph(source) {
         dendrogramElement[0].classList.remove('hover');
       })
     }
+    // for all nodes: right click = collapse to parent
+    nodeElement.on('contextmenu', function(e) {
+        
+        if (d3Node.parent !== undefined && d3Node.parent !== null) {
+          clickOnDendrogram(d3Node.parent);
+          e.preventDefault();
+        }
+    });
+
   });
 
 	svg_supergraph = d3.select('#svg_supergraph');
@@ -569,6 +580,9 @@ function attributesToGraphViz(attributes) {
       // wrap with quotes
       attributeList.push({name: 'label', value: graphvizEscape(attributes.label)});
     }
+    if (attributes.id !== undefined) {
+      attributeList.push({name: 'id', value: graphvizEscape(attributes.id)});
+    }
 
     if (attributeList.length > 0) {
       // transform attributes to strings
@@ -609,12 +623,10 @@ function supergraphToGraphviz(supergraphNodes, superEdges) {
       attributes = 'label=' + graphvizEscape(node.data.name) + ',shape=rectangle'
     }
     // if node is a cluster and not a concrete vertex, give it an id so we can hook up to the dendrogram
-    if (!node.data.isConcrete) {
-      if (attributes.length > 0){
-        attributes += ','
-      }
-      attributes += 'id="' + node.data.id + '"';
+    if (attributes.length > 0){
+      attributes += ','
     }
+    attributes += 'id=' + graphvizEscape(node.data.id);
     // write node to graphviz;
     graphvizOutput += '' + index + ' [' + attributes + '];\n';
 	});
@@ -675,7 +687,7 @@ function getActiveClusters(root) {
 					// TODO(roee): massive hack, wrap fake cluster with extra fake cluster
           // mark it as a concrete vertex so that we don't eliminate self-edges
           // during display
-          active.push({data: idToCluster[vertex]});
+          active.push({data: idToCluster[vertex], parent: node.parent});
 				});
 			}
 		}
