@@ -34,6 +34,13 @@
   fill: white;
  }
  
+ svg text {
+  -webkit-user-select: none; /* Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+ }
+
  .node text, .edge text {
    font: 10px sans-serif;
    pointer-events: none; /* don't block clicks on underlying node */
