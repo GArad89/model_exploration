@@ -14,14 +14,15 @@
 <body>
 
 {% block body_title %}
-<div class="container">
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">{{ self.title() }}</a>
+<div class="container nav-background">
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="{{ url_for('model_choice_form') }}">Model Explorer</a>
+    <a class="navbar-text" id="page-title">{{ self.title() }}</a>
   </nav>
 </div>
 {% endblock %}
 
-<div class="container" id="main-block">
+<div class="container pb-3" id="main-block">
 {% block body %}{% endblock %}
 </div>
 {% block end_of_body %}{% endblock %}

@@ -83,14 +83,14 @@
 {% block title %}Explore!{% endblock %}
 
 {% block body %}
-
-<button id='btn_reset' class="btn btn-primary">Reset</button>
-<button id='btn_export_dendrogram' class="btn btn-primary">Export Dendrogram</button>
-<button id='btn_export_supergraph' class="btn btn-primary">Export Super Graph</button>
-<button id='btn_export_supergraph_dot' class="btn btn-primary">Export Super Graph .dot</button>
-<button id='btn_expand_all' class="btn btn-primary">Expand All</button>
-<button id='btn_collapse_all' class="btn btn-primary">Collapse All</button>
-
+<div class="container p-3">
+  <button id='btn_reset' class="btn btn-info">Reset</button>
+  <button id='btn_export_dendrogram' class="btn btn-info">Export Dendrogram</button>
+  <button id='btn_export_supergraph' class="btn btn-info">Export Super Graph</button>
+  <button id='btn_export_supergraph_dot' class="btn btn-info">Export Super Graph .dot</button>
+  <button id='btn_expand_all' class="btn btn-info">Expand All</button>
+  <button id='btn_collapse_all' class="btn btn-info">Collapse All</button>
+</div>
 
 <svg id="d3-main" style="border: 1px dashed black;"></svg>
 <div id="supergraph"></div>
