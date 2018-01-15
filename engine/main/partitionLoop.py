@@ -12,10 +12,9 @@ def _partition(dgraph, state_subset, clustering_algo, stop_criterion, dendrogram
         dendrogram.add_node(Node(rootnode,state_subset,projected_graph))
         dendrogram.add_child(rootnode,len(dendrogram.nodes())-1)
         rootnode = len(dendrogram.nodes())-1
-
-    # check if the iteration reached the stop criterion
-    if stop_criterion.check(projected_graph):
-        return dendrogram
+        # check if the iteration reached the stop criterion
+        if stop_criterion.check(projected_graph):
+            return dendrogram
 
     #run clustering algorithm and run parition on each cluster
     clusters = clustering_algo.cluster(projected_graph)
