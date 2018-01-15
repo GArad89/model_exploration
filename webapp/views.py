@@ -45,7 +45,7 @@ def model_choice_form():
 @app.route('/choose_algorithm', methods=['GET', 'POST'])
 def algorithm_choice_form():
     # take model id either from form or from get param, prefer the form
-    model_id = request.values.get('model_id','')
+    model_id = request.values.get('model_id','') or model_id = request.values.get('model','')
     if not model_id:
 
         #TODO: implement flash display 
