@@ -37,7 +37,8 @@ class CyclometricCriteria(StopCriteria):
         self.threshold = threshold
 
     def check(self, dgraph, **params):
-        return (( dgraph.number_of_nodes() - dgraph.number_of_edges() + 2*dgraph.numberOfComponenets()) < self.threshold) | (dgraph.number_of_nodes() <= 1)
+        cyclomertic_complexity = dgraph.number_of_edges() - dgraph.number_of_nodes() + 2 * dgraph.numberOfComponenets()
+        return (cyclomertic_complexity < self.threshold) | (dgraph.number_of_nodes() <= 1)
 
 
         
