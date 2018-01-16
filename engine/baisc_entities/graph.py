@@ -1,11 +1,29 @@
 import networkx as nx
 from itertools import chain
 from numpy import zeros
+from collections import OrderedDict
+
+class OrderedDiGraph(nx.DiGraph):
+    """
+    nx.DiGraph that retains ordering when iterating on it
+    """
+    adjlist_outer_dict_factory = OrderedDict
+    adjlist_inner_dict_factory = OrderedDict
+    node_dict_factory = OrderedDict
+
+class OrderedGraph(nx.DiGraph):
+    """
+    nx.DiGraph that retains ordering when iterating on it
+    """
+    adjlist_outer_dict_factory = OrderedDict
+    adjlist_inner_dict_factory = OrderedDict
+    node_dict_factory = OrderedDict
+
 
 class DGraph:
     dgraph = None
     def __init__(self):
-        self.dgraph = nx.DiGraph()
+        self.dgraph = OrderedDiGraph()
 
     def __init__(self, nx_graph):
         self.dgraph = nx_graph
@@ -53,13 +71,14 @@ class DGraph:
         print("write_dot called")
         nx.drawing.nx_pydot.write_dot(self.dgraph, path)
 
-    def adjacency_matrix(self):
-        adj_mat=zeros(shape=(len(self.nodes()),len(self.nodes())))
-        i=0
-        node_dict={}
-        for node in self.nodes():
-            node_dict[node]=i
-            i+=1
+    def adjacency_matrix(self, node_list=None):
+        # order nodes' row,column according to list or according to dgraph.nodes() order
+        if node_list is None:
+            node_list = self.nodes()
+
+        adj_mat = zeros(shape=(len(self.nodes()),len(self.nodes())))
+        i = 0
+        node_dict = {node : i for i, node in enumerate(node_list)}
             
         for edge in self.edges():
             adj_mat[node_dict[edge[0]]][node_dict[edge[1]]] += int(edge[2].get('weight',1))
@@ -81,7 +100,14 @@ class DGraph:
 
     @staticmethod
     def read_dot(path):
-        nx_graph = nx.DiGraph(nx.drawing.nx_pydot.read_dot(path))
+        multigraph = nx.drawing.nx_pydot.read_dot(path)
+        nx_graph = OrderedDiGraph()
+        # create the graph ordered, for consistency when running algorithms
+        for node, data in sorted(multigraph.nodes(data=True)):
+            nx_graph.add_node(node, **data)
+
+        for src, dst, data in multigraph.edges(data=True):
+            nx_graph.add_edge(src, dst, **data)
 
         # deal with ""-encapsulated strings in properties
         # e.g. java.net.DatagramSocket.dot

@@ -42,23 +42,21 @@ class SpectralCluster(Cluster):
   
 
         #adjacency matrix
-        adj_mat =dgraph.adjacency_matrix()
-        adj_mat=np.maximum(adj_mat,adj_mat.transpose())
+        adj_mat = dgraph.adjacency_matrix()
+        # turn to undirected graph
+        adj_mat = np.maximum(adj_mat,adj_mat.transpose())
 
         #SpectralClustering
         sc = SpectralClustering(n_clusters,affinity=self.affinity)
         sc.fit(adj_mat)
-        result=sc.labels_
+        result = sc.labels_
         
-        #seperating the result list to lists for each cluster (1= the node is in the substae 0= the node is not in the state)
-        output=[];
-        dnodes=list(dgraph.nodes())
-        for i in range(0,max(result)+1):
-            temp_list=[];
-            for j in range(0,len(result)):
-                if result[j]!=i:
-                    temp_list+=[dnodes[j]]
-            output.append(temp_list)
+        ordered_nodes = list(dgraph.nodes())
+        # create empty clusters to gather the result
+        output = [[] for i in range(0,max(result)+1)];
+        # append each node to its cluster 
+        for index, value in enumerate(result):
+            output[value].append(ordered_nodes[index])
         return output
 
 
