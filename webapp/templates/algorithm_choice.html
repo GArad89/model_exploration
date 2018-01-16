@@ -11,7 +11,7 @@
 {% block body %}
   <div class="row pl-3 py-3"><h3>Select a Clustering Method</h3></div>
   <div class="form-group row">
-    <label for="algorithms-select" class="col-form-label col-sm-3">Select Labeling Method</label>
+    <label for="algorithms-select" class="col-form-label col-sm-3">Select Clustering Algorithm</label>
     <div class="col-auto">
       <select id="algorithms-select" class="form-control">
         <option disabled selected value> -- select an option -- </option>
@@ -23,9 +23,8 @@
     <!-- pass selected model id to next stage -->
   </div>
   <form id="algorithm-form" method="post">
+    <!-- jsonform will insert its fields inside the div -->
     <div id="json-form"></div>
-    <!-- jsonform will insert its fields before the button and hidden fields,
-          hidden algorithm field will match the select above, which is outside the form -->
     <input id="algorithm" name="algorithm" type="hidden">
     <input id="model_id" name="model_id" type="hidden" value="{{ model_id }}">
     <div class="form-group row">
