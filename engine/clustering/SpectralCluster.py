@@ -2,6 +2,7 @@ from engine.clustering.cluster_abstract import Cluster
 from engine.baisc_entities.graph import DGraph
 from sklearn.cluster import SpectralClustering, KMeans
 import numpy as np
+import random
 
 
 class SpectralCluster(Cluster):
@@ -50,13 +51,22 @@ class SpectralCluster(Cluster):
         sc = SpectralClustering(n_clusters,affinity=self.affinity)
         sc.fit(adj_mat)
         result = sc.labels_
-        
         ordered_nodes = list(dgraph.nodes())
         # create empty clusters to gather the result
         output = [[] for i in range(0,max(result)+1)];
-        # append each node to its cluster 
+        # append each node to its cluster
+
+
+        special_index  = -1
+        if max(result) == 0:  # i.e. all nodes got the same label due to symmetry, choose arbitrarily and remove
+            special_index = random.randint(0, len(ordered_nodes) - 1)
+
         for index, value in enumerate(result):
+            if index == special_index:
+                output.append([ordered_nodes[index]])
+                continue
             output[value].append(ordered_nodes[index])
+
         return output
 
 
