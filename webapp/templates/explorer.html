@@ -34,6 +34,13 @@
   fill: white;
  }
  
+ svg text {
+  -webkit-user-select: none; /* Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+ }
+
  .node text, .edge text {
    font: 10px sans-serif;
    pointer-events: none; /* don't block clicks on underlying node */
@@ -76,14 +83,14 @@
 {% block title %}Explore!{% endblock %}
 
 {% block body %}
-
-<button id='btn_reset' class="btn btn-primary">Reset</button>
-<button id='btn_export_dendrogram' class="btn btn-primary">Export Dendrogram</button>
-<button id='btn_export_supergraph' class="btn btn-primary">Export Super Graph</button>
-<button id='btn_export_supergraph_dot' class="btn btn-primary">Export Super Graph .dot</button>
-<button id='btn_expand_all' class="btn btn-primary">Expand All</button>
-<button id='btn_collapse_all' class="btn btn-primary">Collapse All</button>
-
+<div class="container p-3">
+  <button id='btn_reset' class="btn btn-info">Reset</button>
+  <button id='btn_export_dendrogram' class="btn btn-info">Export Dendrogram</button>
+  <button id='btn_export_supergraph' class="btn btn-info">Export Super Graph</button>
+  <button id='btn_export_supergraph_dot' class="btn btn-info">Export Super Graph .dot</button>
+  <button id='btn_expand_all' class="btn btn-info">Expand All</button>
+  <button id='btn_collapse_all' class="btn btn-info">Collapse All</button>
+</div>
 
 <svg id="d3-main" style="border: 1px dashed black;"></svg>
 <div id="supergraph"></div>
@@ -102,10 +109,9 @@ var margin = {top: 20, right: 120, bottom: 20, left: 120},
         duration = 750,
         root;
 
-
+var viewbox = "0 0 " + (width + margin.right + margin.left) + " " + (height + margin.top + margin.bottom);
 var svg = d3.select("#d3-main")
-    .attr("width", width + margin.right + margin.left)
-    .attr("height", height + margin.top + margin.bottom)
+    .attr("viewBox", viewbox)
     .style("fill", "none")
 
 
@@ -478,7 +484,8 @@ function updateGraph(source) {
 
   var dotContent = supergraphToGraphviz(supergraphNodes, superEdges);
   lastSupergraphGraphviz = dotContent; // store raw .dot content so we can export it
-	document.getElementById('supergraph').innerHTML = Viz(dotContent, {totalMemory: 128*1024*1024});
+  var svgString = Viz(dotContent, {totalMemory: 128*1024*1024});
+	document.getElementById('supergraph').innerHTML = svgString;
 	supergraph_svg_elem = $("#supergraph").find("svg")[0];
 	supergraph_svg_elem.id = 'svg_supergraph';
 
@@ -522,18 +529,13 @@ function updateGraph(source) {
   });
 
 	svg_supergraph = d3.select('#svg_supergraph');
-  // remove width and height so we can use HTML's layout for them
-  // we have a viewBox defined so the SVG renderer will keep our aspect ratio
-  svg_supergraph.attr('width', undefined).attr('height',undefined);
 	svg_supergraph.append("rect");
 
 	zoom_supergraph = d3.zoom()
         .scaleExtent([1 / 2, 4])
         .on("zoom", zoomed_supergraph);
 
-  svg_supergraph.attr("width", width)
-    .attr("height", height)
-    .style("fill", "none")
+  svg_supergraph.style("fill", "none")
     .style("pointer-events", "all")
     .call(zoom_supergraph);
 

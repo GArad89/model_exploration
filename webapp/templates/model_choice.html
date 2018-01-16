@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block body %}
-  <div class="row">
+  <div class="row pl-3 pt-3">
   	<h3>Select a model or upload a DOT file</h3>
   </div>
   <form id="model-form" action="{{ url_for('algorithm_choice_form') }}">
@@ -36,7 +36,7 @@
       <div class="bar" style="width: 0%"></div>
     </div>
 	</div>
-  <button type="submit" form="model-form" class="btn btn-primary">Choose Model</button>
+  <button type="submit" form="model-form" class="btn btn-info">Choose Model</button>
   <script>
 
   function setFileError(msg) {
