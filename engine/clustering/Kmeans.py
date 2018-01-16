@@ -25,7 +25,6 @@ class KmeansClustering (Cluster):
         if(self.n>=len(dgraph.nodes())): n_clusters=len(dgraph.nodes())-1
         else: n_clusters=self.n
      
-
         ## graph embedding (from node to 2 dimensional vectors))
         embedding=spectral_layout(dgraph.dgraph) 
         vector_list=[]
@@ -38,13 +37,11 @@ class KmeansClustering (Cluster):
         result=km.labels_
 
         #seperating the result list to lists for each cluster (1= the node is in the substae 0= the node is not in the state)
-        output=[]; 
         dnodes=list(dgraph.nodes()) 
-        for i in range(0,max(result)+1): 
-            temp_list=[]; 
-            for j in range(0,len(result)): 
-                if result[j]!=i: 
-                    temp_list+=[dnodes[j]] 
-            output.append(temp_list) 
+        output = [[] for i in range(0,max(result)+1)];
+        # append each node to its cluster 
+        for index, value in enumerate(result):
+            output[value].append(dnodes[index])
+
         return output 
          

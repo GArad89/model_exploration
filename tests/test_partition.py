@@ -1,3 +1,6 @@
+from utils import test_init_seed
+test_init_seed()
+
 from engine.baisc_entities.graph import DGraph
 from engine.clustering import SpectralCluster
 from engine.stopping_criteria.stopCriteria import SizeCriteria
@@ -18,4 +21,5 @@ def test_partition():
     print("testing partition on g2.dot for threshold=2:")
     den = partition(g, SpectralCluster.SpectralCluster(), SizeCriteria(2))
     assert len(den.node_list) == 7
-    
+
+

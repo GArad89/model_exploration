@@ -1,8 +1,12 @@
+from utils import test_init_seed
+test_init_seed()
+
 from engine.linear_programming.lin_prog_solver import LPS
 from engine.utils.NxGraphUtil import draw
 from engine.utils.NxGraphUtil import write_nx_graph_to_file
 from engine.utils.FileWriter import log
 from engine.utils.IOUtils import delete_files_from_folder
+from engine.baisc_entities.graph import OrderedGraph
 
 import networkx as nx
 from random import randint
@@ -27,7 +31,7 @@ class LPTest(unittest.TestCase):
     @staticmethod
     def _generate_two_connected_clicks_example(n):
 
-        G = nx.DiGraph()
+        G = OrderedGraph()
         for i in range(n):
             G.add_node(i)
 
@@ -60,7 +64,7 @@ class LPTest(unittest.TestCase):
     @staticmethod
     def _generate_toy_example():
 
-        G = nx.DiGraph()
+        G = OrderedGraph()
         a = "A"
         for i in range(5):
             G.add_node(i, label=a, attr=a)
@@ -83,7 +87,7 @@ class LPTest(unittest.TestCase):
     @staticmethod
     def _generate_random_graph(total_nodes, total_edges, min_weight=0, max_weight=1):
 
-        G = nx.DiGraph()
+        G = OrderedGraph()
         for i in range(total_nodes):
             G.add_node(i)
 
@@ -134,18 +138,18 @@ class LPTest(unittest.TestCase):
 
         G = self._generate_toy_example()
         lower, cut, value = self._run_experiment(G, self.TOY_EXPERIMENT_LOG_PATH)
-        self.assertEqual(lower == 2.5, True)
-        self.assertEqual(3.0 <= value <= 4.0 , True)
-        self.assertEqual(len(cut) >= 1, True)
+        assert lower == 2.5
+        assert 3.0 <= value <= 4.0
+        assert len(cut) >= 1
 
     def test_toy_with_partial_assignment_test(self):
 
         G = self._generate_toy_example()
         partial_assignment_dict = {0: 0, 3: 1, 4: 0}  # None #{0: 0, 3: 1, 4: 0}
         lower, cut, value = self._run_experiment(G, self.TOY_PARTIAL_ASSIGNMENT_EXPERIMENT_LOG_PATH, partial_assignment_dict)
-        self.assertEqual(abs(lower - 4.66666666667) < 0.001, True)
-        self.assertEqual(value == 4.0, True)
-        self.assertEqual(len(cut) > 0, True)
+        assert abs(lower - 4.66666666667) < 0.001
+        assert value == 4.0
+        assert len(cut) > 0
 
     # def test_two_connected_clicks_test(self):
     #

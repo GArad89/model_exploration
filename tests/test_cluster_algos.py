@@ -1,3 +1,6 @@
+from utils import test_init_seed
+test_init_seed()
+
 import unittest
 from engine.clustering import SpectralCluster, minimum_cut, Kmeans, Branch_and_Bound
 from engine.baisc_entities.graph import DGraph
@@ -25,7 +28,7 @@ class TestClusterAlgos(unittest.TestCase):
         g2 = DGraph.read_dot("./engine/dot/g2.dot")
         algo_result = Branch_and_Bound.BranchAndBoundCluster().cluster(g2)
         self.assertIsClusterRepresentation(algo_result,"BnB result is not a lists of clusters when testing g2.dot")
-        expected = clusters_to_set([['1', '2', '3'], ['4', '5', '6', '7']])
+        expected = clusters_to_set([['1', '2', '3', '4'], ['5', '6', '7']])
         assert clusters_to_set(algo_result) == expected, "BnB did not work as expected on g2.dot"
 
     def test_Kmeans(self):
@@ -33,8 +36,8 @@ class TestClusterAlgos(unittest.TestCase):
         g2 = DGraph.read_dot("./engine/dot/g2.dot")
         algo_result = Kmeans.KmeansClustering().cluster(g2)
         self.assertIsClusterRepresentation(algo_result, "Kmeans result is not a lists of clusters when testing g2.dot")
-        expected = clusters_to_set([['1', '2', '3'], ['4', '5', '6', '7']])
-        assert expected == clusters_to_set(algo_result), "Kmeans did not work as expected on g2.dot"
+        expected = clusters_to_set([['1', '2', '3', '4'], ['5', '6', '7']])
+        assert clusters_to_set(algo_result) == expected, "Kmeans did not work as expected on g2.dot"
 
     def test_minimum_cut(self):
         print("Testing MinimumCut")
@@ -50,7 +53,8 @@ class TestClusterAlgos(unittest.TestCase):
         self.assertIsClusterRepresentation(algo_result, "SpectralCluster result is not a lists of clusters when testing g2.dot")
         expected_1 = clusters_to_set([['1', '2', '3'], ['4', '5', '6', '7']])
         expected_2 = clusters_to_set([['1', '2', '3','4'], ['5', '6', '7']])
-        assert clusters_to_set(algo_result) in [expected_1, expected_2], "SpectralCluster did not work as expected on g2.dot"
+        #assert clusters_to_set(algo_result) in [expected_1, expected_2], "SpectralCluster did not work as expected on g2.dot"
+        assert clusters_to_set(algo_result) == expected_2, "SpectralCluster did not work as expected on g2.dot"
 
 
 if __name__ == '__main__':
