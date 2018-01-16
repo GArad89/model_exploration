@@ -1,5 +1,5 @@
 from engine.utils.FileWriter import log
-
+from engine.baisc_entities.graph import OrderedGraph
 import numpy as np
 from scipy.optimize import linprog
 import networkx as nx
@@ -286,7 +286,7 @@ class LPS:
         :return: G - where edges represent node similarity
         '''
         max_val = max(max(X), 1.0)  # normalize weights
-        G = nx.Graph()
+        G = OrderedGraph()
         N = int(len(X) ** 0.5)
         for i in range(N):
             G.add_node(i)
@@ -305,7 +305,7 @@ class LPS:
 
         i = 0
         dic = {}
-        reg_G = nx.Graph()
+        reg_G = OrderedGraph()
         if len(partial_assignment) > 0:
             reg_G.add_node(LPS.P0)
             reg_G.add_node(LPS.P1)
