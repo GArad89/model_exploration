@@ -1,5 +1,5 @@
 import unittest
-from engine.baisc_entities.graph import *
+from engine.basic_entities.graph import *
 from utils import *
 
 class Test_DGraph(unittest.TestCase):

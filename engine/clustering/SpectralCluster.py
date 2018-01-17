@@ -1,5 +1,5 @@
 from engine.clustering.cluster_abstract import Cluster
-from engine.baisc_entities.graph import DGraph
+from engine.basic_entities.graph import DGraph
 from sklearn.cluster import SpectralClustering, KMeans
 import numpy as np
 

@@ -1,5 +1,5 @@
 import unittest
-from engine.baisc_entities.graph import *
+from engine.basic_entities.graph import *
 from engine.labeling import RandomWalkLabeler
 from engine.clustering import SpectralCluster
 from engine.main import engineMainFlow, partitionLoop

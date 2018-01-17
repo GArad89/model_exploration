@@ -21,7 +21,7 @@ log = app.logger
 from webapp.models import Models, Results
 from engine.main.engineMainFlow import run_algo
 from engine.utils.jsonWorker import createAlgoParamsJSON, parse_parameters
-from engine.baisc_entities.graph import DGraph
+from engine.basic_entities.graph import DGraph
 from engine import labeling, stopping_criteria
 
 # get instances of Models, Results according to current config

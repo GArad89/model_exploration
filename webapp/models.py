@@ -8,7 +8,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-from engine.baisc_entities.graph import DGraph
+from engine.basic_entities.graph import DGraph
 
 EXTENSION = '.dot'
 

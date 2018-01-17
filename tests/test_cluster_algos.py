@@ -3,7 +3,7 @@ test_init_seed()
 
 import unittest
 from engine.clustering import SpectralCluster, minimum_cut, Kmeans, Branch_and_Bound
-from engine.baisc_entities.graph import DGraph
+from engine.basic_entities.graph import DGraph
 
 def clusters_to_set(clusters):
     # as a set of sets, clusters can be compared by equality
@@ -36,7 +36,7 @@ class TestClusterAlgos(unittest.TestCase):
         g2 = DGraph.read_dot("./engine/dot/g2.dot")
         algo_result = Kmeans.KmeansClustering().cluster(g2)
         self.assertIsClusterRepresentation(algo_result, "Kmeans result is not a lists of clusters when testing g2.dot")
-        expected = clusters_to_set([['1', '2', '3', '4'], ['5', '6', '7']])
+        expected = clusters_to_set([['1', '2', '3', '4', '6'], ['5', '7']])
         assert clusters_to_set(algo_result) == expected, "Kmeans did not work as expected on g2.dot"
 
     def test_minimum_cut(self):

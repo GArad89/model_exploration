@@ -1,4 +1,4 @@
-from ..baisc_entities.graph import *
+from ..basic_entities.graph import *
 from .label import GraphLabeler, labeling_on_type
 
 class STLabeling(GraphLabeler):

@@ -1,5 +1,5 @@
 from engine.stopping_criteria.stopCriteria import SizeCriteria
-from engine.baisc_entities.dendrogram import Node,Dendrogram
+from engine.basic_entities.dendrogram import Node,Dendrogram
 
 import random
 import logging
