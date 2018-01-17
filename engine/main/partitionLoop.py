@@ -20,6 +20,8 @@ def _partition(dgraph, state_subset, clustering_algo, stop_criterion, dendrogram
         rootnode = len(dendrogram.nodes())-1
         # check if the iteration reached the stop criterion
         if stop_criterion.check(projected_graph):
+            if len(projected_graph.nodes()) == 1:
+                return dendrogram
             for n in projected_graph.nodes():
                 add_dendrogram_node(dendrogram, rootnode, [n], dgraph.project(n))
             return dendrogram
