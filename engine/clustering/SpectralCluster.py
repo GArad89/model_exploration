@@ -56,17 +56,23 @@ class SpectralCluster(Cluster):
         output = [[] for i in range(0,max(result)+1)];
         # append each node to its cluster
 
-
-        special_index  = -1
-        if max(result) == 0:  # i.e. all nodes got the same label due to symmetry, choose arbitrarily and remove
-            special_index = random.randint(0, len(ordered_nodes) - 1)
-
         for index, value in enumerate(result):
-            if index == special_index:
-                output.append([ordered_nodes[index]])
-                continue
             output[value].append(ordered_nodes[index])
 
         return output
+
+
+        #
+        # special_index  = -1
+        # if max(result) == 0:  # i.e. all nodes got the same label due to symmetry, choose arbitrarily and remove
+        #     special_index = random.randint(0, len(ordered_nodes) - 1)
+        #
+        # for index, value in enumerate(result):
+        #     if index == special_index:
+        #         output.append([ordered_nodes[index]])
+        #         continue
+        #     output[value].append(ordered_nodes[index])
+        #
+        # return output
 
 
