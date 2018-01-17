@@ -44,4 +44,5 @@ class PageRankLabeler(GraphLabeler):
                 chosen_labels = [self.graph.dgraph.edges[(edge[0], edge[1])].get('label','') for edge in chosen_edges]
             chosen_labels = [l for l in chosen_labels if l]
             print(chosen_labels)
-            super_node.label = super().shortenlabel(','.join(chosen_labels))
+            # super_node.label = super().shortenlabel(','.join(chosen_labels))
+            super_node.label = super().shortenlabel(chosen_labels)
