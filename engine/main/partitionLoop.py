@@ -4,9 +4,11 @@ from engine.baisc_entities.dendrogram import Node,Dendrogram
 import logging
 log = logging.getLogger(__name__)
 
+
 def add_dendrogram_node(dendrogram, rootnode, state_subset, projected_graph):
     dendrogram.add_node(Node(rootnode, state_subset, projected_graph))
     dendrogram.add_child(rootnode, len(dendrogram.nodes()) - 1)
+
 
 def _partition(dgraph, state_subset, clustering_algo, stop_criterion, dendrogram, rootnode):
     projected_graph = dgraph.project(state_subset)
@@ -25,7 +27,6 @@ def _partition(dgraph, state_subset, clustering_algo, stop_criterion, dendrogram
     #run clustering algorithm and run parition on each cluster
     clusters = clustering_algo.cluster(projected_graph)
     log.debug(clusters)
-    print("clusters", clusters)
     for cluster_iter in clusters:
         _partition(dgraph, cluster_iter, clustering_algo, stop_criterion , dendrogram , rootnode)
 
