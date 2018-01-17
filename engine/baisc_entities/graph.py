@@ -115,7 +115,7 @@ class DGraph:
             for key in ('label', 'style'):
                 if key in attrs:
                     # remove surrounding double-quotes
-                    attrs[key] = attrs[key].strip('"')
+                    attrs[key] = attrs[key].strip().strip('"').strip()
 
         return DGraph(nx_graph)
 
