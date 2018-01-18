@@ -51,10 +51,8 @@ class TestClusterAlgos(unittest.TestCase):
         g2 = DGraph.read_dot("./engine/dot/g2.dot")
         algo_result = SpectralCluster.SpectralCluster().cluster(g2)
         self.assertIsClusterRepresentation(algo_result, "SpectralCluster result is not a lists of clusters when testing g2.dot")
-        expected_1 = clusters_to_set([['1', '2', '3'], ['4', '5', '6', '7']])
-        expected_2 = clusters_to_set([['1', '2', '3','4'], ['5', '6', '7']])
-        #assert clusters_to_set(algo_result) in [expected_1, expected_2], "SpectralCluster did not work as expected on g2.dot"
-        assert clusters_to_set(algo_result) == expected_2, "SpectralCluster did not work as expected on g2.dot"
+        expected = clusters_to_set([['1', '2', '3','4'], ['5', '6', '7']])
+        assert clusters_to_set(algo_result) == expected, "SpectralCluster did not work as expected on g2.dot"
 
 
 if __name__ == '__main__':
