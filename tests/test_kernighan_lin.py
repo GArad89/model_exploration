@@ -5,7 +5,7 @@ from engine.stopping_criteria.stopCriteria import SizeCriteria
 import unittest
 
 import os
-from utils import project_root
+from .utils import project_root
 
 class Test_KL(unittest.TestCase):
 

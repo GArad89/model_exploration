@@ -484,7 +484,8 @@ function updateGraph(source) {
 
   var dotContent = supergraphToGraphviz(supergraphNodes, superEdges);
   lastSupergraphGraphviz = dotContent; // store raw .dot content so we can export it
-  var svgString = Viz(dotContent, {totalMemory: 128*1024*1024});
+  // max RAM set in webapp_config.py
+  var svgString = Viz(dotContent, {totalMemory: {{ VIZJS_MAX_RAM }}});
 	document.getElementById('supergraph').innerHTML = svgString;
 	supergraph_svg_elem = $("#supergraph").find("svg")[0];
 	supergraph_svg_elem.id = 'svg_supergraph';

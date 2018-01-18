@@ -1,4 +1,4 @@
-from utils import test_init_seed
+from .utils import test_init_seed
 test_init_seed()
 
 from engine.basic_entities.graph import DGraph
@@ -8,7 +8,7 @@ from engine.basic_entities.dendrogram import Node,Dendrogram
 from engine.main.partitionLoop import partition
 
 import os
-from utils import project_root
+from .utils import project_root
 
 def test_partition():
     den = None

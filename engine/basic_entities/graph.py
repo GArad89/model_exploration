@@ -21,12 +21,8 @@ class OrderedGraph(nx.DiGraph):
 
 
 class DGraph:
-    dgraph = None
-    def __init__(self):
-        self.dgraph = OrderedDiGraph()
-
-    def __init__(self, nx_graph):
-        self.dgraph = nx_graph
+    def __init__(self, nx_graph=None):
+        self.dgraph = OrderedDiGraph() if nx_graph is None else nx_graph
 
     def add_node(self, node, label=None, **attr):
         self.dgraph.add_node(node,label=label, attr = attr)
@@ -121,7 +117,6 @@ class DGraph:
 
     def project(self, vertices):  
         return DGraph(self.subgraph(vertices))     
-
 
 # for testing purposes
 def main():

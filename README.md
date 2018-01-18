@@ -51,7 +51,7 @@ In addition, there are several dependencies we serve locally, usually because th
 * MODELS_PATH (default: PROJECT/models_dot/) - path to directory containing the .dot files representing models
 * RESULTS_PATH (default: PROJECT/results/) - path to directory that will contain results of runs
 * LOGGING_CONFIG (default: PROJECT/logging.conf) (YAML) - standard python logging configuration (log rotation, format, etc.). default stores logs in PROJECT_ROOT/logs/
-
+* VIZJS_MAX_RAM (default: 128MB) - amount of RAM allocated for graphviz running on client machine in graph exploration page
 
 ### Running
 

@@ -20,7 +20,7 @@ log = app.logger
 
 from webapp.models import Models, Results
 from engine.main.engineMainFlow import run_algo
-from engine.utils.jsonWorker import createAlgoParamsJSON, parse_parameters
+from engine.utils.jsonWorker import get_algorithm_forms, parse_parameters
 from engine.basic_entities.graph import DGraph
 from engine import labeling, stopping_criteria
 
@@ -56,7 +56,8 @@ def algorithm_choice_form():
     # TODO: wrap with exception handling. Right now it's still more useful to see the exception in flask
     graph = get_models().open(model_id)
 
-    algo_data = createAlgoParamsJSON()
+    algo_data = get_algorithm_forms()
+    algo_data = get_algorithm_forms()
 
     labeling_sources = labeling.get_sources()
 
@@ -102,7 +103,9 @@ def algorithm_choice_form():
 @app.route('/explore/<result_id>')
 def show_results(result_id):
     # pass result id so d3 can ajax to get the json of the result
-    return render_template('explorer.html', result_id=result_id)
+    return render_template('explorer.html', 
+                           result_id=result_id,
+                           VIZJS_MAX_RAM=app.config['VIZJS_MAX_RAM'])
 
 @app.route('/results/<result_id>')
 def get_result(result_id):

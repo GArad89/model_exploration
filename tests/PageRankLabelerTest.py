@@ -4,7 +4,7 @@ from engine.labeling import PageRankLabeler, label
 from engine.clustering import SpectralCluster
 from engine.main import engineMainFlow, partitionLoop
 from engine.stopping_criteria import stopCriteria
-from utils import project_root
+from .utils import project_root
 from os.path import join
 
 class RandomWalkLabelerTest(unittest.TestCase):

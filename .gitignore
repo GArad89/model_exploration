@@ -115,5 +115,7 @@ logs/*.log*
 
 # test outputs
 tests/dot_export/
+tests/results/
 
 .idea
+

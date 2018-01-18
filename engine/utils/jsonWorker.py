@@ -25,7 +25,12 @@ def parse_parameters(parameters, schema):
     return parsed
 
 
-def createAlgoParamsJSON():
+def get_algorithm_forms():
+    """
+    Returns a list of dictionaries, one for every algorithm, containing its name and json-form parameters
+    e.g.
+    [{'name': 'algo_1_name', 'form': {'schema' : json_schema, 'form': json_form} }, {'name' :algo_2_name, ...}, ...]
+    """
     jsonlist = []
     algos = clustering.get_algorithms()
     for algo in algos:

@@ -1,12 +1,12 @@
 import unittest
-from engine.basic_entities.graph import *
+from engine.basic_entities.graph import DGraph
 from engine.labeling import TfIdfLabeler
 from engine.clustering import SpectralCluster
 from engine.main import engineMainFlow, partitionLoop
 from engine.stopping_criteria import stopCriteria
 
 import os
-from utils import project_root
+from .utils import project_root
 
 class Test_DGraph(unittest.TestCase):
 

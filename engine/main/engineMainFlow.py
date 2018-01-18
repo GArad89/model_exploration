@@ -1,5 +1,3 @@
-from engine.basic_entities.graph import *
-from engine.basic_entities.dendrogram import *
 from engine.clustering import get_cluster_algorithm
 from engine.stopping_criteria import get_stopping_criterion
 from engine.labeling import get_labeling_method
@@ -33,7 +31,7 @@ def run_algo(graph, algo_name, params, stopping_criterion, labeling_method, labe
     return dendrogramToJSON(dendro)
 
 def get_info_list():
-    return createAlgoParamsJSON();
+    return get_algorithm_forms();
 
 
 
