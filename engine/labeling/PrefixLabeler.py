@@ -12,10 +12,9 @@ class PrefixLabeler(GraphLabeler):
         # label the dendrogram's nodes
         for node in self.dendrogram.nodes()[1:]:
             labels = super().get_labels(node.projected_graph.dgraph)
-
-            # shortest common prefix 
+            # shortest common prefix
             prefix = os.path.commonprefix(list(labels))
-            if not prefix:
+            if not prefix or len(list(labels)) <= 1:
                 # NOTE ESCAPED \n for graphviz happiness
                 # node.label = super().shortenlabel("\n".join(labels))
                 node.label = super().shortenlabel(labels)
