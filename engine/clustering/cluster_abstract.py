@@ -23,6 +23,3 @@ class Cluster(ABC):
         """
         raise NotImplementedError
 
-
-
-
