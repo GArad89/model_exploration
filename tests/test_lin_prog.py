@@ -6,7 +6,7 @@ from engine.utils.NxGraphUtil import draw
 from engine.utils.NxGraphUtil import write_nx_graph_to_file
 from engine.utils.FileWriter import log
 from engine.utils.IOUtils import delete_files_from_folder
-from engine.baisc_entities.graph import OrderedGraph
+from engine.basic_entities.graph import OrderedGraph
 
 import networkx as nx
 from random import randint

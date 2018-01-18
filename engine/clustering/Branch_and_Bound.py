@@ -1,5 +1,5 @@
 from .cluster_abstract import Cluster
-from engine.baisc_entities.graph import DGraph
+from engine.basic_entities.graph import DGraph
 import numpy as np
 import networkx as nx
 import copy

@@ -1,5 +1,5 @@
 from engine.clustering.cluster_abstract import Cluster
-from engine.baisc_entities.graph import DGraph
+from engine.basic_entities.graph import DGraph
 from sklearn.cluster import SpectralClustering, KMeans
 import numpy as np
 
@@ -50,13 +50,14 @@ class SpectralCluster(Cluster):
         sc = SpectralClustering(n_clusters,affinity=self.affinity)
         sc.fit(adj_mat)
         result = sc.labels_
-        
         ordered_nodes = list(dgraph.nodes())
         # create empty clusters to gather the result
         output = [[] for i in range(0,max(result)+1)];
-        # append each node to its cluster 
+        # append each node to its cluster
+
         for index, value in enumerate(result):
             output[value].append(ordered_nodes[index])
+
         return output
 
 

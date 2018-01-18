@@ -1,5 +1,5 @@
 from engine.utils.FileWriter import log
-from engine.baisc_entities.graph import OrderedGraph
+from engine.basic_entities.graph import OrderedGraph
 import numpy as np
 from scipy.optimize import linprog
 import networkx as nx

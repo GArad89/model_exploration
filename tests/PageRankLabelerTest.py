@@ -1,5 +1,5 @@
 import unittest
-from engine.baisc_entities.graph import DGraph
+from engine.basic_entities.graph import DGraph
 from engine.labeling import PageRankLabeler, label
 from engine.clustering import SpectralCluster
 from engine.main import engineMainFlow, partitionLoop

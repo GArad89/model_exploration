@@ -86,5 +86,6 @@ class PathLabeler(GraphLabeler):
         for super_node in self.dendrogram.nodes():
             start_nodes, end_nodes = self.get_strategic_nodes(super_node)
             path = self.traverse_cluster(start_nodes, end_nodes)
-            path_str = ','.join([self.graph.node_attr(node, 'label') for node in path])
-            super_node.label = self.shortenlabel(path_str)
+            # path_str = ','.join([self.graph.node_attr(node, 'label') for node in path])
+            labels = [self.graph.node_attr(node, 'label') for node in path]
+            super_node.label = self.shortenlabel(labels)

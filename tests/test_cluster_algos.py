@@ -3,7 +3,7 @@ test_init_seed()
 
 import unittest
 from engine.clustering import SpectralCluster, minimum_cut, Kmeans, Branch_and_Bound
-from engine.baisc_entities.graph import DGraph
+from engine.basic_entities.graph import DGraph
 
 def clusters_to_set(clusters):
     # as a set of sets, clusters can be compared by equality
@@ -19,11 +19,11 @@ class TestClusterAlgos(unittest.TestCase):
         return (ideal_result == algo_result)
 
     def assertIsClusterRepresentation(self, algo_result, error_msg):
-        self.assertTrue(isinstance(algo_result, list), error_msg)
+        assert isinstance(algo_result, list), error_msg
         for cluster in algo_result:
-            self.assertTrue(isinstance(cluster,list),error_msg)
+            assert isinstance(cluster,list), error_msg
 
-    def test_Branch_and_Bound(self):
+    def test_branch_and_bound(self):
         print("Testing Branch and Bound")
         g2 = DGraph.read_dot("./engine/dot/g2.dot")
         algo_result = Branch_and_Bound.BranchAndBoundCluster().cluster(g2)

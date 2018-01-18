@@ -1,5 +1,5 @@
 from engine.clustering.KernighanLinCluster import KernighanLinCluster
-from engine.baisc_entities.graph import DGraph
+from engine.basic_entities.graph import DGraph
 from engine.main.partitionLoop import partition
 from engine.stopping_criteria.stopCriteria import SizeCriteria
 import unittest

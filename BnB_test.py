@@ -1,5 +1,5 @@
 from engine.clustering.Branch_and_Bound import *
-from engine.baisc_entities.graph import DGraph
+from engine.basic_entities.graph import DGraph
 import networkx as nx
 from engine.main.engineMainFlow import run_algo
 
