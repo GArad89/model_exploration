@@ -39,8 +39,8 @@ class RandomWalkLabeler(GraphLabeler):
         for super_node in self.dendrogram.nodes():
             chosen_nodes = self.n_important_nodes(super_node.subset, label_size)
             chosen_nodes_labels = [self.graph.node_attr(node, 'label') for node in chosen_nodes]
-            # super_node.label = super().shortenlabel(','.join(chosen_nodes_labels))
-            super_node.label = super().shortenlabel(chosen_nodes_labels)
+            # super_node.label = super().shorten_label(','.join(chosen_nodes_labels))
+            super_node.label = super().shorten_label(chosen_nodes_labels)
             print(super_node.label)
             
 

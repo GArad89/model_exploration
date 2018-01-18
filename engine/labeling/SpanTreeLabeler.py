@@ -10,4 +10,4 @@ class STLabeling(GraphLabeler):
             subgraph = self.graph.subgraph(node.subset)
             spanning_tree=nx.minimum_spanning_tree(subgraph)
             labels = super().get_labels(spanning_tree)
-            node.label = super().shortenlabel(','.join(labels))
+            node.label = super().shorten_label(','.join(labels))
