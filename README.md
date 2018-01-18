@@ -34,9 +34,9 @@ At this point, running `py.test` from project root should successfully pass all 
 
 `webapp_config.py` contains configuration for the web application:
 
-* MODELS_PATH [<project dir>/models_dot/] - path to directory containing the .dot files representing models
-* RESULTS_PATH [<project dir>/results/] - path to directory that will contain results of runs
-* LOGGING_CONFIG [<project dir>/logging.conf (YAML)] - standard python logging configuration (log rotation, format, etc.). default stores logs in <project dir>/logs/
+* MODELS_PATH (default: PROJECT/models_dot/) - path to directory containing the .dot files representing models
+* RESULTS_PATH (default: PROJECT/results/) - path to directory that will contain results of runs
+* LOGGING_CONFIG (default: PROJECT/logging.conf) (YAML) - standard python logging configuration (log rotation, format, etc.). default stores logs in <project dir>/logs/
 Flask
 
 
