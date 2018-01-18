@@ -19,9 +19,9 @@ logging.config.dictConfig(app.config['LOGGING_CONFIG'])
 log = app.logger
 
 from webapp.models import Models, Results
-from engine.main.engineMainFlow import run_algorithm
-from engine.utils.jsonWorker import get_algorithm_forms, parse_parameters
-from engine.basic_entities.graph import DGraph
+from engine.main.interface import run_algorithm, \
+                                  get_algorithm_forms, \
+                                  parse_parameters
 from engine import labeling, stopping_criteria
 
 # get instances of Models, Results according to current config

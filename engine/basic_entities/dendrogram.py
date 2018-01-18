@@ -1,5 +1,4 @@
 from .graph import DGraph
-import networkx as nx
 
 class Node:
     child_indexes=[]

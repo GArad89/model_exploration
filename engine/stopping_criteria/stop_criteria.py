@@ -28,7 +28,7 @@ class InOutDegreeCriteria(StopCriteria):
         self.threshold = threshold
 
     def check(self, dgraph, **params):
-       return (dgraph.maxInOutDegree() <= self.threshold) | (dgraph.number_of_nodes() <= 1)
+       return (dgraph.max_in_out_degree() <= self.threshold) | (dgraph.number_of_nodes() <= 1)
 
 
 class CyclometricCriteria(StopCriteria):
@@ -37,7 +37,7 @@ class CyclometricCriteria(StopCriteria):
         self.threshold = threshold
 
     def check(self, dgraph, **params):
-        cyclomertic_complexity = dgraph.number_of_edges() - dgraph.number_of_nodes() + 2 * dgraph.numberOfComponenets()
+        cyclomertic_complexity = dgraph.number_of_edges() - dgraph.number_of_nodes() + 2 * dgraph.number_of_components()
         return (cyclomertic_complexity < self.threshold) | (dgraph.number_of_nodes() <= 1)
 
 

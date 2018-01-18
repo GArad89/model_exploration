@@ -13,7 +13,7 @@ class OrderedDiGraph(nx.DiGraph):
 
 class OrderedGraph(nx.DiGraph):
     """
-    nx.DiGraph that retains ordering when iterating on it
+    nx.Graph that retains ordering when iterating on it
     """
     adjlist_outer_dict_factory = OrderedDict
     adjlist_inner_dict_factory = OrderedDict
@@ -85,13 +85,15 @@ class DGraph:
         return self.dgraph.subgraph(vertices)  
 
 
-    def maxInOutDegree(self):
+    def max_in_out_degree(self):
+        ":returns: maximal in- or out-degree in the graph"
         maxdeg = 0
         for node in self.dgraph.nodes():
             maxdeg = max(maxdeg,max(self.dgraph.in_degree(node), self.dgraph.out_degree(node)))
         return maxdeg
 
-    def numberOfComponenets(self):
+    def number_of_components(self):
+        ":returns: number of strongly-connected components in the graph"
         return sum(1 for _ in nx.strongly_connected_components(self.dgraph))
 
     @staticmethod

@@ -1,5 +1,5 @@
-from ..basic_entities.graph import *
-from .label import GraphLabeler, labeling_on_type
+from .label import GraphLabeler
+import networkx as nx
 
 class STLabeling(GraphLabeler):
     def __init__(self, graph, dendrogram, source):

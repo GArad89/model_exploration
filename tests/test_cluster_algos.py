@@ -2,7 +2,7 @@ from .utils import test_init_seed
 test_init_seed()
 
 import unittest
-from engine.clustering import SpectralCluster, minimum_cut, Kmeans, Branch_and_Bound
+from engine.clustering import SpectralCluster, minimum_cut, KMeans, BranchAndBound
 from engine.basic_entities.graph import DGraph
 from .utils import project_root
 from os.path import join
@@ -29,7 +29,7 @@ class TestClusterAlgos(unittest.TestCase):
     def test_branch_and_bound(self):
         print("Testing Branch and Bound")
         g2 = DGraph.read_dot(join(project_root(), "engine/dot/g2.dot"))
-        algo_result = Branch_and_Bound.BranchAndBoundCluster().cluster(g2)
+        algo_result = BranchAndBound.BranchAndBoundCluster().cluster(g2)
         self.assertIsClusterRepresentation(algo_result,"BnB result is not a lists of clusters when testing g2.dot")
         expected = clusters_to_set([['1', '2', '3', '4'], ['5', '6', '7']])
         assert clusters_to_set(algo_result) == expected, "BnB did not work as expected on g2.dot"
@@ -37,7 +37,7 @@ class TestClusterAlgos(unittest.TestCase):
     def test_Kmeans(self):
         print("Testing Kmeans")
         g2 = DGraph.read_dot(join(project_root(), "engine/dot/g2.dot"))
-        algo_result = Kmeans.KmeansClustering().cluster(g2)
+        algo_result = KMeans.KMeansClustering().cluster(g2)
         self.assertIsClusterRepresentation(algo_result, "Kmeans result is not a lists of clusters when testing g2.dot")
         expected = clusters_to_set([['1', '2', '3', '4'], ['5', '6', '7']])
         assert clusters_to_set(algo_result) == expected, "Kmeans did not work as expected on g2.dot"
