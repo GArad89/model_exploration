@@ -1,5 +1,4 @@
 import unittest
-from engine.basic_entities.graph import *
 from engine.labeling import PathLabeler
 from engine.clustering import SpectralCluster
 from engine.main import partition
