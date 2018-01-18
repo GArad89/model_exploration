@@ -19,11 +19,11 @@ class TestClusterAlgos(unittest.TestCase):
         return (ideal_result == algo_result)
 
     def assertIsClusterRepresentation(self, algo_result, error_msg):
-        self.assertTrue(isinstance(algo_result, list), error_msg)
+        assert isinstance(algo_result, list), error_msg
         for cluster in algo_result:
-            self.assertTrue(isinstance(cluster,list),error_msg)
+            assert isinstance(cluster,list), error_msg
 
-    def test_Branch_and_Bound(self):
+    def test_branch_and_bound(self):
         print("Testing Branch and Bound")
         g2 = DGraph.read_dot("./engine/dot/g2.dot")
         algo_result = Branch_and_Bound.BranchAndBoundCluster().cluster(g2)
@@ -36,7 +36,7 @@ class TestClusterAlgos(unittest.TestCase):
         g2 = DGraph.read_dot("./engine/dot/g2.dot")
         algo_result = Kmeans.KmeansClustering().cluster(g2)
         self.assertIsClusterRepresentation(algo_result, "Kmeans result is not a lists of clusters when testing g2.dot")
-        expected = clusters_to_set([['1', '2', '3', '4', '6'], ['5', '7']])
+        expected = clusters_to_set([['1', '2', '3', '4'], ['5', '6', '7']])
         assert clusters_to_set(algo_result) == expected, "Kmeans did not work as expected on g2.dot"
 
     def test_minimum_cut(self):
