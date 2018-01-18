@@ -1,6 +1,6 @@
 import networkx as nx
 from itertools import chain
-from numpy import zeros
+import numpy as np
 from collections import OrderedDict
 
 class OrderedDiGraph(nx.DiGraph):
@@ -72,7 +72,7 @@ class DGraph:
         if node_list is None:
             node_list = self.nodes()
 
-        adj_mat = zeros(shape=(len(self.nodes()),len(self.nodes())))
+        adj_mat = np.zeros(shape=(len(self.nodes()),len(self.nodes())))
         i = 0
         node_dict = {node : i for i, node in enumerate(node_list)}
             

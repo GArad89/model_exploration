@@ -27,9 +27,7 @@ def parse_parameters(parameters, schema):
 
 def get_algorithm_forms():
     """
-    Returns a list of dictionaries, one for every algorithm, containing its name and json-form parameters
-    e.g.
-    [{'name': 'algo_1_name', 'form': {'schema' : json_schema, 'form': json_form} }, {'name' :algo_2_name, ...}, ...]
+    :return: Returns a list of dictionaries, one for every algorithm, containing its name and json-form parameters. e.g. [{'name': 'algo_1_name', 'form': {'schema' : json_schema, 'form': json_form} }, {'name' :algo_2_name, ...}, ...]
     """
     jsonlist = []
     algos = clustering.get_algorithms()
@@ -39,13 +37,18 @@ def get_algorithm_forms():
         jsonlist += [algo_form]
     return jsonlist
 
-def dendrogramToJSON(dendro):
+def serialize_dendrogram(dendrogram):
+    """
+    Serialize a dendrogram to a json-friendly format
+    :param dendrogram: engine.basic_entities.dendrogram.Dendrogram
+    :returns: json-friendly serialization of the dendrogram(dictionary of lists)
+    """
+
     jsondata = {}
-    jsondata['vertices'] = list(dendro.dgraph.nodes().items())
-    jsondata['edges'] = list(dendro.dgraph.edges())
-    #print(list(dendro.dgraph.edges()))
+    jsondata['vertices'] = list(dendrogram.dgraph.nodes().items())
+    jsondata['edges'] = list(dendrogram.dgraph.edges())
     clusters = []
-    for index, node in enumerate(dendro.nodes()):
+    for index, node in enumerate(dendrogram.nodes()):
         clusters.append({
             'name' : node.get_label(),
             'inEdge' : node.parent(),
@@ -53,15 +56,13 @@ def dendrogramToJSON(dendro):
             'vertices' : list(node.vertices()),
             'id': 'cluster_{}'.format(index),
             })
-    #print(clusters)
     jsondata['clusters'] = clusters
 
     jsondata['cluster_tree']= _build_cluster_tree(0,clusters)
-    #print(jsondata['cluster_tree'])
 
     return jsondata
 
-def _build_cluster_tree(index,cluster_list):
+def _build_cluster_tree(index, cluster_list):
     "turn cluster graph to tree"
     node = {}
 

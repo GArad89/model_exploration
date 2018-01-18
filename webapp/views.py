@@ -19,7 +19,7 @@ logging.config.dictConfig(app.config['LOGGING_CONFIG'])
 log = app.logger
 
 from webapp.models import Models, Results
-from engine.main.engineMainFlow import run_algo
+from engine.main.engineMainFlow import run_algorithm
 from engine.utils.jsonWorker import get_algorithm_forms, parse_parameters
 from engine.basic_entities.graph import DGraph
 from engine import labeling, stopping_criteria
@@ -79,11 +79,19 @@ def algorithm_choice_form():
         log.debug(parameters)
 
         stopping_criterion = request.values['stopping-criterion']
+        # TODO: parametrize better
+        stopping_criterion_parameter = int(request.values['stopping-criterion-parameter'])
         labeling_method = request.values['labeling-method']
         labeling_source = labeling_sources[request.values['labeling-source']]
         #TODO: if labeling_source not in labeling_sources: raise Exception('aaah')
 
-        result = run_algo(graph, algorithm_name, parameters, stopping_criterion, labeling_method, labeling_source)
+        result = run_algorithm(graph,
+                               algorithm_name,
+                               parameters,
+                               stopping_criterion,
+                               stopping_criterion_parameter,
+                               labeling_method,
+                               labeling_source)
         result_id = get_results().save(result)
 
         return redirect(url_for('show_results', result_id=result_id))
