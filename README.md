@@ -1,13 +1,14 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+This repo contains model_exploration, a web-app to facilitate exploring software models represented as directed graphs (e.g. state machines), using hierarchical clustering with user input to choose the level of abstraction displayed,
 
-### What is this repository for? ###
+### Table of Contents
 
-* Quick summary
-* Version
+**[How do I get set up?](#setup)**<br>
+**[Configuration](#configuration)**<br>
+**[Running](#configuration)**<br>
 
-### How do I get set up? ###
+### Setup
 
 * Dependencies
 
@@ -21,15 +22,15 @@ Working git with ssh is required.
 
 Check out the git repository.
 
+(optional) Set up a virtualenv: in linux run `virtualenv venv` and then `source ./venv/bin/activate`, in windows run `virtualenv venv` and then `.\venv\bin\activate.bat`
+
 Install dependencies by running `pip3 install -r requirements.txt`
 
 *NOTE:* Working git with ssh is required. GEM (Graph Embedding Methods) is installed from github directly since PyPI contains an outdated version at the moment (v0.1.12 at writing).
 
-To develop and/or run unit tests, `pip3 install -r requirements-dev.txt` for additional, dev-only dependencies
+At this point, running `py.test` from project root should successfully pass all tests
 
-To run all tests run the following command from the main project folder: `python -m unittest discover -s tests`
-
-* Configuration
+### Configuration
 
 `webapp_config.py` contains configuration for the web application:
 
@@ -38,18 +39,15 @@ To run all tests run the following command from the main project folder: `python
 * LOGGING_CONFIG [<project dir>/logging.conf (YAML)] - standard python logging configuration (log rotation, format, etc.). default stores logs in <project dir>/logs/
 Flask
 
+
+### Running
+
 * How to run tests
-* Deployment instructions
 
-`python3 run_webapp.py`
+To run all tests run the following command from the main project folder: `py.test`
 
-### Contribution guidelines ###
+* How to run the server
 
-* Writing tests
-* Code review
-* Other guidelines
+`python3 run_webapp.py` will run the server
 
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+Point your browser to [http://localhost:5000/]
