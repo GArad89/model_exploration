@@ -136,7 +136,10 @@ def models_endpoint():
         filename = secure_filename(file.filename)
         path = os.path.join(app.config['MODELS_PATH'], filename)
         if os.path.exists(path):
-            return json_error("Cannot overwrite existing model")
+            try:
+                os.remove(path)
+            except:
+                return json_error("Cannot overwrite existing model")
 
         # write the file, finally 
         file.save(path)
