@@ -1,5 +1,6 @@
 import re
 import string
+import operator
 from sklearn.feature_extraction.text import TfidfVectorizer
 from .label import GraphLabeler
 
@@ -21,8 +22,6 @@ class TfIdfLabeler(GraphLabeler):
                     node_labels.append(edge_data['label'])
 
             labels_dict[node] = node_labels
-
-        print(labels_dict)
 
         def tokenize(lst):
             tokens = []
@@ -54,20 +53,16 @@ class TfIdfLabeler(GraphLabeler):
 
             print("available labels = ", nodes_labels)
 
-            top_label = None
-            top_labels_score = -1
-            for label in nodes_labels:
-                if tfifd_scores[label] > top_labels_score:
-                    top_labels_score = tfifd_scores[label]
-                    top_label = label
-
-            if top_label:
-                tfifd_scores[top_label] = -1
-            else:
-                top_label = "Unnamed {}".format(unnamed_cluster)
+            labels = list(filter(lambda x: x[0] in nodes_labels, tfifd_scores.items()))
+            # reveresed = [(x[1], x[0]) for x in labels].sort(reverse=True)
+            if not len(labels):
                 unnamed_cluster += 1
-
-            return top_label
+                return ["Unnamed {}".format(unnamed_cluster)]
+            else:
+                max_tfidf = max(labels, key=operator.itemgetter(1))[1]
+                labels = list(filter(lambda x: x[1] == max_tfidf, labels))
+                # labels = [nodes_labels.get(x[0]) for x in items]
+                return [x[0] for x in labels]
 
         # label the dendrogram's nodes
         for node in self.dendrogram.nodes():

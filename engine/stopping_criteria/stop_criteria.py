@@ -31,7 +31,7 @@ class InOutDegreeCriteria(StopCriteria):
        return (dgraph.max_in_out_degree() <= self.threshold) | (dgraph.number_of_nodes() <= 1)
 
 
-class CyclometricCriteria(StopCriteria):
+class CyclometricCriteria(StopCriteria):  #Todo: extension print values to learn on how to suggest the users what values to use
 
     def __init__(self, threshold):
         self.threshold = threshold
