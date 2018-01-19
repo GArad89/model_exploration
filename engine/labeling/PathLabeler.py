@@ -88,4 +88,4 @@ class PathLabeler(GraphLabeler):
             path = self.traverse_cluster(start_nodes, end_nodes)
             # path_str = ','.join([self.graph.node_attr(node, 'label') for node in path])
             labels = [self.graph.node_attr(node, 'label') for node in path]
-            super_node.label = self.shortenlabel(labels)
+            super_node.label = self.shorten_label(labels)

@@ -1,9 +1,9 @@
-from . import Kmeans, SpectralCluster, minimum_cut, Branch_and_Bound, KernighanLinCluster
+from . import KMeans, SpectralCluster, minimum_cut, BranchAndBound, KernighanLinCluster
 
 def get_algorithms():
     "return list of clustering classes"
-    return [Kmeans.KmeansClustering, SpectralCluster.SpectralCluster, minimum_cut.MinimumCut, 
-            Branch_and_Bound.BranchAndBoundCluster, KernighanLinCluster.KernighanLinCluster]
+    return [KMeans.KMeansClustering, SpectralCluster.SpectralCluster, minimum_cut.MinimumCut, 
+            BranchAndBound.BranchAndBoundCluster, KernighanLinCluster.KernighanLinCluster]
 
 def get_cluster_algorithm(algorithm_name):
     "return class for specific algorithm"

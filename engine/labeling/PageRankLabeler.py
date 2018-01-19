@@ -28,7 +28,7 @@ class PageRankLabeler(GraphLabeler):
                 out_node_rank = ranks[out_node]
                 edges_ranks[(edge[0], edge[1])] = out_node_rank / len(self.graph.dgraph.out_edges())
 
-            print(edges_ranks)
+            log.debug(edges_ranks)
 
             k = min(n, len(subset_edges))
             subset_sorted = sorted(subset_edges, key=lambda edge: edges_ranks[(edge[0], edge[1])], reverse=True)
@@ -43,6 +43,6 @@ class PageRankLabeler(GraphLabeler):
                 chosen_edges = n_important_edges(super_node.projected_graph.edges(), label_size)
                 chosen_labels = [self.graph.dgraph.edges[(edge[0], edge[1])].get('label','') for edge in chosen_edges]
             chosen_labels = [l for l in chosen_labels if l]
-            print(chosen_labels)
-            # super_node.label = super().shortenlabel(','.join(chosen_labels))
-            super_node.label = super().shortenlabel(chosen_labels)
+            log.debug(chosen_labels)
+            # super_node.label = super().shorten_label(','.join(chosen_labels))
+            super_node.label = super().shorten_label(chosen_labels)

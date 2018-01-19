@@ -1,11 +1,11 @@
 from engine.clustering.KernighanLinCluster import KernighanLinCluster
 from engine.basic_entities.graph import DGraph
-from engine.main.partitionLoop import partition
-from engine.stopping_criteria.stopCriteria import SizeCriteria
+from engine.main.partition import partition
+from engine.stopping_criteria.stop_criteria import SizeCriteria
 import unittest
 
 import os
-from utils import project_root
+from .utils import project_root
 
 class Test_KL(unittest.TestCase):
 

@@ -1,14 +1,13 @@
-from utils import test_init_seed
+from .utils import test_init_seed
 test_init_seed()
 
 from engine.basic_entities.graph import DGraph
 from engine.clustering import SpectralCluster
-from engine.stopping_criteria.stopCriteria import SizeCriteria
-from engine.basic_entities.dendrogram import Node,Dendrogram
-from engine.main.partitionLoop import partition
+from engine.stopping_criteria.stop_criteria import SizeCriteria
+from engine.main.partition import partition
 
 import os
-from utils import project_root
+from .utils import project_root
 
 def test_partition():
     den = None

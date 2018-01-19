@@ -9,9 +9,7 @@ class SpectralCluster(Cluster):
         The number of clusters is defined by the input n.
         If len(dgraph.nodes())<n then the number of clusters would be len(dgraph.nodes())
         this clustering method uses sklearn's SpectralClustering method
-
     """
-
 
     def __init__(self, n = 2, affinity='precomputed'):
         super().__init__()
@@ -21,9 +19,9 @@ class SpectralCluster(Cluster):
 
     @staticmethod
     def get_params():
-        form = [{'key': 'n', 'type': 'text'}, {'key' : 'affinity'}]
+        form = [{'key': 'n', 'type': 'number'}, {'key' : 'affinity'}]
         schema = {
-            'n' : {'type': 'integer', 'title': 'Number of Clusters', 'minimum' : 2, 'required' : True},
+            'n' : {'type': 'integer', 'title': 'Number of Clusters', 'minimum' : 2, 'default': 2, 'required' : True},
             'affinity' : {
                 'type' : 'string',
                 'title': 'Affinity',
@@ -32,14 +30,14 @@ class SpectralCluster(Cluster):
         }
         return schema, form
 
-
         
     def cluster(self, dgraph):
         
         #number of clusters can't be bigger than the number of nodes
-        if(self.n>=len(dgraph.nodes())): n_clusters=len(dgraph.nodes())-1
-        else: n_clusters=self.n
-  
+        if(self.n>=len(dgraph.nodes())): 
+            raise ValueError("Not enough nodes in graph, expected at least {}".format(self.n))
+        else: 
+            n_clusters=self.n  
 
         #adjacency matrix
         adj_mat = dgraph.adjacency_matrix()

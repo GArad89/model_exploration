@@ -1,6 +1,6 @@
 import networkx as nx
 from itertools import chain
-from numpy import zeros
+import numpy as np
 from collections import OrderedDict
 
 class OrderedDiGraph(nx.DiGraph):
@@ -13,7 +13,7 @@ class OrderedDiGraph(nx.DiGraph):
 
 class OrderedGraph(nx.DiGraph):
     """
-    nx.DiGraph that retains ordering when iterating on it
+    nx.Graph that retains ordering when iterating on it
     """
     adjlist_outer_dict_factory = OrderedDict
     adjlist_inner_dict_factory = OrderedDict
@@ -21,12 +21,8 @@ class OrderedGraph(nx.DiGraph):
 
 
 class DGraph:
-    dgraph = None
-    def __init__(self):
-        self.dgraph = OrderedDiGraph()
-
-    def __init__(self, nx_graph):
-        self.dgraph = nx_graph
+    def __init__(self, nx_graph=None):
+        self.dgraph = OrderedDiGraph() if nx_graph is None else nx_graph
 
     def add_node(self, node, label=None, **attr):
         self.dgraph.add_node(node,label=label, attr = attr)
@@ -76,7 +72,7 @@ class DGraph:
         if node_list is None:
             node_list = self.nodes()
 
-        adj_mat = zeros(shape=(len(self.nodes()),len(self.nodes())))
+        adj_mat = np.zeros(shape=(len(self.nodes()),len(self.nodes())))
         i = 0
         node_dict = {node : i for i, node in enumerate(node_list)}
             
@@ -89,13 +85,15 @@ class DGraph:
         return self.dgraph.subgraph(vertices)  
 
 
-    def maxInOutDegree(self):
+    def max_in_out_degree(self):
+        ":returns: maximal in- or out-degree in the graph"
         maxdeg = 0
         for node in self.dgraph.nodes():
             maxdeg = max(maxdeg,max(self.dgraph.in_degree(node), self.dgraph.out_degree(node)))
         return maxdeg
 
-    def numberOfComponenets(self):
+    def number_of_components(self):
+        ":returns: number of strongly-connected components in the graph"
         return sum(1 for _ in nx.strongly_connected_components(self.dgraph))
 
     @staticmethod
@@ -121,7 +119,6 @@ class DGraph:
 
     def project(self, vertices):  
         return DGraph(self.subgraph(vertices))     
-
 
 # for testing purposes
 def main():

@@ -1,20 +1,21 @@
-from utils import test_init_seed
+from .utils import test_init_seed
 test_init_seed()
 
 from engine.linear_programming.lin_prog_solver import LPS
-from engine.utils.NxGraphUtil import draw
-from engine.utils.NxGraphUtil import write_nx_graph_to_file
 from engine.utils.FileWriter import log
-from engine.utils.IOUtils import delete_files_from_folder
 from engine.basic_entities.graph import OrderedGraph
 
 import networkx as nx
 from random import randint
 import unittest
 import os
+from .utils import project_root, \
+                   delete_files_from_folder, \
+                   write_nx_graph_to_file, \
+                   draw
 
 class LPTest(unittest.TestCase):
-    OUT_FOLDER = os.path.join(os.path.dirname(__file__),'../results/linear_programming/')
+    OUT_FOLDER = os.path.join(project_root(),'./tests/results/linear_programming/')
     GRAPH_PLOTS_PATH = OUT_FOLDER + 'plots/'
     GRAPH_DOT_PATH = OUT_FOLDER + 'dot/'
     CLICKS_EXPERIMENT_LOG_PATH = OUT_FOLDER + 'click_graph_results.txt'
@@ -130,9 +131,13 @@ class LPTest(unittest.TestCase):
         return lower, cut, value
 
     def setUp(self):
-        delete_files_from_folder(self.GRAPH_DOT_PATH)
-        delete_files_from_folder(self.GRAPH_PLOTS_PATH)
-        delete_files_from_folder(self.OUT_FOLDER)
+        folders = [self.OUT_FOLDER, self.GRAPH_DOT_PATH, self.GRAPH_PLOTS_PATH]
+        for folder in folders:
+            # create dir if it doesn't exist
+            os.makedirs(folder, exist_ok=True)
+
+        for folder in reversed(folders):
+            delete_files_from_folder(folder)
 
     def test_toy(self):
 
@@ -148,7 +153,7 @@ class LPTest(unittest.TestCase):
         partial_assignment_dict = {0: 0, 3: 1, 4: 0}  # None #{0: 0, 3: 1, 4: 0}
         lower, cut, value = self._run_experiment(G, self.TOY_PARTIAL_ASSIGNMENT_EXPERIMENT_LOG_PATH, partial_assignment_dict)
         assert abs(lower - 4.66666666667) < 0.001
-        assert value == 4.0
+        assert value == 5.0
         assert len(cut) > 0
 
     # def test_two_connected_clicks_test(self):

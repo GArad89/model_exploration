@@ -34,7 +34,7 @@ class GraphLabeler(ABC):
             labeling_on_type.EDGES_AND_NODES: itertools.chain(subgraph.edges.items(), subgraph.nodes.items())
         }.get(self.source, [])
 
-    def shortenlabel(self, lables_list, max_lables=3):
+    def shorten_label(self, lables_list, max_lables=3):
         lables_list = list(lables_list)
         l = len(lables_list)
         if l > max_lables:
@@ -46,21 +46,6 @@ class GraphLabeler(ABC):
             return "\n".join(newlist)
         else:
             return "\n".join(lables_list)
-
-    # def shortenlabel(self,label, max_lables=5):
-    #     lables_list = re.split(',|_|-|,\n|\n',label)
-    #     l = len(lables_list)
-    #     if  l > max_lables:
-    #         newlist = [lables_list[0]]
-    #         print(newlist)
-    #         for i in range(1,max_lables-1):
-    #             newlist += [lables_list[(l//(max_lables-1))*i]]
-    #         newlist += [lables_list[-1]]
-    #         return ','.join(newlist)
-    #     else:
-    #         return label
-    #
-
 
     @abstractmethod
     def label(self):

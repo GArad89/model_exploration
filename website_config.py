@@ -6,6 +6,9 @@ BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 MODELS_PATH = os.path.join(BASE_PATH, 'models_dot')
 RESULTS_PATH = os.path.join(BASE_PATH, 'results')
 
+# 128 MB allocation as maximum for viz.js
+VIZJS_MAX_RAM = 128*1024*1024
+
 # set up logging
 with open(os.path.join(BASE_PATH, "logging.conf")) as f:
     LOGGING_CONFIG = yaml.load(f)

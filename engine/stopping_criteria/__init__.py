@@ -1,4 +1,4 @@
-from .stopCriteria import SizeCriteria, InOutDegreeCriteria, CyclometricCriteria
+from .stop_criteria import SizeCriteria, InOutDegreeCriteria, CyclometricCriteria
 def get_criteria():
     "return list of stopping criteria classes"
     return [SizeCriteria, InOutDegreeCriteria, CyclometricCriteria]

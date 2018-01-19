@@ -16,11 +16,10 @@ class Cluster(ABC):
 
     @abstractmethod
     def cluster(self, dgraph):
-        """Returns a list of set of states for dgraph
-        sets can be joint
+        """
+        graph => [[node a, node b, node c], [node d, node e, ...], ...]
+        Accepts a dgraph, returns a list of lists of nodes, each sublist being a cluster
+        ( nodes are node keys in the graph, e.g. list(dgraph.nodes())) )
         """
         raise NotImplementedError
-
-
-
 
