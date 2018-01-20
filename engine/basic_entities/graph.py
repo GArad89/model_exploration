@@ -61,7 +61,7 @@ class DGraph:
 
 
     def node_attr(self, node, attr):
-        return self.dgraph.nodes[node][attr]
+        return self.dgraph.nodes[node].get(attr,'')
 
     def write_dot(self, path):
         print("write_dot called")
@@ -82,7 +82,7 @@ class DGraph:
         return adj_mat
 
     def subgraph(self, vertices):
-        return self.dgraph.subgraph(vertices)  
+        return nx.MultiDiGraph(self.dgraph.subgraph(vertices))  
 
 
     def max_in_out_degree(self):
