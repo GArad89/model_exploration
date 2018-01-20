@@ -82,7 +82,7 @@ class DGraph:
         return adj_mat
 
     def subgraph(self, vertices):
-        return nx.MultiDiGraph(self.dgraph.subgraph(vertices))  
+        return self.dgraph.subgraph(vertices)    
 
 
     def max_in_out_degree(self):
