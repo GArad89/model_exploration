@@ -16,12 +16,12 @@ class PrefixLabeler(GraphLabeler):
             prefix = os.path.commonprefix(list(labels))
             if not prefix or len(list(labels)) <= 1:
                 # NOTE ESCAPED \n for graphviz happiness
-                # node.label = super().shortenlabel("\n".join(labels))
-                node.label = super().shortenlabel(labels)
+                # node.label = super().shorten_label("\n".join(labels))
+                node.label = super().shorten_label(labels)
             else:
                 #TODO: deal with empty suffix and repeated labels
-                node.label = prefix + super().shortenlabel(labels)
-                # node.label = super().shortenlabel("{prefix}{{\n{suffixes}}}".format(
+                node.label = prefix + super().shorten_label(labels)
+                # node.label = super().shorten_label("{prefix}{{\n{suffixes}}}".format(
                 #     prefix=prefix,
                 #     suffixes=",\n".join(l[len(prefix):] for l in labels)
                 #     ))

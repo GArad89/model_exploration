@@ -1,10 +1,9 @@
 from .cluster_abstract import Cluster 
-from engine.basic_entities.graph import DGraph
 from sklearn.cluster import KMeans 
 from networkx import spectral_layout
  
  
-class KmeansClustering (Cluster):
+class KMeansClustering (Cluster):
 
     def __init__(self, n = 2):
         super().__init__()

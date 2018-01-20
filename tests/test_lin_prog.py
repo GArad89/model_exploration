@@ -2,8 +2,6 @@ from .utils import test_init_seed
 test_init_seed()
 
 from engine.linear_programming.lin_prog_solver import LPS
-from engine.utils.NxGraphUtil import draw
-from engine.utils.NxGraphUtil import write_nx_graph_to_file
 from engine.utils.FileWriter import log
 from engine.basic_entities.graph import OrderedGraph
 
@@ -11,7 +9,10 @@ import networkx as nx
 from random import randint
 import unittest
 import os
-from .utils import project_root, delete_files_from_folder
+from .utils import project_root, \
+                   delete_files_from_folder, \
+                   write_nx_graph_to_file, \
+                   draw
 
 class LPTest(unittest.TestCase):
     OUT_FOLDER = os.path.join(project_root(),'./tests/results/linear_programming/')
@@ -152,7 +153,7 @@ class LPTest(unittest.TestCase):
         partial_assignment_dict = {0: 0, 3: 1, 4: 0}  # None #{0: 0, 3: 1, 4: 0}
         lower, cut, value = self._run_experiment(G, self.TOY_PARTIAL_ASSIGNMENT_EXPERIMENT_LOG_PATH, partial_assignment_dict)
         assert abs(lower - 4.66666666667) < 0.001
-        assert value == 4.0
+        assert value == 5.0
         assert len(cut) > 0
 
     # def test_two_connected_clicks_test(self):
