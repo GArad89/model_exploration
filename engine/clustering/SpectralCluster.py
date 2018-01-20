@@ -32,8 +32,9 @@ class SpectralCluster(Cluster):
 
         
     def cluster(self, dgraph):
-        
-        #number of clusters can't be bigger than the number of nodes
+        """ the actual clustering method
+            args: dgraph- (networkx' MultiDigraph) the graph being partitioned
+        """
          #number of clusters can't be bigger than the number of nodes
         if(self.n>=len(dgraph.nodes())): n_clusters=len(dgraph.nodes())-1
         else: n_clusters=self.n

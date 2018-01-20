@@ -5,21 +5,75 @@ import networkx as nx
 import copy
 from engine.linear_programming.lin_prog_solver import *
 
+
+## target value herustics ##
+"""this area is for the herustiscs that set the value to be minimized (currently hardcoded as sparest cut in the algorithm"""
 def sparset_cut_target(bound,graph_node_num):
     return bound/graph_node_num
 
+
+## lower bound herustics ##
+""" this area is for the herustics that estimates the target value lower bound (currently only for sparest cut)
+    args:
+    dgraph-(networkx' MultiDigraph) the current graph being partitioned
+    bnb_node -(BnBNode) the current subproblem being bound"""
+
 def lower_bound_lps(dgraph,bnb_node):
+    """uses a linear programming solver
+       in order to estimate the bound for each problem"""
      if(len(bnb_node.checked)==len(dgraph.nodes())): return check_final_cut(bnb_node,dgraph)
      a,bnb_node.res= LPS().solve_LB(dgraph.dgraph)
      return a
 
 def lower_bound_lps_simple(dgraph,bnb_node):
+    """uses a linear programming solver
+       in order to estimate the bound for the initial probelm. then uses lower_bound_greedy_simple"""
      if(bnb_node.parent_bnb_node==None):
          a,bnb_node.res= LPS().solve_LB(dgraph.dgraph)
          return a
      return lower_bound_greedy_simple(dgraph,bnb_node)
 
+def lower_bound_greedy_simple(dgraph, bnb_node):
+    """no estimation. the lower bound is the subproblem current cut"""
+    graph_edges = dgraph.edges()
+    is_accepted = True
+    
+    if(bnb_node.parent_bnb_node == None): return 0
+    
+    edge_list = []
+    graph_node=None
+    for node in bnb_node.checked:
+        if node not in bnb_node.parent_bnb_node.checked:
+            graph_node=node
+            break
+        
+    is_accepted = (graph_node in bnb_node.accepted)
+    
+    for edge in graph_edges:
+        if(edge[0]==graph_node):
+            edge_list+=[[edge[1],edge[2].get('weight',1)]]
+        elif((edge[1]==graph_node)):
+            edge_list+=[[edge[0],edge[2].get('weight',1)]]
+            
+    LB=bnb_node.LB
+    LB*=(len(dgraph.nodes())-len(bnb_node.checked)+2*min(len(bnb_node.parent_bnb_node.accepted),len(bnb_node.parent_bnb_node.rejected)))
+    
+    for edge in edge_list:
+        if (bnb_node.accepted.count(edge[0])>0): LB+=(1-is_accepted)*int(edge[1])
+        if (bnb_node.rejected.count(edge[0])>0): LB+=is_accepted*int(edge[1])
+    return LB/(len(dgraph.nodes())-len(bnb_node.checked)+2*min(len(bnb_node.accepted),len(bnb_node.rejected)))
+
+## upper bound herustics ##
+""" this area is for the herustics that estimates the target value upper bound (currently only tested for sparest cut)
+    args:
+        dgraph-(networkx' MultiDigraph) the current graph being partitioned
+        bnb_node -(BnBNode) the current subproblem being bound
+        new_graph_node-(networkx' graph node)-the new graph node being rejected or accepted in the subproblem
+        is_accepted -(boolean) True if the new graph node is accepted. False otherwise""""
+
 def upper_bound_lps_simple(dgraph,bnb_node,new_graph_node,is_accepted):
+    """uses a linear programming solver
+       in order to estimate the bound for the initial probelm. then uses initial relxed cut in order to estimate the values"""
     if(bnb_node.parent_bnb_node==None): return upper_bound_lps(dgraph,bnb_node,new_graph_node,is_accepted)
     if((new_graph_node in bnb_node.parent_bnb_node.relaxed_a)and(is_accepted==False))or((new_graph_node in bnb_node.parent_bnb_node.relaxed_r)and(is_accepted)):
         bnb_node.relaxed_a=bnb_node.parent_bnb_node.relaxed_a
@@ -37,6 +91,11 @@ def upper_bound_lps_simple(dgraph,bnb_node,new_graph_node,is_accepted):
     return check_final_cut(temp,dgraph)
     
 def upper_bound_lps(dgraph,bnb_node,new_graph_node,is_accepted):
+    """uses a linear programming solver
+       in order to estimate the bound for each problem.
+       in a result from trying to reduce runtime this herustic wll probably
+       not work with lower_bound_greedy_simple (it woudln't make sense either, considering the "hard" part
+       for the lower bound lps would be running anyway)"""
     if(bnb_node.parent_bnb_node==None):
         if(len(dgraph.nodes())>3):
             bnb_node.relaxed_a,bnb_node.UB=LPS().solve_UB(dgraph.dgraph, bnb_node.res,{})
@@ -72,37 +131,8 @@ def upper_bound_greedy_simple(dgraph,bnb_node,new_graph_node,is_accepted):
     #the input is only in order to have the same input as upper_bound_lps
     return bnb_node.LB
 
-def lower_bound_greedy_simple(dgraph, bnb_node):
-    graph_edges = dgraph.edges()
-    is_accepted = True
-    
-    if(bnb_node.parent_bnb_node == None): return 0
-    
-    edge_list = []
-    graph_node=None
-    for node in bnb_node.checked:
-        if node not in bnb_node.parent_bnb_node.checked:
-            graph_node=node
-            break
-        
-    is_accepted = (graph_node in bnb_node.accepted)
-    
-    for edge in graph_edges:
-        #print()
-        if(edge[0]==graph_node):
-            edge_list+=[[edge[1],edge[2].get('weight',1)]]
-        elif((edge[1]==graph_node)):
-            edge_list+=[[edge[0],edge[2].get('weight',1)]]
-            
-    LB=bnb_node.LB
-    LB*=(len(dgraph.nodes())-len(bnb_node.checked)+2*min(len(bnb_node.parent_bnb_node.accepted),len(bnb_node.parent_bnb_node.rejected)))
-    
-    for edge in edge_list:
-        #print(edge)
-        if (bnb_node.accepted.count(edge[0])>0): LB+=(1-is_accepted)*int(edge[1])
-        if (bnb_node.rejected.count(edge[0])>0): LB+=is_accepted*int(edge[1])
-    return LB/(len(dgraph.nodes())-len(bnb_node.checked)+2*min(len(bnb_node.accepted),len(bnb_node.rejected)))
-
+## sort herustics ##
+"""this area is for the herustiscs that set the order for checking the graph nodes. (currenlty onle 1 herustic)"""
 def sort_nodes_by_degree(dgraph, bnb_node=None):  #bnb_node added so Sort by degrees input variables will match other sort heruistics.  
     deg_dict=dgraph.dgraph.degree(dgraph.nodes())
     
@@ -115,6 +145,8 @@ def sort_nodes_by_degree(dgraph, bnb_node=None):  #bnb_node added so Sort by deg
         
  
     return sorted_nodes
+
+## Branch and Bound tree node implementation ##
 
 class BnBNode():
     
@@ -156,7 +188,8 @@ class BnBNode():
         self.child_bnb_nodes+=[child_node]
 
         
-
+## Branch and Bound tree implementation ##
+        
 class BnBSearchTree():
 
     
@@ -236,6 +269,7 @@ class BranchAndBoundCluster (Cluster):
 
     
     def cluster(self, dgraph, debug_print=False):
+        """the actual clustering method"""
         #initialize branch and bound tree and herustics dictionary
         heru_dict={'target':self.target,'heru_LB':self.heru_LB,'heru_UB':self.heru_UB,'heru_order':self.heru_order}
         bnb_tree=BnBSearchTree(dgraph,heru_dict)
@@ -266,21 +300,9 @@ class BranchAndBoundCluster (Cluster):
 
 
 
-
-
-
-def Print_Sol(bnbtree):
-    
-    for node in bnbtree.node_list:
-        print("accepted: ")
-        print(node.accepted)
-        print("rejected: ")
-        print(node.rejected)
-        print("LB: ")
-        print(node.LB)
-
-
 def check_final_cut(bnbnode,dgraph):
+    """returns the actual cut value of a bnb node which has reached the weight limit
+       or checked all the graph nodes"""
     if(len(bnbnode.accepted)>=len(bnbnode.rejected)): added_list=bnbnode.rejected
     else: added_list=bnbnode.accepted
     temp_list=[]

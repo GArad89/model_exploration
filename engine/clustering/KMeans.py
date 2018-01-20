@@ -4,6 +4,11 @@ from networkx import spectral_layout
  
  
 class KMeansClustering (Cluster):
+    """ Returns a sparset cut partition of the input dgraph.
+        The number of clusters is defined by the input n.
+        If len(dgraph.nodes())<n then the number of clusters would be len(dgraph.nodes())
+        this clustering method uses sklearn's Kmeans method
+    """
 
     def __init__(self, n = 2):
         super().__init__()
@@ -19,7 +24,9 @@ class KMeansClustering (Cluster):
  
      
     def cluster(self,dgraph):
-
+        """ the actual clustering method
+            args: dgraph- (networkx' MultiDigraph) the graph being partitioned
+        """
         #number of clusters can't be bigger than the number of nodes
         if(self.n>=len(dgraph.nodes())): n_clusters=len(dgraph.nodes())-1
         else: n_clusters=self.n
