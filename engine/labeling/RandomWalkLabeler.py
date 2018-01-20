@@ -49,19 +49,19 @@ class RandomWalkLabeler(GraphLabeler):
             
         X=temp
         self.ranks = dict(zip(nodes,X))
-
+        chosen_labels=[]
         for super_node in self.dendrogram.nodes():
             if self.source == labeling_on_type.NODES:
                 chosen_nodes = self.n_important_nodes(super_node.subset, label_size)
-                chosen_nodes_labels = [self.graph.node_attr(node, 'label') for node in chosen_nodes]
+                chosen_labels = [self.graph.node_attr(node, 'label') for node in chosen_nodes]
             elif (self.source == labeling_on_type.EDGES)or(self.source == labeling_on_type.EDGES_AND_NODES):
                 print("chk3")
                 chosen_edges = self.n_important_edges(super_node.projected_graph.edges(), label_size)
                 print("chk3")
                 chosen_labels = [self.graph.dgraph.edges[(edge[0], edge[1])].get('label','') for edge in chosen_edges]
-
+            chosen_labels = [l for l in chosen_labels if l]
             # super_node.label = super().shorten_label(','.join(chosen_nodes_labels))
-            super_node.label = super().shorten_label(chosen_nodes_labels)
+            super_node.label = super().shorten_label(chosen_labels)
             print(super_node.label)
             
             
