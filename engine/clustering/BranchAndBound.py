@@ -20,21 +20,24 @@ def sparset_cut_target(bound,graph_node_num):
 
 def lower_bound_lps(dgraph,bnb_node):
     """uses a linear programming solver
-       in order to estimate the bound for each problem"""
-     if(len(bnb_node.checked)==len(dgraph.nodes())): return check_final_cut(bnb_node,dgraph)
-     a,bnb_node.res= LPS().solve_LB(dgraph.dgraph)
-     return a
+       in order to estimate the bound for each problem
+    """
+    if(len(bnb_node.checked)==len(dgraph.nodes())): return check_final_cut(bnb_node,dgraph)
+    a,bnb_node.res= LPS().solve_LB(dgraph.dgraph)
+    return a
 
 def lower_bound_lps_simple(dgraph,bnb_node):
     """uses a linear programming solver
-       in order to estimate the bound for the initial probelm. then uses lower_bound_greedy_simple"""
-     if(bnb_node.parent_bnb_node==None):
-         a,bnb_node.res= LPS().solve_LB(dgraph.dgraph)
-         return a
-     return lower_bound_greedy_simple(dgraph,bnb_node)
+       in order to estimate the bound for the initial probelm. then uses lower_bound_greedy_simple
+    """
+    if(bnb_node.parent_bnb_node==None):
+        a,bnb_node.res= LPS().solve_LB(dgraph.dgraph)
+        return a
+    return lower_bound_greedy_simple(dgraph,bnb_node)
 
 def lower_bound_greedy_simple(dgraph, bnb_node):
-    """no estimation. the lower bound is the subproblem current cut"""
+    """no estimation. the lower bound is the subproblem current cut
+    """
     graph_edges = dgraph.edges()
     is_accepted = True
     
@@ -64,16 +67,20 @@ def lower_bound_greedy_simple(dgraph, bnb_node):
     return LB/(len(dgraph.nodes())-len(bnb_node.checked)+2*min(len(bnb_node.accepted),len(bnb_node.rejected)))
 
 ## upper bound herustics ##
-""" this area is for the herustics that estimates the target value upper bound (currently only tested for sparest cut)
+"""
+    this area is for the herustics that estimates the target value upper bound (currently only tested for sparest cut)
     args:
-        dgraph-(networkx' MultiDigraph) the current graph being partitioned
+        dgraph-(networkx MultiDigraph) the current graph being partitioned
         bnb_node -(BnBNode) the current subproblem being bound
-        new_graph_node-(networkx' graph node)-the new graph node being rejected or accepted in the subproblem
-        is_accepted -(boolean) True if the new graph node is accepted. False otherwise""""
+        new_graph_node-(networkx graph node)-the new graph node being rejected or accepted in the subproblem
+        is_accepted -(boolean) True if the new graph node is accepted. False otherwise   
+"""
 
 def upper_bound_lps_simple(dgraph,bnb_node,new_graph_node,is_accepted):
-    """uses a linear programming solver
-       in order to estimate the bound for the initial probelm. then uses initial relxed cut in order to estimate the values"""
+    """
+       uses a linear programming solver
+       in order to estimate the bound for the initial probelm. then uses initial relxed cut in order to estimate the values
+    """
     if(bnb_node.parent_bnb_node==None): return upper_bound_lps(dgraph,bnb_node,new_graph_node,is_accepted)
     if((new_graph_node in bnb_node.parent_bnb_node.relaxed_a)and(is_accepted==False))or((new_graph_node in bnb_node.parent_bnb_node.relaxed_r)and(is_accepted)):
         bnb_node.relaxed_a=bnb_node.parent_bnb_node.relaxed_a
