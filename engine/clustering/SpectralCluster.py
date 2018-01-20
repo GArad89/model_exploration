@@ -34,10 +34,9 @@ class SpectralCluster(Cluster):
     def cluster(self, dgraph):
         
         #number of clusters can't be bigger than the number of nodes
-        if(self.n>=len(dgraph.nodes())): 
-            raise ValueError("Not enough nodes in graph, expected at least {}".format(self.n))
-        else: 
-            n_clusters=self.n  
+         #number of clusters can't be bigger than the number of nodes
+        if(self.n>=len(dgraph.nodes())): n_clusters=len(dgraph.nodes())-1
+        else: n_clusters=self.n
 
         #adjacency matrix
         adj_mat = dgraph.adjacency_matrix()
