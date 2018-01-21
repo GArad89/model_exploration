@@ -295,7 +295,6 @@ class BranchAndBoundCluster (Cluster):
             if(bnb_tree.best_sol_cut<current_best_sol_cut): current_best_sol_cut=bnb_tree.best_sol_cut
             bnb_tree.check_live()
             
-        #main_name=__main__.__file__.split('\\')
         if debug_print:
             print("bnb search tree holds "+str(len(bnb_tree.node_list))+" nodes")
             print(bnb_tree.best_solution. accepted)

@@ -120,33 +120,5 @@ class DGraph:
     def project(self, vertices):  
         return DGraph(self.subgraph(vertices))     
 
-# for testing purposes
-def main():
-    g = DGraph.read_dot("./dot/example.dot")
-    #for n in g.dgraph.nodes():
-        #print(g.dgraph.node[n]['label'])
-    g.draw() 
-    #new_node = random() * 10000 
-    #g.add_node(new_node, weight=0.4)
-    #g.add_edge(2, '1', weight=0.2)
-    #DGraph.write_dot(g, "./dot/g1.dot") 
- 
 
-
-def projectedgraph_test():
-    #g = DGraph.read_dot("./dot/weighted_g2.dot")
-    g=DGraph(nx.DiGraph())
-    g.add_node('1' , label='kekek')
-    g.add_node('2')
-    g.add_node('3')
-    g.add_node('4')
-    g.add_edge('1','2',weight=2)
-    g.add_edge('3','2',weight=2)
-    #print(list(g.edges_of_node('3'))[0][0])
-    #DGraph.write_dot(g, "./dot/test.dot")
-    
-    
-if __name__ == "__main__":
-   #main()
-   projectedgraph_test()
 
