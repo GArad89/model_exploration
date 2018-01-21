@@ -8,6 +8,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='d3-zoom/d3-zoom.js') }}"></script>
 
 <script type="text/javascript" src="{{ url_for('static', filename='saveSvgAsPng/saveSvgAsPng.js') }}"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.6.3/svg.js"></script>
 
 <style>
  .node {
@@ -246,13 +247,27 @@ function collapse(d) {
 function clickOnDendrogram(d) {
   document.getElementById('tree-' + d.data.id).classList.remove('hover');
   if (d.children) {
+      // collapse
       d._children = d.children;
       d.children = null;
+      update(d);
     } else {
+      // expand
       d.children = d._children;
       d._children = null;
+
+      update(d);
+      superGraphSvg = SVG.get('svg_supergraph')
+      clicked_cluster = idToCluster[d.data.id]
+
+      for (var i = 0; i < clicked_cluster.vertices.length; i++) {
+        elements = superGraphSvg.select("[id='" + clicked_cluster.vertices[i] +"'] ellipse")
+        elements.attr({'fill': '#ffffff'})
+        elements.animate({ease: '<'}).attr({fill: '#ffcc00'}).animate().attr({fill: '#ffffff'})
+      }
+
     }
-  update(d);
+
 }
 
 
