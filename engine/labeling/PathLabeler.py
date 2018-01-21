@@ -1,4 +1,5 @@
 from .label import GraphLabeler
+from .label import labeling_on_type
 import networkx as nx
 import random
 
@@ -87,5 +88,13 @@ class PathLabeler(GraphLabeler):
             start_nodes, end_nodes = self.get_strategic_nodes(super_node)
             path = self.traverse_cluster(start_nodes, end_nodes)
             # path_str = ','.join([self.graph.node_attr(node, 'label') for node in path])
-            labels = [self.graph.node_attr(node, 'label') for node in path]
+
+            if self.source is labeling_on_type.EDGES:
+                labels = []
+                for idx in range(len(path) - 1):
+                    print(path[idx], path[idx + 1])
+                    labels.append(self.graph.dgraph[path[idx]][path[idx + 1]])
+            else:
+                labels = [self.graph.node_attr(node, 'label') for node in path]
+
             super_node.label = self.shorten_label(labels)
