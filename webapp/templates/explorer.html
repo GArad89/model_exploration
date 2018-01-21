@@ -263,7 +263,10 @@ function clickOnDendrogram(d) {
       for (var i = 0; i < clicked_cluster.vertices.length; i++) {
         elements = superGraphSvg.select("[id='" + clicked_cluster.vertices[i] +"'] ellipse")
         elements.attr({'fill': '#ffffff'})
-        elements.animate({ease: '<'}).attr({fill: '#ffcc00'}).animate().attr({fill: '#ffffff'})
+        elements.animate({ease: '<>'}).attr({fill: '#ffcc00'}).animate().attr({fill: '#ffffff'}).animate().attr({fill: '#ffcc00'})
+
+        elements = superGraphSvg.select("[id=cluster_" + clicked_cluster.vertices[i] +"] polygon")
+        elements.animate({ease: '<>'}).attr({fill: '#ffcc00'}).animate().attr({fill: '#ffffff'}).animate().attr({fill: '#ffcc00'})
       }
 
     }
