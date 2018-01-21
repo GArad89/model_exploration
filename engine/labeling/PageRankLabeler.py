@@ -33,6 +33,9 @@ class PageRankLabeler(GraphLabeler):
             return subset_sorted[:k]
         chosen_labels=[]
         for super_node in self.dendrogram.nodes()[1:]:
+            chosen_labels=[]
+            chosen_labels_nodes=[]
+            chosen_labels_edges=[]
             if self.source == labeling_on_type.NODES:
                 chosen_nodes = n_important_nodes(super_node.subset, label_size)
                 chosen_labels = [self.graph.node_attr(node, 'label') for node in chosen_nodes]
@@ -41,12 +44,15 @@ class PageRankLabeler(GraphLabeler):
                 chosen_labels = [self.graph.dgraph.edges[(edge[0], edge[1])].get('label','') for edge in chosen_edges]
             else:  #both edges and nodes
                 chosen_nodes = n_important_nodes(super_node.subset, label_size)
+                print("CHK21")
                 chosen_labels_nodes = [self.graph.node_attr(node, 'label') for node in chosen_nodes]
                 chosen_edges = n_important_edges(super_node.projected_graph.edges(), label_size)
                 chosen_labels_edges = [self.graph.dgraph.edges[(edge[0], edge[1])].get('label','') for edge in chosen_edges]
-                for i in range(int(len(chosen_labels_nodes)/2)): #since the edge and node ranks arent normalized, they can't be compared. we "mix" the labels as such: node,edge,node...
-                    chosen_labels+=[chosen_labels_nodes[i]]
-                    chosen_labels+=[chosen_labels_edges[i]]
+                for i in range(1+int(len(chosen_labels_nodes)/2)): #since the edge and node ranks arent normalized, they can't be compared. we "mix" the labels as such: node,edge,node...
+                    if(len(chosen_labels_nodes)>i):
+                        chosen_labels+=[chosen_labels_nodes[i]]
+                    if(len(chosen_labels_edges)>i):
+                        chosen_labels+=[chosen_labels_edges[i]]
             chosen_labels = [l for l in chosen_labels if l]
             log.debug(chosen_labels)
             # super_node.label = super().shorten_label(','.join(chosen_labels))
