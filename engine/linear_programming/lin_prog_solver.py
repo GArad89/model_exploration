@@ -381,7 +381,8 @@ class LPS:
         return lower_bound, new_cut, real_value
 
     def solve_LB(self, G, partial_assignment_dict={}, log_path=None):
-
+        """"use lps in order to solve only the lower bound
+        """
         reg_G, old_nodes_to_new_nodes = LPS._graph_to_standard_form(G, partial_assignment_dict)
         res = LPS._compute_LP_lower_bound(reg_G, log_path)
         lower_bound = res.fun + LPS._compute_partial_assignment_cost(G, partial_assignment_dict)
@@ -389,7 +390,8 @@ class LPS:
         return lower_bound,res
 
     def solve_UB(self, G, res,partial_assignment_dict={}, log_path=None):
-        
+        """"use lps in order to solve only the upper bound
+        """
         reg_G, old_nodes_to_new_nodes = LPS._graph_to_standard_form(G, partial_assignment_dict)
         cut, value = self._generate_cut_from_relaxed_solution(res.x, reg_G, log_path)
         new_cut = []

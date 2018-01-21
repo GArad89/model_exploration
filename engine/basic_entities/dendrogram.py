@@ -17,8 +17,7 @@ class Node:
                 self.label='root'
 
         self.parent_index=parent
-        self.label=label if label is not None else ''
-                
+        self.label=label if label is not None else ''           
         self.subset=subset
         self.projected_graph=dgraph
         self.child_indexes=[]

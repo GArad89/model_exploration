@@ -17,8 +17,6 @@ class SizeCriteria(StopCriteria):
         self.threshold = threshold
 
     def check(self, dgraph, **params):
-
-        #print("the dgraph number of nodes is: ",dgraph.number_of_nodes())
         return dgraph.number_of_nodes() <= self.threshold
 
 

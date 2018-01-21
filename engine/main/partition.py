@@ -48,5 +48,12 @@ def _partition(dgraph, state_subset, clustering_algo, stop_criterion, dendrogram
 
 
 def partition(dgraph, clustering_algo, stop_criterion=SizeCriteria(20)):
+    """recursivly partition the inputted graph, using the clustering algorithm.
+       the partition iteration stops when stop_criterion is reached.
+       args:
+           dgraph-(DGraph) a directed graph implementation
+           clustering_algo-(a class inheriting from Cluster located in engine.clustering.cluster_abstract) the clustering algorithm to be used.
+           stop_criterion-(a class inheriting from StopCriteria located in engine.stopping_criteria.stop_criteria) the stop critrea for the iteration.
+    """
     dendrogram = Dendrogram(dgraph)
     return _partition(dgraph, state_subset=dgraph.nodes(), clustering_algo=clustering_algo, stop_criterion=stop_criterion, dendrogram=dendrogram, rootnode = 0)
