@@ -60,36 +60,3 @@ class TfIdfLabeler(RankingLabeler):
 
         # map every words to it's tfidf score
         self.tfifd_labels_scores = dict(zip(vectorizer.get_feature_names(), vectorizer.idf_))
-        # print(self.tfifd_labels_scores)
-        #
-        #
-        # unnamed_cluster = 1
-        # def top_labels(nodes, n = 1): #TODO: support n top labels
-        #
-        #     nonlocal labels_dict
-        #     nonlocal tfifd_scores
-        #     nonlocal unnamed_cluster
-        #
-        #     nodes_labels = []
-        #     for node in nodes:
-        #         nodes_labels = nodes_labels + labels_dict[node]
-        #
-        #     print("available labels = ", nodes_labels)
-        #
-        #     labels = list(filter(lambda x: x[0] in nodes_labels, tfifd_scores.items()))
-        #     # reveresed = [(x[1], x[0]) for x in labels].sort(reverse=True)
-        #     if not len(labels):
-        #         unnamed_cluster += 1
-        #         return ["Unnamed {}".format(unnamed_cluster)]
-        #     else:
-        #         max_tfidf = max(labels, key=operator.itemgetter(1))[1]
-        #         labels = list(filter(lambda x: x[1] == max_tfidf, labels))
-        #         # labels = [nodes_labels.get(x[0]) for x in items]
-        #         return [x[0] for x in labels]
-        #
-        # # label the dendrogram's nodes
-        # for node in self.dendrogram.nodes():
-        #     print(node.subset)
-        #     top_label = top_labels(node.subset)
-        #     print("top_label = ", top_label)
-        #     node.label = super().shorten_label(top_label)

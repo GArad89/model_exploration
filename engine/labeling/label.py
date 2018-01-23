@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-import itertools
 from enum import Enum
 import networkx as nx
 import os
@@ -18,6 +17,7 @@ class DendrogramLabeler(ABC):
         self.max_labels = max_labels # max labels for each superstate
         self.ordered_nodes = self.order_nodes(self.graph.dgraph)
 
+    #return bfs ordered list of nodes of dgraph
     def order_nodes(self, dgraph):
         graph = dgraph.copy()
         init_nodes = self.find_init_nodes(graph)
@@ -30,6 +30,7 @@ class DendrogramLabeler(ABC):
         return [n for n in nx.bfs_tree(graph, init_nodes[0])]
         # ordered_edges = nx.bfs_edges(graph, init_nodes[0])
 
+    #returns a list of unique labels of list of labels
     def _get_first_appreance_in_list(self, labels):
         seen_labels = set()
         unique_labels = []
@@ -58,6 +59,7 @@ class DendrogramLabeler(ABC):
          labels = self._get_first_appreance_in_list(labels)
          return labels
 
+    #returns a shorten version of labels_list with maximum of self.max_labels labels
     def shorten_label(self, lables_list):
         lables_list = list(lables_list)
         l = len(lables_list)
