@@ -2,18 +2,20 @@ from abc import ABC, abstractmethod
 import itertools
 from enum import Enum
 import networkx as nx
+import os
 
 class labeling_on_type(Enum):
     EDGES = 1
     NODES = 2
     EDGES_AND_NODES = 3
 
-class GraphLabeler(ABC):
+class DendrogramLabeler(ABC):
 
-    def __init__(self, graph, dendrogram, source = labeling_on_type.EDGES_AND_NODES):
+    def __init__(self, graph, dendrogram, source = labeling_on_type.EDGES_AND_NODES, max_labels = 3):
         self.graph = graph
         self.dendrogram = dendrogram
         self.source = source
+        self.max_labels = max_labels # max labels for each superstate
         self.ordered_nodes = self.order_nodes(self.graph.dgraph)
 
     def order_nodes(self, dgraph):
@@ -37,14 +39,14 @@ class GraphLabeler(ABC):
                 unique_labels.append(l)
         return unique_labels
 
-    def get_labels(self,subgraph):
+    def get_labels(self, super_node):
          '''
             subgraph = node.projected_graph.dgraph
             get all inner labels (nodes and edges)
             generates an order list of labels,
             ordering is by BFS traversal order over the graph
          '''
-         labels = [(v, attrs.get('label','')) for v, attrs in self.get_list_of_lables(subgraph)]
+         labels = [(v, attrs.get('label','')) for v, attrs in self.select_important_nodes_and_edges(super_node)]
          # filter out empty ones
          labels = list(filter(lambda x: x[1], labels))
          # sort labels according to bfs order
@@ -56,21 +58,13 @@ class GraphLabeler(ABC):
          labels = self._get_first_appreance_in_list(labels)
          return labels
 
-    def get_list_of_lables(self,subgraph):
-        return {
-            labeling_on_type.EDGES: itertools.chain(subgraph.edges.items()),
-            labeling_on_type.NODES: itertools.chain(subgraph.nodes.items()),
-            labeling_on_type.EDGES_AND_NODES: itertools.chain(subgraph.edges.items(), subgraph.nodes.items())
-        }.get(self.source, [])
-
-    def shorten_label(self, lables_list, max_lables=3):
+    def shorten_label(self, lables_list):
         lables_list = list(lables_list)
         l = len(lables_list)
-        if l > max_lables:
+        if l > self.max_labels:
             newlist = [lables_list[0]]
-            print(newlist)
-            for i in range(1, max_lables - 1):
-                newlist += [lables_list[(l // (max_lables - 1)) * i]]
+            for i in range(1, self.max_labels - 1):
+                newlist += [lables_list[(l // (self.max_labels - 1)) * i]]
             newlist += [lables_list[-1]]
             return "\n".join(newlist)
         else:
@@ -92,9 +86,32 @@ class GraphLabeler(ABC):
             pass
         return cycle
 
-    @abstractmethod
     def label(self):
-        pass
+        unnamed_cluster = 1
+        # label the dendrogram's nodes
+        for super_node in self.dendrogram.nodes()[1:]:
+            labels = self.get_labels(super_node)
+            # shortest common prefix
+            prefix = os.path.commonprefix(list(labels))
+            if not prefix or len(list(labels)) <= 1:
+                # NOTE ESCAPED \n for graphviz happiness
+                # node.label = super().shorten_label("\n".join(labels))
+                super_node.label = self.shorten_label(labels)
+            else:
+                #TODO: deal with empty suffix and repeated labels
+                super_node.label = prefix + self.shorten_label(labels)
+                # node.label = super().shorten_label("{prefix}{{\n{suffixes}}}".format(
+                #     prefix=prefix,
+                #     suffixes=",\n".join(l[len(prefix):] for l in labels)
+                #     ))
 
+            if not super_node.label:
+                #TODO:roee(hack)
+                super_node.label = "Unnamed {}".format(unnamed_cluster)
+                unnamed_cluster += 1
+
+    @abstractmethod
+    def select_important_nodes_and_edges(self, super_node):
+        pass
 
 
