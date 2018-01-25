@@ -11,16 +11,19 @@ class SpectralCluster(Cluster):
         this clustering method uses sklearn's SpectralClustering method
     """
 
-    def __init__(self, n = 2, affinity='precomputed'):
+    def __init__(self, n = 2, affinity='precomputed', find_opt_clusters = False):
         super().__init__()
         self.n = n
         self.affinity = affinity
+        self.find_opt_clusters = find_opt_clusters
 
 
     @staticmethod
     def get_params():
-        form = [{'key': 'n', 'type': 'number'}, {'key' : 'affinity'}]
+        form = [{'key': 'n', 'type': 'number'}, {'key' : 'find_opt_clusters', 'type' : 'select'}, {'key' : 'affinity'}]
         schema = {
+            'find_opt_clusters': {'type': 'boolean', 'enum': ['True', 'False'], 'title': 'Find optimal num. clusters' \
+                , 'required': True},
             'n' : {'type': 'integer', 'title': 'Number of Clusters', 'minimum' : 2, 'default': 2, 'required' : True},
             'affinity' : {
                 'type' : 'string',
@@ -45,8 +48,16 @@ class SpectralCluster(Cluster):
         adj_mat = np.maximum(adj_mat,adj_mat.transpose())
 
         #SpectralClustering
-        sc = SpectralClustering(n_clusters,affinity=self.affinity)
-        sc.fit(adj_mat)
+        if self.find_opt_clusters:
+            sc = SpectralClustering(affinity=self.affinity)
+            try:
+                sc.fit(adj_mat)
+            except:
+                sc = SpectralClustering(2, affinity=self.affinity)
+                sc.fit(adj_mat)
+        else:
+            sc = SpectralClustering(n_clusters = self.n, affinity=self.affinity)
+            sc.fit(adj_mat)
         result = sc.labels_
         ordered_nodes = list(dgraph.nodes())
         # create empty clusters to gather the result

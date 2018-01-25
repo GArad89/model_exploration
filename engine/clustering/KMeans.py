@@ -1,7 +1,10 @@
 from .cluster_abstract import Cluster 
 from sklearn.cluster import KMeans 
 from networkx import spectral_layout
- 
+
+from sklearn import metrics
+from scipy.spatial.distance import cdist
+import numpy as np
  
 class KMeansClustering (Cluster):
     """ Returns a sparset cut partition of the input dgraph.
@@ -10,19 +13,37 @@ class KMeansClustering (Cluster):
         this clustering method uses sklearn's Kmeans method
     """
 
-    def __init__(self, n = 2):
+    MAX_K = 8
+
+    def __init__(self, n = 2, find_best_k = False):
         super().__init__()
         self.n=n
+        self.find_best_k = find_best_k
         
     @staticmethod
     def get_params(): 
-        form = [{'key': 'n', 'type': 'text'}] 
-        schema = { 
-            'n' : {'type': 'integer', 'title': 'number of clusters', 'minimum' : 2, 'required' : True} 
-            } 
-        return schema, form 
- 
-     
+        form = [{'key': 'n', 'type': 'text'}, {'key' : 'find_best_k', 'type' : 'select'}]
+        schema = {
+            'n' : {'type': 'integer', 'title': 'number of clusters', 'minimum' : 2, 'required' : True},
+            'find_best_k': {'type': 'boolean', 'enum': ['True', 'False'], 'title': 'Find optimal k' \
+                , 'required': True},
+        }
+        return schema, form
+
+
+    def _find_k(self, vector):
+
+        maxK = range(1, min(len(vector), self.MAX_K))
+        distortion_values = []
+        vector = np.array(vector)
+        for k in maxK:
+            kmeanModel = KMeans(n_clusters=k).fit(vector)
+            kmeanModel.fit(vector)
+            distortion = sum(np.min(cdist(vector, kmeanModel.cluster_centers_, 'euclidean'), axis=1)) / vector.shape[0]
+            distortion_values.append((k, distortion))
+        best_k = min(distortion_values, key=lambda x:x[1])
+        return best_k[0]
+
     def cluster(self,dgraph):
         """ the actual clustering method
             args: dgraph- (networkx' MultiDigraph) the graph being partitioned
@@ -39,7 +60,9 @@ class KMeansClustering (Cluster):
             vector_list+=[temp] 
         
         ## Kmeans Clustering
-        km = KMeans(self.n).fit(vector_list) 
+        if self.find_best_k:
+            self.n = self._find_k(vector_list)
+        km = KMeans(self.n).fit(vector_list)
         result=km.labels_
 
         #seperating the result list to lists for each cluster (1= the node is in the substae 0= the node is not in the state)

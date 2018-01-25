@@ -19,14 +19,14 @@ class TfIdfLabeler(RankingLabeler):
         return [self.graph.node_attr(node, 'label') for node in super_node.subset]
 
     def fill_ranking_dictionary_with_nodes(self):
-        if(not self.tfifd_labels_scores):
+        if not self.tfifd_labels_scores:
             self.create_labels_score_dict()
         for super_node in self.dendrogram.nodes()[1:]:
             for node_item in super_node.projected_graph.dgraph.nodes(data=True):
                 self.ranks_dict[node_item[0]] = self.tfifd_labels_scores[node_item[1].get('label','')]
 
     def fill_ranking_dictionary_with_edges(self):
-        if(not self.tfifd_labels_scores):
+        if not self.tfifd_labels_scores:
             self.create_labels_score_dict()
         for super_node in self.dendrogram.nodes()[1:]:
             for edge_item in super_node.projected_graph.dgraph.edges(data=True):
@@ -37,9 +37,9 @@ class TfIdfLabeler(RankingLabeler):
         super_node_labels_dict = {}
         for super_node in self.dendrogram.nodes()[1:]:
 
-            if(self.source == labeling_on_type.EDGES):
+            if self.source == labeling_on_type.EDGES:
                 super_node_labels_dict[super_node] = self.get_edges_labels_list_in_super_node(super_node)
-            elif(self.source == labeling_on_type.NODES):
+            elif self.source == labeling_on_type.NODES:
                 super_node_labels_dict[super_node] = self.get_nodes_labels_list_in_super_node(super_node)
             else:
                 nodes_labels = self.get_nodes_labels_list_in_super_node(super_node)

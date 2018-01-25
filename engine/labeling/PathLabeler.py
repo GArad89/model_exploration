@@ -59,6 +59,8 @@ class PathLabeler(DendrogramLabeler):
     def traverse_cluster(self, start_nodes, end_nodes, super_node):
         path = []
         current_node = random.choice(start_nodes)
+        if current_node in end_nodes:  #Try to avoid single node paths, TODO: improve
+            end_nodes.remove(current_node)
         path.append(current_node)
         while current_node not in end_nodes:
             out_edges = self.graph.dgraph.out_edges(current_node[0])
@@ -85,16 +87,15 @@ class PathLabeler(DendrogramLabeler):
     def select_important_nodes_and_edges(self, super_node):
         start_nodes, end_nodes = self.get_strategic_nodes(super_node)
         path = self.traverse_cluster(start_nodes, end_nodes, super_node)
-        if (self.source == labeling_on_type.NODES):
+        if self.source == labeling_on_type.NODES:
             return path
         else:
             edges_items_in_path = []
-
             for idx in range(len(path) - 1):
                 edge = (path[idx][0], path[idx + 1][0])
                 edge_item = (edge, super_node.projected_graph.dgraph.edges[edge])
                 edges_items_in_path.append(edge_item)
-            if(self.source == labeling_on_type.EDGES):
+            if self.source == labeling_on_type.EDGES:
                 return edges_items_in_path
             else:
                 return path + edges_items_in_path

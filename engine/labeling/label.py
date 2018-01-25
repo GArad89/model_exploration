@@ -15,12 +15,12 @@ class DendrogramLabeler(ABC):
         self.dendrogram = dendrogram
         self.source = source
         self.max_labels = max_labels # max labels for each superstate
-        self.ordered_nodes = self.order_nodes(self.graph.dgraph)
+        self.ordered_nodes = self._order_nodes(self.graph.dgraph)
 
     #return bfs ordered list of nodes of dgraph
-    def order_nodes(self, dgraph):
+    def _order_nodes(self, dgraph):
         graph = dgraph.copy()
-        init_nodes = self.find_init_nodes(graph)
+        init_nodes = self._find_init_nodes(graph)
         for init in init_nodes:
             cycle = self._find_cycle(graph, init)
             while cycle:
@@ -68,11 +68,11 @@ class DendrogramLabeler(ABC):
             for i in range(1, self.max_labels - 1):
                 newlist += [lables_list[(l // (self.max_labels - 1)) * i]]
             newlist += [lables_list[-1]]
-            return "\n".join(newlist)
+            return ",\n".join(newlist)
         else:
-            return "\n".join(lables_list)
+            return ",\n".join(lables_list)
 
-    def find_init_nodes(self, graph):
+    def _find_init_nodes(self, graph):
 
         init_nodes = []
         for n in graph.nodes():
@@ -101,7 +101,8 @@ class DendrogramLabeler(ABC):
                 super_node.label = self.shorten_label(labels)
             else:
                 #TODO: deal with empty suffix and repeated labels
-                super_node.label = prefix + self.shorten_label(labels)
+                adj_labels = [ l[len(prefix):] for l in labels]
+                super_node.label = prefix + ': (' + self.shorten_label(adj_labels) + ')'
                 # node.label = super().shorten_label("{prefix}{{\n{suffixes}}}".format(
                 #     prefix=prefix,
                 #     suffixes=",\n".join(l[len(prefix):] for l in labels)

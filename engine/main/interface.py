@@ -71,6 +71,7 @@ _type_parsers = {
     'integer' : int,
     'number' : float,
     'string' : str,
+    'boolean' : bool,
 }
 
 def parse_parameters(parameters, schema):
@@ -82,8 +83,16 @@ def parse_parameters(parameters, schema):
         if parser is None:
             raise Exception('unsupported schema type: ' + schema[name]['type'])
         real_value = parser(value)
+        if parser == bool:
+            if value.lower() == "true":
+                real_value = True
+            elif value.lower() == "false":
+                real_value = False
+            else:
+                raise Exception('Invalid boolean value {} must eqaul {true, false}'.format(
+                    value, item_schema['enum']))
         if 'enum' in item_schema:
-            if real_value not in item_schema['enum']:
+            if str(real_value) not in item_schema['enum']:
                 raise Exception('Invalid enum value {} not in allowed values {}'.format(
                                     real_value, item_schema['enum']))
         parsed[name] = real_value
