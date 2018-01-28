@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+-{% extends "layout.html" %}
 {% block head %}
  {{ super() }}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.js"></script>
@@ -322,7 +322,7 @@ function updateTree(source) {
 
           var cluster = idToCluster[d.data.id];
           //console.log(cluster);
-          tooltip_div.html('#Nodes: ' + cluster.vertices.length)
+          tooltip_div.html('#Nodes: ' + (cluster.vertices.length))
          .style("left", (d3.event.pageX) + "px")
          .style("top", (d3.event.pageY - 28) + "px");
       })
