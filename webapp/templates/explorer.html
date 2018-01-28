@@ -322,7 +322,6 @@ function updateTree(source) {
 
           var cluster = idToCluster[d.data.id];
           //console.log(cluster);
-          debugger;
           vertices_no_initial = cluster.vertices.filter(vertex => vertex != "initial")
           tooltip_div.html('#Nodes: ' + (vertices_no_initial.length))
          .style("left", (d3.event.pageX) + "px")
