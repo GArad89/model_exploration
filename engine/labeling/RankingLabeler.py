@@ -3,7 +3,7 @@ from .label import DendrogramLabeler, labeling_on_type
 
 
 class RankingLabeler(DendrogramLabeler):
-    def __init__(self, graph, dendrogram, source = labeling_on_type.EDGES_AND_NODES, max_labels =  3):
+    def __init__(self, graph, dendrogram, source=labeling_on_type.EDGES_AND_NODES, max_labels=3):
         super().__init__(graph, dendrogram, source, max_labels)
         self.ranks_dict = {}
         if(source == labeling_on_type.NODES):

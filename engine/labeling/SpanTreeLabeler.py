@@ -2,8 +2,8 @@ from .label import DendrogramLabeler, labeling_on_type
 import networkx as nx
 
 class STLabeling(DendrogramLabeler):
-    def __init__(self, graph, dendrogram, source):
-        super().__init__(graph, dendrogram, source)
+    def __init__(self, graph, dendrogram, source, max_labels=3):
+        super().__init__(graph, dendrogram, source, max_labels=3)
 
     def select_important_nodes_and_edges(self, super_node):
         subgraph = super_node.projected_graph.dgraph

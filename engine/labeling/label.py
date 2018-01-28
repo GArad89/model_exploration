@@ -10,7 +10,7 @@ class labeling_on_type(Enum):
 
 class DendrogramLabeler(ABC):
 
-    def __init__(self, graph, dendrogram, source = labeling_on_type.EDGES_AND_NODES, max_labels = 3):
+    def __init__(self, graph, dendrogram, source=labeling_on_type.EDGES_AND_NODES, max_labels=3):
         self.graph = graph
         self.dendrogram = dendrogram
         self.source = source

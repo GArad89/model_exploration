@@ -4,8 +4,8 @@ import itertools
 
 class PrefixLabeler(DendrogramLabeler):
 
-    def __init__(self, graph, dendrogram, source):
-        super().__init__(graph, dendrogram, source)
+    def __init__(self, graph, dendrogram, source, max_labels=3):
+        super().__init__(graph, dendrogram, source, max_labels)
 
     def select_important_nodes_and_edges(self, super_node):
         sub_dgraph = super_node.projected_graph.dgraph

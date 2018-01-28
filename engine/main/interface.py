@@ -99,7 +99,7 @@ def parse_parameters(parameters, schema):
     return parsed
 
 
-def run_algorithm(graph, algo_name, params, stopping_criterion, stopping_parameter, labeling_method, labeling_source):
+def run_algorithm(graph, algo_name, params, stopping_criterion, stopping_parameter, labeling_method, labeling_source, max_labels):
     #parsing from string + params to algo object
     algo_class = get_cluster_algorithm(algo_name) #we want the algorithm class
     algo = algo_class(**params) #now we have an object
@@ -109,7 +109,7 @@ def run_algorithm(graph, algo_name, params, stopping_criterion, stopping_paramet
     dendrogram = partition(graph, algo, stopping_criterion)
 
     labeler_class = get_labeling_method(labeling_method)
-    labeler = labeler_class(graph, dendrogram, labeling_source)
+    labeler = labeler_class(graph, dendrogram, labeling_source, max_labels)
     labeler.label()
 
     log.info(len(dendrogram.nodes()))

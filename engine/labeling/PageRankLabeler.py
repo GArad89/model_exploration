@@ -9,8 +9,8 @@ log = logging.getLogger(__name__)
 
 class PageRankLabeler(RankingLabeler):
     
-    def __init__(self, graph, dendrogram, source):
-        super().__init__(graph, dendrogram, source)
+    def __init__(self, graph, dendrogram, source, max_labels=3):
+        super().__init__(graph, dendrogram, source, max_labels)
 
     def fill_ranking_dictionary_with_nodes(self):
         self.ranks_dict = nx.pagerank_numpy(self.graph.dgraph)

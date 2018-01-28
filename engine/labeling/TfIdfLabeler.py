@@ -8,7 +8,7 @@ from .RankingLabeler import RankingLabeler
 
 class TfIdfLabeler(RankingLabeler):
 
-    def __init__(self, graph, dendrogram, source):
+    def __init__(self, graph, dendrogram, source, max_labels=3):
         self.tfifd_labels_scores = {}
         super().__init__(graph, dendrogram, source)
 
