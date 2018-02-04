@@ -57,7 +57,6 @@ def algorithm_choice_form():
     graph = get_models().open(model_id)
 
     algo_data = get_algorithm_forms()
-    algo_data = get_algorithm_forms()
 
     labeling_sources = labeling.get_sources()
 

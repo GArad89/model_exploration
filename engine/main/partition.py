@@ -26,7 +26,7 @@ def _partition(dgraph, state_subset, clustering_algo, stop_criterion, dendrogram
     #log.debug(state_subset)
     # if not first iteration
     if len(projected_graph.nodes()) != len(dgraph.nodes()): #in case a dendrogram WAS initiated. making sure not to add the root twice
-        if ((len(projected_graph.nodes()) == 1) & ("initial" in projected_graph.nodes(data=True))):
+        if ((len(projected_graph.nodes()) == 1) and ("initial" in projected_graph.nodes())):
             return
         _add_dendrogram_node(dendrogram, rootnode, state_subset, projected_graph)
         rootnode = len(dendrogram.nodes())-1

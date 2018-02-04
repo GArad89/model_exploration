@@ -1,6 +1,4 @@
--{% extends "layout.html" %}
-{% block head %}
- {{ super() }}
+-{% extends "layout.html" %} {% block head %} {{ super() }}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.js"></script>
 <!-- minified at https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.min.js -->
 <!-- graphviz in javascript -->
@@ -11,83 +9,96 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.6.3/svg.js"></script>
 
 <style>
- .node {
-   cursor: pointer;
- }
+  .node {
+    cursor: pointer;
+  }
 
- .node circle {
-   fill: grey;
-   stroke: steelblue;
-   stroke-width: 1.5px;
- }
+  .node circle {
+    fill: grey;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+  }
 
- .node:hover circle,
- .node.hover circle {
-   fill: #fff;
-   stroke-width: 2px;
- }
+  .node:hover circle,
+  .node.hover circle {
+    fill: #fff;
+    stroke-width: 2px;
+  }
 
- .node circle.node.active {
-  fill: lightsteelblue;
- }
- .node:hover circle.node.active,
- .node.hover circle.node.active {
-  fill: white;
- }
- 
- svg text {
-  -webkit-user-select: none; /* Safari */        
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE10+/Edge */
-  user-select: none; /* Standard */
- }
+  .node circle.node.active {
+    fill: lightsteelblue;
+  }
 
- .edge, .edge text, .node text {
-   font: 10px sans-serif;
-   pointer-events: none; /* don't block clicks on underlying node */
- }
+  .node:hover circle.node.active,
+  .node.hover circle.node.active {
+    fill: white;
+  }
 
- .link {
-   fill: none;
-   stroke: #ccc;
-   stroke-width: 1.5px;
- }
+  svg text {
+    -webkit-user-select: none;
+    /* Safari */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* IE10+/Edge */
+    user-select: none;
+    /* Standard */
+  }
+
+  .edge,
+  .edge text,
+  .node text {
+    font: 10px sans-serif;
+    pointer-events: none;
+    /* don't block clicks on underlying node */
+  }
+
+  .link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1.5px;
+  }
 
 
- div.tooltip {
-  position: absolute;
-  text-align: center;
-  width: 60px;
-  height: 28px;
-  padding: 2px;
-  font: 12px sans-serif;
-  background: lightsteelblue;
-  border: 0px;
-  border-radius: 8px;
-  pointer-events: none;
-}
+  div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 60px;
+    height: 28px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+  }
 
-#supergraph {
-  border: 1px dashed black;
-  text-align: center;
-}
+  #supergraph {
+    border: 1px dashed black;
+    text-align: center;
+  }
 
-#svg_supergraph {
-  width: 100%;
-  height: auto;
+  #concrete_graph {
+    border: 1px dashed black;
+    text-align: center;
+  }
 
-}
+  #svg_supergraph {
+    width: 100%;
+    height: auto;
+  }
 
+  #svg_concrete_graph {
+    width: 100%;
+    height: auto;
+  }
 </style>
-{% endblock %}
-
-{% block title %}Explore!{% endblock %}
-
-{% block body %}
+{% endblock %} {% block title %}Explore!{% endblock %} {% block body %}
 <div class="container p-3">
   <button id='btn_reset' class="btn btn-info">Reset</button>
   <button id='btn_export_dendrogram' class="btn btn-info">Export Dendrogram</button>
   <button id='btn_export_supergraph' class="btn btn-info">Export Super Graph</button>
+  <button id='btn_export_concrete_dot' class="btn btn-info">Export Last Selected Concrete Graph .dot</button>
   <button id='btn_export_supergraph_dot' class="btn btn-info">Export Super Graph .dot</button>
   <button id='btn_expand_all' class="btn btn-info">Expand All</button>
   <button id='btn_collapse_all' class="btn btn-info">Collapse All</button>
@@ -95,647 +106,912 @@
 
 <svg id="d3-main" style="border: 1px dashed black;"></svg>
 <div id="supergraph"></div>
-{% endblock %}
-
-{% block end_of_body %}
+<div id="concrete_graph"></div>
+{% endblock %} {% block end_of_body %}
 <script type="text/javascript">
+  var shownDuplicateMessage = false; // only show duplicate vertex warning once
 
-var shownDuplicateMessage = false; // only show duplicate vertex warning once
-
-var margin = {top: 20, right: 120, bottom: 20, left: 120},
+  var margin = {
+      top: 20,
+      right: 120,
+      bottom: 20,
+      left: 120
+    },
     width = 960 - margin.right - margin.left,
     height = 800 - margin.top - margin.bottom;
 
-    var i = 0,
-        duration = 750,
-        root;
+  var i = 0,
+    duration = 750,
+    root;
 
-var viewbox = "0 0 " + (width + margin.right + margin.left) + " " + (height + margin.top + margin.bottom);
-var svg = d3.select("#d3-main")
+  var viewbox = "0 0 " + (width + margin.right + margin.left) + " " + (height + margin.top + margin.bottom);
+  var svg = d3.select("#d3-main")
     .attr("viewBox", viewbox)
     .style("fill", "none")
 
 
-var tooltip_div = d3.select("body").append("div")
+  var tooltip_div = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-var zoom = d3.zoom()
-        .scaleExtent([1 / 2, 4])
-        .on("zoom", zoomed);
+  var zoom = d3.zoom()
+    .scaleExtent([1 / 2, 4])
+    .on("zoom", zoomed);
 
-svg.style("fill", "none")
+  svg.style("fill", "none")
     .style("pointer-events", "all")
     .call(zoom);
 
-var g_container = svg.append("g")
-     .attr("transform", "translate("+ margin.left + "," + margin.top + ")");
+  var g_container = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var g_root = g_container.append("g");
+  var g_root = g_container.append("g");
 
+  function zoomed() {
+    g_root.attr("transform", d3.event.transform);
+  }
 
-function zoomed() {
-  g_root.attr("transform", d3.event.transform);
-}
-
-function zoomed_supergraph() {
+  function zoomed_supergraph() {
     d3.select('#graph0').attr("transform", d3.event.transform);
-}
+  }
 
-$('#btn_reset').click(function() {
-   zoom.transform(svg, d3.zoomIdentity.scale(1))
-});
+  function zoomed_concrete_graph() {
+    d3.select('#graph1').attr("transform", d3.event.transform);
+  }
+
+  $('#btn_reset').click(function() {
+    zoom.transform(svg, d3.zoomIdentity.scale(1))
+  });
 
 
-$('#btn_export_dendrogram').click(function() {
-    saveSvgAsPng(document.getElementById("d3-main"), "diagram.png", {scale: 1, backgroundColor: 'white'});
-});
+  $('#btn_export_dendrogram').click(function() {
+    saveSvgAsPng(document.getElementById("d3-main"), "diagram.png", {
+      scale: 1,
+      backgroundColor: 'white'
+    });
+  });
 
 
-$('#btn_export_supergraph').click(function() {
-    saveSvgAsPng($('#supergraph').children().first()[0], "diagram.png", {scale: 1, backgroundColor: 'white'});
-});
+  $('#btn_export_supergraph').click(function() {
+    saveSvgAsPng($('#supergraph').children().first()[0], "diagram.png", {
+      scale: 1,
+      backgroundColor: 'white'
+    });
+  });
 
-$('#btn_export_supergraph_dot').click(function() {
+  $('#btn_export_supergraph_dot').click(function() {
     // NOTE: this function is exported by saveSvgAsPng.js
     download("superstate_graph.dot", "data:text/vnd.graphviz," + lastSupergraphGraphviz);
-});
+  });
 
-$(document).keydown(function(e) {
-    switch(e.which) {
-        case 38: // up
-        document.getElementById('btn_reset').scrollIntoView({block: 'start', behavior: 'smooth'});
+  $('#btn_export_concrete_dot').click(function() {
+    // NOTE: this function is exported by saveSvgAsPng.js
+    download("concrete_graph.dot", "data:text/vnd.graphviz," + lastSelectedConcreteGraph);
+  });
+
+
+  $(document).keydown(function(e) {
+    switch (e.which) {
+      case 38: // up
+        document.getElementById('btn_reset').scrollIntoView({
+          block: 'start',
+          behavior: 'smooth'
+        });
         break;
 
-        case 40: // down
-        document.getElementById('supergraph').scrollIntoView({block: 'start', behavior: 'smooth'});
+      case 40: // down
+        document.getElementById('supergraph').scrollIntoView({
+          block: 'start',
+          behavior: 'smooth'
+        });
+        document.getElementById('concrete_graph').scrollIntoView({
+          block: 'start',
+          behavior: 'smooth'
+        });
         break;
 
-        default: return; // exit this handler for other keys
+      default:
+        return; // exit this handler for other keys
     }
     e.preventDefault(); // prevent the default action (scroll / move caret)
-});
+  });
 
 
 
-function expandAll(){
+  function expandAll() {
     expand(root);
-}
+  }
 
-function expand(d){
-    var children = (d.children)?d.children:d._children;
+  function expand(d) {
+    var children = (d.children) ? d.children : d._children;
     if (d._children) {
-        d.children = d._children;
-        d._children = null;
-    }
-    if(children)
-      children.forEach(expand);
-}
-
-var lastSupergraphGraphviz;
-
-// declares a tree layout and assigns the size
-var treemap = d3.tree().size([height, width]);
-d3.json("{{ url_for('get_result', result_id=result_id) }}", function(error, data) {
-if (error) throw error;
-console.log(data);
-
-// set up for graph view
-
-// mapping of: cluster i id -> cluster struct (e.g. verices: [vertex i1, vertex i2, ..., ik])
-var idToCluster = {};
-data.clusters.forEach(function(cluster, index) {
-  // name -> cluster mapping
-  idToCluster[cluster.id] = cluster;
-});
-// TODO(roee): hack! get better data from server-side
-// create fake, unconnected clusters for stand-alone vertices for the super-state graph
-// to allow us to treat them the same when creating the super-state graph
-data.vertices.forEach(function(vertex) {
-  var vertexId = vertex[0],
-      attrs = vertex[1]
-  // TODO: what if there is a cluster with the same name?!?!
-  if (!idToCluster[vertexId]) {
-    // TODO: name from real graph
-    idToCluster[vertexId] = {
-        vertices:[vertexId],
-        name: vertexId,
-        id: vertexId,
-        attrs: attrs,
-        isConcrete: true
-    };
-  }
-});
-
-// set up tree view
-treeData = data['cluster_tree'];
-// Assigns parent, children, height, depth
-root = d3.hierarchy(treeData, function(d) { return d.children; });
-console.log(root);
-//form x and y axis
-root.x0 = 0;
-root.y0 = height/2;
-
-function collapse(d) {
-  if (d.children) {
-    d._children = d.children;
-    d._children.forEach(collapse);
-    d.children = null;
-  }
-}
-// Toggle children on click.
-function clickOnDendrogram(d) {
-  document.getElementById('tree-' + d.data.id).classList.remove('hover');
-  if (d.children) {
-      // collapse
-      d._children = d.children;
-      d.children = null;
-      update(d);
-    } else {
-      // expand
       d.children = d._children;
       d._children = null;
+    }
+    if (children)
+      children.forEach(expand);
+  }
 
-      update(d);
-      superGraphSvg = SVG.get('svg_supergraph')
-      clicked_cluster = idToCluster[d.data.id]
+  var lastSupergraphGraphviz;
+  var lastSelectedConcreteGraph;
+  var concrete_nodes_dic = {}
+  // declares a tree layout and assigns the size
+  var treemap = d3.tree().size([height, width]);
+  d3.json("{{ url_for('get_result', result_id=result_id) }}", function(error, data) {
+    if (error) throw error;
+    console.log(data);
 
-      for (var i = 0; i < clicked_cluster.vertices.length; i++) {
-        elements = superGraphSvg.select("[id='" + clicked_cluster.vertices[i] +"'] ellipse")
-        elements.attr({'fill': '#ffffff'})
-        elements.animate({ease: '<>'}).attr({fill: '#ffcc00'}).animate().attr({fill: '#ffffff'}).animate().attr({fill: '#ffcc00'})
+    // set up for graph view
 
-        elements = superGraphSvg.select("[id=cluster_" + clicked_cluster.vertices[i] +"] polygon")
-        elements.animate({ease: '<>'}).attr({fill: '#ffcc00'}).animate().attr({fill: '#ffffff'}).animate().attr({fill: '#ffcc00'})
+    // mapping of: cluster i id -> cluster struct (e.g. verices: [vertex i1, vertex i2, ..., ik])
+    var idToCluster = {};
+    data.clusters.forEach(function(cluster, index) {
+      // name -> cluster mapping
+      idToCluster[cluster.id] = cluster;
+    });
+    // TODO(roee): hack! get better data from server-side
+    // create fake, unconnected clusters for stand-alone vertices for the super-state graph
+    // to allow us to treat them the same when creating the super-state graph
+    data.vertices.forEach(function(vertex) {
+      var vertexId = vertex[0],
+        attrs = vertex[1];
+      concrete_nodes_dic[vertexId] = attrs
+      // TODO: what if there is a cluster with the same name?!?!
+      if (!idToCluster[vertexId]) {
+        // TODO: name from real graph
+        idToCluster[vertexId] = {
+          vertices: [vertexId],
+          name: vertexId,
+          id: vertexId,
+          attrs: attrs,
+          isConcrete: true
+        };
+      }
+    });
+
+    // set up tree view
+    treeData = data['cluster_tree'];
+    // Assigns parent, children, height, depth
+    root = d3.hierarchy(treeData, function(d) {
+      return d.children;
+    });
+    console.log(root);
+    //form x and y axis
+    root.x0 = 0;
+    root.y0 = height / 2;
+
+    function collapse(d) {
+      if (d.children) {
+        d._children = d.children;
+        d._children.forEach(collapse);
+        d.children = null;
+      }
+    }
+    // Toggle children on click.
+    function clickOnDendrogram(d) {
+      document.getElementById('tree-' + d.data.id).classList.remove('hover');
+      if (d.children) {
+        // collapse
+        d._children = d.children;
+        d.children = null;
+        update(d);
+      } else {
+        // expand
+        d.children = d._children;
+        d._children = null;
+
+        update(d);
+        superGraphSvg = SVG.get('svg_supergraph')
+        clicked_cluster = idToCluster[d.data.id]
+
+        for (var i = 0; i < clicked_cluster.vertices.length; i++) {
+          elements = superGraphSvg.select("[id='" + clicked_cluster.vertices[i] + "'] ellipse")
+          elements.attr({
+            'fill': '#ffffff'
+          })
+          elements.animate({
+            ease: '<>'
+          }).attr({
+            fill: '#ffcc00'
+          }).animate().attr({
+            fill: '#ffffff'
+          }).animate().attr({
+            fill: '#ffcc00'
+          })
+
+          elements = superGraphSvg.select("[id=cluster_" + clicked_cluster.vertices[i] + "] polygon")
+          elements.animate({
+            ease: '<>'
+          }).attr({
+            fill: '#ffcc00'
+          }).animate().attr({
+            fill: '#ffffff'
+          }).animate().attr({
+            fill: '#ffcc00'
+          })
+        }
+
+        // concrete graph
+        concreteGraphSvg = SVG.get('svg_concrete_graph')
+        clicked_cluster = idToCluster[d.data.id]
+
+        for (var i = 0; i < clicked_cluster.vertices.length; i++) {
+
+          node = clicked_cluster.vertices[i]
+          console.log('is concrete:' + !node.isConcrete);
+          if (!node.isConcrete){
+              continue;
+          }
+          elements = concreteGraphSvg.select("[id='" + clicked_cluster.vertices[i] + "'] ellipse")
+          elements.attr({
+            'fill': '#ffffff'
+          })
+          elements.animate({
+            ease: '<>'
+          }).attr({
+            fill: '#ffcc00'
+          }).animate().attr({
+            fill: '#ffffff'
+          }).animate().attr({
+            fill: '#ffcc00'
+          })
+
+        }
+
+
       }
 
     }
 
-}
+    // Toggle children on click.
+    function rightClickOnDendrogram(d) {
+      document.getElementById('tree-' + d.data.id).classList.remove('hover');
+      // collapse
+      var clicked_cluster = idToCluster[d.data.id];
+
+      var colors_dic = {};
+
+      var children = d.children;
+      if (!d.children){
+        children = d._children;
+      }
+      for  (var i=0; i< children.length;i++){
+        child =  idToCluster[children[i].data.id];;
+        for  (var j=0; j < child.vertices.length;j++){
+          colors_dic[child.vertices[j]] = i;
+        }
+      }
+
+      var concrete_nodes = clicked_cluster.vertices;
+      var set1 = new Set(concrete_nodes);
+      // alert(concrete_nodes);
+      for (var j = 0; j < concrete_nodes.length; j++) {
+        console.log('node:' + concrete_nodes[j]);
+      }
+      var concrete_edges = [];
+      for (var i = 0; i < data.edges.length; i++) {
+        edge = data.edges[i];
+        if (set1.has(edge[0]) && set1.has(edge[1])) {
+          concrete_edges.push(edge);
+          console.log(edge[0] + " -> " + edge[1] + ": " + edge[2]);
+        }
+      }
+      var svgString = concreteGraphToGraphviz(concrete_nodes, concrete_edges, colors_dic);
+      lastSelectedConcreteGraph = svgString;
+      try{
+        present_concrete_graph(svgString, concrete_nodes, concrete_edges);
+      }
+      catch(err) {
+          download("concrete_graph.dot", "data:text/vnd.graphviz," + svgString);
+          console.log(err);
+          if (err.indexOf("Cannot enlarge memory arrays") >=0){
+            alert("Model is too large to present - downloading dot file");
+         }
+
+     }
+      // if (children > 1) {
+      //   for (var i = 0; i < clicked_cluster.vertices.length; i++) {}
+      // }
+    }
 
 
-root.children.forEach(collapse);
+    root.children.forEach(collapse);
 
-update(root);
+    update(root);
 
-function update(source) {
-	updateTree(source);
-	updateGraph(source);
-}
+    function update(source) {
+      updateTree(source);
+      updateGraph(source);
+    }
 
-function updateTree(source) {
-  
+    function updateTree(source) {
 
-  // Assigns the x and y position for the nodes
-  var treeData = treemap(root);
 
-  // Compute the new tree layout.
-  var nodes = treeData.descendants(),
-      links = treeData.descendants().slice(1);
+      // Assigns the x and y position for the nodes
+      var treeData = treemap(root);
 
-  // Normalize for fixed-depth.
-  nodes.forEach(function(d){ d.y = d.depth * 180});
+      // Compute the new tree layout.
+      var nodes = treeData.descendants(),
+        links = treeData.descendants().slice(1);
 
-  // ****************** Nodes section ***************************
+      // Normalize for fixed-depth.
+      nodes.forEach(function(d) {
+        d.y = d.depth * 180
+      });
 
-  // Update the nodes...
-  var node = g_root.selectAll('g.node')
-      .data(nodes, function(d) {return d.id || (d.id = ++i); });
+      // ****************** Nodes section ***************************
 
-  // Enter any new modes at the parent's previous position.
-  var nodeEnter = node.enter().append('g')
-      .attr('class', 'node')
-      .attr('id', function(d) { return 'tree-' + d.data.id; })
-      .attr("transform", function(d) {
-        return "translate(" + source.y0 + "," + source.x0 + ")";
-    })
-    .on('click', clickOnDendrogram);
+      // Update the nodes...
+      var node = g_root.selectAll('g.node')
+        .data(nodes, function(d) {
+          return d.id || (d.id = ++i);
+        });
 
-  // Add Circle for the nodes
-  nodeEnter.append('circle')
-      .attr('class', 'node')
-      .on("mouseover", function(d) {
+      // Enter any new modes at the parent's previous position.
+      var nodeEnter = node.enter().append('g')
+        .attr('class', 'node')
+        .attr('id', function(d) {
+          return 'tree-' + d.data.id;
+        })
+        .attr("transform", function(d) {
+          return "translate(" + source.y0 + "," + source.x0 + ")";
+        })
+        .on('click', clickOnDendrogram);
+
+      nodeEnter.on('contextmenu', rightClickOnDendrogram);
+
+      // Add Circle for the nodes
+      nodeEnter.append('circle')
+        .attr('class', 'node')
+        .on("mouseover", function(d) {
           //console.log(d.data);
           tooltip_div.transition()
-         .duration(200)
-         .style("opacity", .9);
+            .duration(200)
+            .style("opacity", .9);
 
           var cluster = idToCluster[d.data.id];
           //console.log(cluster);
           vertices_no_initial = cluster.vertices.filter(vertex => vertex != "initial")
           tooltip_div.html('#Nodes: ' + (vertices_no_initial.length))
-         .style("left", (d3.event.pageX) + "px")
-         .style("top", (d3.event.pageY - 28) + "px");
-      })
-      .on("mouseout", function(d) {
-       tooltip_div.transition()
-          .duration(500)
-          .style("opacity", 0);
-      })
-      .attr('r', 1e-6)
-      .classed('active', function(d) {
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(d) {
+          tooltip_div.transition()
+            .duration(500)
+            .style("opacity", 0);
+        })
+        .attr('r', 1e-6)
+        .classed('active', function(d) {
           return d._children !== undefined && d._children !== null;
-      });
+        });
 
-  // Add labels for the nodes
-  nodeEnter.append('text')
-      .attr("dy", ".35em")
-      .attr("fill", "#202020")
-      .attr("x", function(d) {
+      // Add labels for the nodes
+      nodeEnter.append('text')
+        .attr("dy", ".35em")
+        .attr("fill", "#202020")
+        .attr("x", function(d) {
           return d.children || d._children ? -13 : 13;
-      })
-      .attr("text-anchor", function(d) {
+        })
+        .attr("text-anchor", function(d) {
           return d.children || d._children ? "end" : "start";
-      })
-      .text(function(d) { return d.data.name; });
+        })
+        .text(function(d) {
+          return d.data.name;
+        });
 
-  // UPDATE
-  var nodeUpdate = nodeEnter.merge(node);
+      // UPDATE
+      var nodeUpdate = nodeEnter.merge(node);
 
-  // Transition to the proper position for the node
-  nodeUpdate.transition()
-    .duration(duration)
-    .attr("transform", function(d) {
-        return "translate(" + d.y + "," + d.x + ")";
-     });
+      // Transition to the proper position for the node
+      nodeUpdate.transition()
+        .duration(duration)
+        .attr("transform", function(d) {
+          return "translate(" + d.y + "," + d.x + ")";
+        });
 
-  // Update the node attributes and style
-  nodeUpdate.select('circle.node')
-    .attr('r', 10)
-    .classed('active', function(d) {
-        return d._children !== undefined && d._children !== null;
-    })
-    .classed('hover', false)
-    .attr('cursor', 'pointer');
+      // Update the node attributes and style
+      nodeUpdate.select('circle.node')
+        .attr('r', 10)
+        .classed('active', function(d) {
+          return d._children !== undefined && d._children !== null;
+        })
+        .classed('hover', false)
+        .attr('cursor', 'pointer');
 
 
-  // Remove any exiting nodes
-  var nodeExit = node.exit().transition()
-      .duration(duration)
-      .attr("transform", function(d) {
+      // Remove any exiting nodes
+      var nodeExit = node.exit().transition()
+        .duration(duration)
+        .attr("transform", function(d) {
           return "translate(" + source.y + "," + source.x + ")";
-      })
-      .remove();
+        })
+        .remove();
 
-  // On exit reduce the node circles size to 0
-  nodeExit.select('circle')
-    .attr('r', 1e-6);
+      // On exit reduce the node circles size to 0
+      nodeExit.select('circle')
+        .attr('r', 1e-6);
 
-  // On exit reduce the opacity of text labels
-  nodeExit.select('text')
-    .style('fill-opacity', 1e-6);
+      // On exit reduce the opacity of text labels
+      nodeExit.select('text')
+        .style('fill-opacity', 1e-6);
 
-  // ****************** links section ***************************
+      // ****************** links section ***************************
 
-  // Update the links...
-  var link = g_root.selectAll('path.link')
-      .data(links, function(d) { return d.id; });
+      // Update the links...
+      var link = g_root.selectAll('path.link')
+        .data(links, function(d) {
+          return d.id;
+        });
 
-  // Enter any new links at the parent's previous position.
-  var linkEnter = link.enter().insert('path', "g")
-      .attr("class", "link")
-      .attr('d', function(d){
-        var o = {x: source.x0, y: source.y0}
-        return diagonal(o, o)
+      // Enter any new links at the parent's previous position.
+      var linkEnter = link.enter().insert('path', "g")
+        .attr("class", "link")
+        .attr('d', function(d) {
+          var o = {
+            x: source.x0,
+            y: source.y0
+          }
+          return diagonal(o, o)
+        });
+
+      // UPDATE
+      var linkUpdate = linkEnter.merge(link);
+
+      // Transition back to the parent element position
+      linkUpdate.transition()
+        .duration(duration)
+        .attr('d', function(d) {
+          return diagonal(d, d.parent)
+        });
+
+      // Remove any exiting links
+      var linkExit = link.exit().transition()
+        .duration(duration)
+        .attr('d', function(d) {
+          var o = {
+            x: source.x,
+            y: source.y
+          }
+          return diagonal(o, o)
+        })
+        .remove();
+
+      // Store the old positions for transition.
+      nodes.forEach(function(d) {
+        d.x0 = d.x;
+        d.y0 = d.y;
       });
 
-  // UPDATE
-  var linkUpdate = linkEnter.merge(link);
+      // Creates a curved (diagonal) path from parent to the child nodes
+      function diagonal(s, d) {
 
-  // Transition back to the parent element position
-  linkUpdate.transition()
-      .duration(duration)
-      .attr('d', function(d){ return diagonal(d, d.parent) });
-
-  // Remove any exiting links
-  var linkExit = link.exit().transition()
-      .duration(duration)
-      .attr('d', function(d) {
-        var o = {x: source.x, y: source.y}
-        return diagonal(o, o)
-      })
-      .remove();
-
-  // Store the old positions for transition.
-  nodes.forEach(function(d){
-    d.x0 = d.x;
-    d.y0 = d.y;
-  });
-
-  // Creates a curved (diagonal) path from parent to the child nodes
-  function diagonal(s, d) {
-
-    path = `M ${s.y} ${s.x}
+        path = `M ${s.y} ${s.x}
             C ${(s.y + d.y) / 2} ${s.x},
               ${(s.y + d.y) / 2} ${d.x},
               ${d.y} ${d.x}`
 
-    return path
-  }
-}
-
-function updateGraph(source) {
-	// generate the supergraph - its nodes and then edges
-	// derived from the graph and clusters
-	console.log('Updating super-state graph');
-	// the clusters with no children are the super-cut
-	var supergraphNodes = getActiveClusters(root);
-	//console.log(supergraphNodes);
-	//console.log(idToCluster);
-
-	// To construct the edges, we'll map each edge in the original graph
-	// into an edge in the supergraph.
-
-	// map of vertex id -> cluster in original graph
-	var vertexToNode = {};
-
-	supergraphNodes.forEach(function (d3Node) {
-		var clusterId = d3Node.data.id;
-		// for every vertex in the cluster, map it to the cluster
-		idToCluster[clusterId].vertices.forEach(function(vertex) {
-			if (vertexToNode[vertex] !== undefined){
-        if (!shownDuplicateMessage) {
-  				alert('vertex showed up in two clusters!');
-          shownDuplicateMessage = true;
-        }
-        // if vertex is assiged to a cluster with an id smaller than ours
-        // leave it be. otherwise map the vertex to us
-        if (vertexToNode[vertex] < clusterId) {
-          return;
-        }
-			}
-			vertexToNode[vertex] = clusterId;
-		});
-	}); // supergraphNodes.forEach
-
-
-	// map of source -> dest edges in the supergraph
-	// generated from map of edges 
-	var superEdges = {};
-
-	// for each edge in the original graph, create/update superedge or discard
-	// if the edge is internal to a cluster
-	data.edges.forEach(function(edge) {
-		//console.log(edge);
-		// map src, dest from graph nodes to clusters
-		var srcNode = vertexToNode[edge[0]],
-			dstNode = vertexToNode[edge[1]];
-
-		if (srcNode === dstNode) {
-      // self-edges are ok only for concrete vertices
-      if (!idToCluster[srcNode].isConcrete) {
-  			return;
+        return path
       }
-		}
-
-		var existingEdges = superEdges[srcNode];
-		if (existingEdges === undefined) {
-			//console.log('First edge for', srcNode);
-			existingEdges = [];
-		}
-
-		existingEdges.push({dst : dstNode, attrs : edge[2]});
-		superEdges[srcNode] = existingEdges;
-	});
-
-  var dotContent = supergraphToGraphviz(supergraphNodes, superEdges);
-  lastSupergraphGraphviz = dotContent; // store raw .dot content so we can export it
-  // max RAM set in webapp_config.py
-  var svgString = Viz(dotContent, {totalMemory: {{ VIZJS_MAX_RAM }}});
-	document.getElementById('supergraph').innerHTML = svgString;
-	supergraph_svg_elem = $("#supergraph").find("svg")[0];
-	supergraph_svg_elem.id = 'svg_supergraph';
-
-  supergraphNodes.forEach(function(d3Node) {
-    var nodeElement = $('#' + d3Node.data.id),
-        dendrogramElement = $('#tree-' + d3Node.data.id);
-    if (!d3Node.data.isConcrete) {
-      console.log('setting click handler on ' + d3Node.data.id);
-
-      // node is a cluster, make it so click on node in super-state graph expands it
-      nodeElement.on('click', function(e) {
-          console.log('click on ' + d3Node.data.id);
-          var evt = new MouseEvent("click");
-          // [0] is for raw DOM node instead of jquery since d3 doesn't use jquery
-          // so dendrogramElement.click() doesn't work...
-          dendrogramElement[0].dispatchEvent(evt);
-      });
-      nodeElement.on('mouseenter', function(e) {
-        // TODO: make sure all other fake-hovers are removed
-        console.log('hover on');
-        console.log(dendrogramElement);
-        // note: jquery addClass/removeClass don't work inside svg :(
-        dendrogramElement[0].classList.add('hover');
-      });
-      nodeElement.on('mouseleave', function(e) {
-        console.log('hover off');
-        console.log(dendrogramElement);
-        // note: jquery addClass/removeClass don't work inside svg :(
-        dendrogramElement[0].classList.remove('hover');
-      })
     }
-    // for all nodes: right click = collapse to parent
-    nodeElement.on('contextmenu', function(e) {
-        
-        if (d3Node.parent !== undefined && d3Node.parent !== null) {
-          clickOnDendrogram(d3Node.parent);
-          e.preventDefault();
+
+    function updateGraph(source) { //TODO add concrete node creation over here as well
+      // generate the supergraph - its nodes and then edges
+      // derived from the graph and clusters
+      console.log('Updating super-state graph');
+      // the clusters with no children are the super-cut
+      var supergraphNodes = getActiveClusters(root);
+      //console.log(supergraphNodes);
+      //console.log(idToCluster);
+
+      // To construct the edges, we'll map each edge in the original graph
+      // into an edge in the supergraph.
+
+      // map of vertex id -> cluster in original graph
+      var vertexToNode = {};
+
+      supergraphNodes.forEach(function(d3Node) {
+        var clusterId = d3Node.data.id;
+        // for every vertex in the cluster, map it to the cluster
+        idToCluster[clusterId].vertices.forEach(function(vertex) {
+          if (vertexToNode[vertex] !== undefined) {
+            if (!shownDuplicateMessage) {
+              alert('vertex showed up in two clusters!');
+              shownDuplicateMessage = true;
+            }
+            // if vertex is assiged to a cluster with an id smaller than ours
+            // leave it be. otherwise map the vertex to us
+            if (vertexToNode[vertex] < clusterId) {
+              return;
+            }
+          }
+          vertexToNode[vertex] = clusterId;
+        });
+      }); // supergraphNodes.forEach
+
+
+      // map of source -> dest edges in the supergraph
+      // generated from map of edges
+      var superEdges = {};
+
+      // for each edge in the original graph, create/update superedge or discard
+      // if the edge is internal to a cluster
+      data.edges.forEach(function(edge) {
+        //console.log(edge);
+        // map src, dest from graph nodes to clusters
+        var srcNode = vertexToNode[edge[0]],
+          dstNode = vertexToNode[edge[1]];
+
+        if (srcNode === dstNode) {
+          // self-edges are ok only for concrete vertices
+          if (!idToCluster[srcNode].isConcrete) {
+            return;
+          }
         }
-    });
 
-  });
+        var existingEdges = superEdges[srcNode];
+        if (existingEdges === undefined) {
+          //console.log('First edge for', srcNode);
+          existingEdges = [];
+        }
 
-	svg_supergraph = d3.select('#svg_supergraph');
+        existingEdges.push({
+          dst: dstNode,
+          attrs: edge[2]
+        });
+        superEdges[srcNode] = existingEdges;
+      });
 
-	zoom_supergraph = d3.zoom()
+      var dotContent = supergraphToGraphviz(supergraphNodes, superEdges);
+      lastSupergraphGraphviz = dotContent; // store raw .dot content so we can export it
+      // max RAM set in webapp_config.py
+      var svgString = Viz(dotContent); // TODO: FIXME add var from webapp_config.py
+      document.getElementById('supergraph').innerHTML = svgString;
+      supergraph_svg_elem = $("#supergraph").find("svg")[0];
+      supergraph_svg_elem.id = 'svg_supergraph';
+
+      supergraphNodes.forEach(function(d3Node) {
+        var nodeElement = $('#' + d3Node.data.id),
+          dendrogramElement = $('#tree-' + d3Node.data.id);
+        if (!d3Node.data.isConcrete) {
+
+          // node is a cluster, make it so click on node in super-state graph expands it
+          nodeElement.on('click', function(e) {
+            console.log('click on ' + d3Node.data.id);
+            var evt = new MouseEvent("click");
+            // [0] is for raw DOM node instead of jquery since d3 doesn't use jquery
+            // so dendrogramElement.click() doesn't work...
+            dendrogramElement[0].dispatchEvent(evt);
+          });
+          nodeElement.on('mouseenter', function(e) {
+            // TODO: make sure all other fake-hovers are removed
+            console.log('hover on');
+            console.log(dendrogramElement);
+            // note: jquery addClass/removeClass don't work inside svg :(
+            dendrogramElement[0].classList.add('hover');
+          });
+          nodeElement.on('mouseleave', function(e) {
+            console.log('hover off');
+            console.log(dendrogramElement);
+            // note: jquery addClass/removeClass don't work inside svg :(
+            dendrogramElement[0].classList.remove('hover');
+          })
+        }
+        // for all nodes: right click = collapse to parent
+        nodeElement.on('contextmenu', function(e) {
+
+          if (d3Node.parent !== undefined && d3Node.parent !== null) {
+            clickOnDendrogram(d3Node.parent);
+            e.preventDefault();
+          }
+        });
+
+      });
+
+      svg_supergraph = d3.select('#svg_supergraph');
+      zoom_supergraph = d3.zoom()
         .scaleExtent([1 / 2, 4])
         .on("zoom", zoomed_supergraph);
 
-  svg_supergraph.style("fill", "none")
-    .style("pointer-events", "all")
-    .call(zoom_supergraph);
+      svg_supergraph.style("fill", "none")
+        .style("pointer-events", "all")
+        .call(zoom_supergraph);
 
-  // read SVG transform matrix, convert to d3-zoom object, set as initial zoom. ugh.
-  // this stops the super-state graph jumping on first zoom
-  var initialTransform = document.getElementById('graph0').transform.baseVal.consolidate().matrix;
-  console.log('initial transform from svg');
-  console.log(initialTransform);
-  if (initialTransform.a != initialTransform.d) {
-    alert('svg zoom on supergraph does not preserve aspect ratio. UNSUPPORTED!');
-  }
-  var asZoomTransform = d3.zoomIdentity.translate(initialTransform.e, initialTransform.f).scale(initialTransform.a);
-  // set initial transform
-  svg_supergraph.call(zoom_supergraph.transform, asZoomTransform);
-}
+      // read SVG transform matrix, convert to d3-zoom object, set as initial zoom. ugh.
+      // this stops the super-state graph jumping on first zoom
+      var initialTransform = document.getElementById('graph0').transform.baseVal.consolidate().matrix;
+      if (initialTransform.a != initialTransform.d) {
+        alert('svg zoom on supergraph does not preserve aspect ratio. UNSUPPORTED!');
+      }
+      var asZoomTransform = d3.zoomIdentity.translate(initialTransform.e, initialTransform.f).scale(initialTransform.a);
+      // set initial transform
+    }
 
-function graphvizEscape(str) {
-    return '"' + str.replace(/\n/g,'\\n') + '"';
-}
+    function graphvizEscape(str) {
+      return '"' + str.replace(/\n/g, '\\n') + '"';
+    }
 
-function mergeAttributes(attributes) {
-    // single edge, use its attributes
-    if (attributes.length == 1) {
+    function mergeAttributes(attributes) {
+      // single edge, use its attributes
+      if (attributes.length == 1) {
         return attributes[0];
-    }
+      }
 
-    // multiple edges, do our thing
-    // merge labels from multiple edges
-    // TODO: merge weights?
-    var labels = attributes.map(function (item){
+      // multiple edges, do our thing
+      // merge labels from multiple edges
+      // TODO: merge weights?
+      var labels = attributes.map(function(item) {
         return item.label;
-    }).filter(function(v){return v !== undefined; });
-
-    var uniqueLabels = Array.from(new Set(labels));
-
-    return {label: uniqueLabels.join('\n')};
-}
-
-function attributesToGraphViz(attributes) {
-    // add attributes
-    var attributeList = [];
-    if (attributes.color !== undefined) {
-      attributeList.push({name: 'color', value: attributes.color});
-    }
-    if (attributes.shape !== undefined) {
-      attributeList.push({name: 'shape', value: attributes.shape});
-    }
-    if (attributes.style !== undefined) {
-      // wrap with quotes
-      attributeList.push({name: 'style', value: graphvizEscape(attributes.style)});
-    }
-    if (attributes.label !== undefined) {
-      // wrap with quotes
-      attributeList.push({name: 'label', value: graphvizEscape(attributes.label)});
-    }
-    if (attributes.id !== undefined) {
-      attributeList.push({name: 'id', value: graphvizEscape(attributes.id)});
-    }
-
-    if (attributeList.length > 0) {
-      // transform attributes to strings
-      var attributeStrings = attributeList.map(function (item) {
-        return item.name + '=' + item.value;
+      }).filter(function(v) {
+        return v !== undefined;
       });
 
-      return attributeStrings.join(',');
+      var uniqueLabels = Array.from(new Set(labels));
+
+      return {
+        label: uniqueLabels.join('\n')
+      };
     }
-    return '';
-}
 
-// convert supergraphNodes, superEdges into a .dot file, render to svg
-// NOTE: to style the graph use CSS (see '.node text' above for example)
-function supergraphToGraphviz(supergraphNodes, superEdges) {
-	var graphvizOutput = '';
-	console.log(supergraphNodes)
-	console.log(superEdges);
-
-	// TODO: get node shape from original graph potentially
-	// TODO: get smart name for result (e.g. model name)
-	graphvizOutput += 'Digraph "Supergraph" {\n';
-
-	// assign a number to every cluster for the graphviz graph, which is 
-	var supernodeToGraph = {};
-
-	supergraphNodes.forEach(function (node, index) {
-		// update mapping for edge lookups
-		supernodeToGraph[node.data.id] = index;
-
-    // prepare graphviz node
-    var attributes;
-    if (node.data.hasOwnProperty('attrs')) {
-      // server-side attributes, use these
-      attributes = attributesToGraphViz(node.data.attrs)
-    } else {
-      // no server-side attributes
-      attributes = 'label=' + graphvizEscape(node.data.name) + ',shape=rectangle'
-    }
-    // if node is a cluster and not a concrete vertex, give it an id so we can hook up to the dendrogram
-    if (attributes.length > 0){
-      attributes += ','
-    }
-    attributes += 'id=' + graphvizEscape(node.data.id);
-    // write node to graphviz;
-    graphvizOutput += '' + index + ' [' + attributes + '];\n';
-	});
-
-	for (var srcNode in superEdges) {
-		if (superEdges.hasOwnProperty(srcNode)) {
-      // join together edges from the original graph to form edges from/to clusters
-      // for each target vertex, store array of attributes from edges contributing to this super-edge
-			var finalEdges = {};
-			superEdges[srcNode].forEach(function (edgeTarget) {
-				// check if this edge is inserted already
-				// this can happen if supernode contains multiple vertices that
-				// had edges to vertices in the same dst supernode
-				// here is where we de-duplicate
-				if (finalEdges[edgeTarget.dst] !== undefined) {
-          // existing edge, add attributes
-					finalEdges[edgeTarget.dst].push(edgeTarget.attrs)
-				} else {
-          // new edge
-          finalEdges[edgeTarget.dst] = [edgeTarget.attrs];
+    function attributesToGraphViz(attributes) {
+      // add attributes
+      var attributeList = [];
+      if (attributes.color !== undefined) {
+        attributeList.push({
+          name: 'color',
+          value: attributes.color
+        });
+      }
+      if (attributes.shape !== undefined) {
+        attributeList.push({
+          name: 'shape',
+          value: attributes.shape
+        });
+      }
+      if (attributes.style !== undefined) {
+        // wrap with quotes
+        attributeList.push({
+          name: 'style',
+          value: graphvizEscape(attributes.style)
+        });
+      }
+      if (attributes.label !== undefined) {
+        // wrap with quotes
+        var label_val = attributes.label;
+        if (attributes.weight !== undefined){
+          label_val += "\nweight:" + attributes.weight;
         }
+        label_val = graphvizEscape(label_val);
+        attributeList.push({
+          name: 'label',
+          value: label_val
+        });
+      }
+      if (attributes.id !== undefined) {
+        attributeList.push({
+          name: 'id',
+          value: graphvizEscape(attributes.id)
+        });
+      }
+      if (attributes.penwidth !== undefined) {
+        attributeList.push({
+          name: 'penwidth',
+          value: attributes.penwidth
+        });
+      }
+
+      if (attributeList.length > 0) {
+        // transform attributes to strings
+        var attributeStrings = attributeList.map(function(item) {
+          return item.name + '=' + item.value;
+        });
+
+        return attributeStrings.join(',');
+      }
+      return '';
+    }
+
+    // convert supergraphNodes, superEdges into a .dot file, render to svg
+    // NOTE: to style the graph use CSS (see '.node text' above for example)
+    function supergraphToGraphviz(supergraphNodes, superEdges) {
+      var graphvizOutput = '';
+      console.log(supergraphNodes)
+      console.log(superEdges);
+
+      // TODO: get node shape from original graph potentially
+      // TODO: get smart name for result (e.g. model name)
+      graphvizOutput += 'Digraph "Supergraph" {\n';
+
+      // assign a number to every cluster for the graphviz graph, which is
+      var supernodeToGraph = {};
+
+      supergraphNodes.forEach(function(node, index) {
+        // update mapping for edge lookups
+        supernodeToGraph[node.data.id] = index;
+
+        // prepare graphviz node
+        var attributes;
+        if (node.data.hasOwnProperty('attrs')) {
+          // server-side attributes, use these
+          attributes = attributesToGraphViz(node.data.attrs)
+        } else {
+          // no server-side attributes
+          attributes = 'label=' + graphvizEscape(node.data.name) + ',shape=rectangle'
+        }
+        // if node is a cluster and not a concrete vertex, give it an id so we can hook up to the dendrogram
+        if (attributes.length > 0) {
+          attributes += ','
+        }
+        attributes += 'id=' + graphvizEscape(node.data.id);
+        // write node to graphviz;
+        graphvizOutput += '' + index + ' [' + attributes + '];\n';
       });
-      // write out the final super-edges for this source node
-      for (var target in finalEdges) {
-        if (finalEdges.hasOwnProperty(target)) {
-          // add attributes string
-          var merged = mergeAttributes(finalEdges[target]);
-          var attributes = attributesToGraphViz(merged);
 
-          // add the edge to the total output
-          graphvizOutput += '' + supernodeToGraph[srcNode] + ' -> ' + supernodeToGraph[target];
+      for (var srcNode in superEdges) {
+        if (superEdges.hasOwnProperty(srcNode)) {
+          // join together edges from the original graph to form edges from/to clusters
+          // for each target vertex, store array of attributes from edges contributing to this super-edge
+          var finalEdges = {};
+          superEdges[srcNode].forEach(function(edgeTarget) {
+            // check if this edge is inserted already
+            // this can happen if supernode contains multiple vertices that
+            // had edges to vertices in the same dst supernode
+            // here is where we de-duplicate
+            if (finalEdges[edgeTarget.dst] !== undefined) {
+              // existing edge, add attributes
+              finalEdges[edgeTarget.dst].push(edgeTarget.attrs)
+            } else {
+              // new edge
+              finalEdges[edgeTarget.dst] = [edgeTarget.attrs];
+            }
+          });
+          // write out the final super-edges for this source node
+          for (var target in finalEdges) {
+            if (finalEdges.hasOwnProperty(target)) {
+              // add attributes string
+              var merged = mergeAttributes(finalEdges[target]);
+              var attributes = attributesToGraphViz(merged);
 
-          graphvizOutput += ' [' + attributes + '];\n';
+              // add the edge to the total output
+              graphvizOutput += '' + supernodeToGraph[srcNode] + ' -> ' + supernodeToGraph[target];
+
+              graphvizOutput += ' [' + attributes + '];\n';
+            }
+          }
         }
       }
-		}
-	}
 
-	graphvizOutput += '}\n';
-  console.log(graphvizOutput);
-  return graphvizOutput;
-}
+      graphvizOutput += '}\n';
+      console.log(graphvizOutput);
+      return graphvizOutput;
+    }
 
-function getActiveClusters(root) {
-	var active = [];
-	function getRecursive(node) {
-		// an active node has no children for now
-		if (node.children) {
-			node.children.forEach(getRecursive);
-		} else {
-			// if not actually a leaf node, it becomes a node in the super-state graph
-			if (node._children) {
-				active.push(node);	
-			} else {
-				// leaf node, make all its contained vertices nodes in the super-state graph
-				console.log(node);
-				idToCluster[node.data.id].vertices.forEach(function(vertex) {
-					// TODO(roee): massive hack, wrap fake cluster with extra fake cluster
-          // mark it as a concrete vertex so that we don't eliminate self-edges
-          // during display
-          active.push({data: idToCluster[vertex], parent: node.parent});
-				});
-			}
-		}
-	}
-	getRecursive(root);
-	return active;
-}
+    // convert SsuperNodes, into a .dot file, render to svg
+    // NOTE: to style the graph use CSS (see '.node text' above for example)
+    function concreteGraphToGraphviz(nodes, edges, colors_dic) {
+      var graphvizOutput = '';
+      graphvizOutput += 'Digraph "Concretegraph" {\n';
 
-$('#btn_expand_all').click(function() {
-    expandAll(root);
-    update(root);
-});
+      // go over each concrete node and write it in dot format
+      nodes.forEach(function(node, index) {
+        // update mapping for edge lookups
+        // prepare graphviz node
+        var attributes;
+        if (concrete_nodes_dic[node]) {
+          // server-side attributes, use these
+          attributes = attributesToGraphViz(concrete_nodes_dic[node])
+        } else {
+          // no server-side attributes
+          attributes = 'label=' + graphvizEscape(node) + ',shape=ellipse'
+        }
+        // if node is a cluster and not a concrete vertex, give it an id so we can hook up to the dendrogram
+        if (attributes.length > 0) {
+          attributes += ','
+        }
+        attributes += 'id=' + graphvizEscape(node);
+        // write node to graphviz;
+        color = "green";//get_color(colors_dic[node]);
+        colors_map = ["red", "green", "cyan", "yellow","gray","cornsilk","aliceblue","deeppink"]
+        color_tag ="style=filled,fillcolor=" + colors_map[colors_dic[node]];
+        graphvizOutput += '' + parseInt(node) + ' [' + attributes + ", " + color_tag +'];\n';
+      });
 
-$('#btn_collapse_all').click(function() {
-   root.children.forEach(collapse);
-   collapse(root);
-   update(root);
-});
+      // go over each concrete node and write it in dot format
+      edges.forEach(function(edge, index) {
+        // join together edges from the original graph to form edges from/to clusters
+        // for each target vertex, store array of attributes from edges contributing to this super-edge
+        var attributes = '';
+        if (edge.length == 3) {
+          // server-side attributes, use these
+          attributes = attributesToGraphViz(edge[2]);
+        }
+        graphvizOutput += '' + edge[0] + ' -> ' + edge[1];
+        graphvizOutput += ' [' + attributes + '];\n';
+      });
+      graphvizOutput += '}\n';
+      return graphvizOutput;
+    }
 
-}); // d3.json
+    function present_concrete_graph(dotContent, nodes, transitions){
+      // max RAM set in webapp_config.py
+      var svgString = Viz(dotContent, {totalMemory: {{ VIZJS_MAX_RAM }}}); // TODO: FIXME add var from webapp_config.py
+      svgString = svgString.replace("graph0", "graph1");
+      console.log(svgString);
+      document.getElementById('concrete_graph').innerHTML = svgString;
+      concretegraph_svg_elem = $("#concrete_graph").find("svg")[0];
+      concretegraph_svg_elem.id = 'svg_concrete_graph';
 
+      nodes.forEach(function(d3Node) {
+        var nodeElement = $('#' + d3Node);
+      });
 
+      svg_concrete_graph = d3.select('#svg_concrete_graph');
+
+      zoom_concrete_graph = d3.zoom()
+        .scaleExtent([1 / 2, 4])
+        .on("zoom", zoomed_concrete_graph);
+
+      svg_concrete_graph.style("fill", "none")
+        .style("pointer-events", "all")
+        .call(zoom_concrete_graph);
+
+      // read SVG transform matrix, convert to d3-zoom object, set as initial zoom. ugh.
+      // this stops the super-state graph jumping on first zoom
+      // console.log(document)
+      // console.log(document.getElementById('graph0'));
+      // graph_obj = document.getElementsByClassName('graph')[1];
+      // console.log(graph_obj);
+      var initialTransform = document.getElementById('graph1').transform.baseVal.consolidate().matrix;
+      if (initialTransform.a != initialTransform.d) {
+        alert('svg zoom on concretegraph does not preserve aspect ratio. UNSUPPORTED!');
+      }
+      var asZoomTransform = d3.zoomIdentity.translate(initialTransform.e, initialTransform.f).scale(initialTransform.a);
+      // set initial transform
+      svg_concrete_graph.call(zoom_concrete_graph.transform, asZoomTransform);
+
+    }
+
+    function getActiveClusters(root) {
+      var active = [];
+
+      function getRecursive(node) {
+        // an active node has no children for now
+        if (node.children) {
+          node.children.forEach(getRecursive);
+        } else {
+          // if not actually a leaf node, it becomes a node in the super-state graph
+          if (node._children) {
+            active.push(node);
+          } else {
+            // leaf node, make all its contained vertices nodes in the super-state graph
+            console.log(node);
+            idToCluster[node.data.id].vertices.forEach(function(vertex) {
+              // TODO(roee): massive hack, wrap fake cluster with extra fake cluster
+              // mark it as a concrete vertex so that we don't eliminate self-edges
+              // during display
+              active.push({
+                data: idToCluster[vertex],
+                parent: node.parent
+              });
+            });
+          }
+        }
+      }
+      getRecursive(root);
+      return active;
+    }
+
+    $('#btn_expand_all').click(function() {
+      expandAll(root);
+      update(root);
+    });
+
+    $('#btn_collapse_all').click(function() {
+      root.children.forEach(collapse);
+      collapse(root);
+      update(root);
+    });
+
+  }); // d3.json
 </script>
 {% endblock %}

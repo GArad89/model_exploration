@@ -11,7 +11,7 @@ class KernighanLinCluster(Cluster):
         return schema, form
 
     def cluster(self, dgraph, weight=None):
-        udgraph = dgraph.dgraph.to_undirected()
+        udgraph = super().to_undirected(dgraph.dgraph)
         A, B = kernighan_lin_bisection(udgraph, weight=weight)
         return [A, B]
 

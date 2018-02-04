@@ -104,8 +104,34 @@ class DGraph:
         for node, data in sorted(multigraph.nodes(data=True)):
             nx_graph.add_node(node, **data)
 
+        ## edges may be spread across the dot model
+        edges_dic = {}
         for src, dst, data in multigraph.edges(data=True):
-            nx_graph.add_edge(src, dst, **data)
+            attributes = edges_dic.get((src, dst), [])
+            attributes.append(data)
+            edges_dic[(src, dst)] = attributes
+
+        ## unify edges data
+
+        for edge, data in edges_dic.items():
+            has_weight_attr = False
+            agg_dic = {}
+            for attr in data[0]:
+                agg_value = ""
+                if attr == "label":
+                    agg_value = ";\n".join([d.get(attr, "").strip("\"").strip("\'") for d in data])
+                elif attr == "weight":
+                    has_weight_attr = True
+                    agg_value = sum([float(d.get(attr, [])) for d in data])
+                else:
+                    agg_value = data.get[attr][0]
+                agg_dic[attr] = agg_value
+
+            if has_weight_attr is False:
+                agg_dic['weight'] = max(1, len(data))
+            agg_dic['penwidth'] = agg_dic['weight']
+
+            nx_graph.add_edge(edge[0], edge[1], **agg_dic)
 
         # deal with ""-encapsulated strings in properties
         # e.g. java.net.DatagramSocket.dot

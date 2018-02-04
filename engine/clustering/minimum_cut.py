@@ -15,12 +15,11 @@ class MinimumCut(Cluster):
         form = []
         schema = {}
         return schema, form
-               
+
     def cluster(self, dgraph):
 
         ## get edges in the cut
-        cop=dgraph.dgraph.copy()
-        cop=cop.to_undirected()
+        cop = super().to_undirected(dgraph.dgraph)
         cut_edges=nx.minimum_edge_cut(cop)
 
         ## remove edges in the cut and get connected subgraphs
