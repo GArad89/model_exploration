@@ -11,7 +11,7 @@ from os.path import join
 class RandomWalkLabelerTest(unittest.TestCase):
 
     def test_labeling(self):
-        g = DGraph.read_dot(join(project_root(), "engine/dot/java.util.Formatter.dot"))
+        g = DGraph.read_dot(join(project_root(), "dot/java.util.Formatter.dot"))
         den = partition.partition(g, SpectralCluster.SpectralCluster(), stop_criteria.SizeCriteria(4))
         labeler = RandomWalkLabeler.RandomWalkLabeler(g, den, 'Both')
         labeler.label()

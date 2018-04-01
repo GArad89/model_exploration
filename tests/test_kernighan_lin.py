@@ -10,7 +10,7 @@ from .utils import project_root
 class Test_KL(unittest.TestCase):
 
     def test_kerningham_lin(self):
-        g = DGraph.read_dot(os.path.join(project_root(), "engine/dot/cvs.net.mutated.dot"))
+        g = DGraph.read_dot(os.path.join(project_root(), "dot/cvs.net.mutated.dot"))
         KL = KernighanLinCluster()
         dendrogram = partition(g, clustering_algo=KL, stop_criterion=SizeCriteria(3))
         print("foo")

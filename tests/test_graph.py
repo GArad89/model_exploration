@@ -33,12 +33,12 @@ class Test_DGraph(unittest.TestCase):
 class Test_GraphImporter(unittest.TestCase):
 
     def test_import_example(self):
-        g = DGraph.read_dot(join(project_root(), "./engine/dot/example.dot"))
+        g = DGraph.read_dot(join(project_root(), "./dot/example.dot"))
         self.assertIsNotNone(g.dgraph, "import of example.dot failed")
         self.assertEqual(len(g.nodes()),24, "wrong number of nodes after import")
         
     def test_import_zip(self):
-        g = DGraph.read_dot(join(project_root(), "./engine/dot/zip.dot"))
+        g = DGraph.read_dot(join(project_root(), "./dot/zip.dot"))
         self.assertIsNotNone(g.dgraph, "import of zip.dot failed")
         self.assertEqual(len(g.nodes()),5, "wrong number of nodes after import")
         self.assertEqual(len(g.edges()),9, "wrong number of edges after import")
@@ -46,7 +46,7 @@ class Test_GraphImporter(unittest.TestCase):
 class Test_GraphExporter(unittest.TestCase):
 
     def test_import_and_export(self):
-        g = DGraph.read_dot(join(project_root(), "./engine/dot/example.dot"))
+        g = DGraph.read_dot(join(project_root(), "./dot/example.dot"))
         self.assertIsNotNone(g,"import of example.dot failed")
         g.write_dot(join(project_root(), "./tests/dot_export/example.dot"))
         g2 = DGraph.read_dot(join(project_root(), "./tests/dot_export/example.dot"))

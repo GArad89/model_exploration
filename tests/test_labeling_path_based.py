@@ -13,7 +13,7 @@ class PathLabelerTest(unittest.TestCase):
 
     def test_labeling(self):
 
-        g = DGraph.read_dot(join(project_root(), "engine/dot/large/ktails4.dot"))
+        g = DGraph.read_dot(join(project_root(), "dot/large/ktails4.dot"))
         den = partition.partition(g, SpectralCluster.SpectralCluster(), stop_criteria.SizeCriteria(4))
         labeler = PathLabeler.PathLabeler(g, den, labeling_on_type.EDGES)
         labeler.label()

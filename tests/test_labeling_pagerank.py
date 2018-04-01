@@ -11,7 +11,7 @@ class RandomWalkLabelerTest(unittest.TestCase):
 
     def test_labeling(self):
 
-        g = DGraph.read_dot(join(project_root(), "engine/dot/cvs.net.dot"))
+        g = DGraph.read_dot(join(project_root(), "dot/cvs.net.dot"))
         den = partition.partition(g, SpectralCluster.SpectralCluster(), stop_criteria.SizeCriteria(4))
         labeler = PageRankLabeler.PageRankLabeler(g, den, label.labeling_on_type.EDGES)
         labeler.label()

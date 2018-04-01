@@ -11,7 +11,7 @@ from .utils import project_root
 class Test_DGraph(unittest.TestCase):
 
     def test_labeling(self):
-        g = DGraph.read_dot(os.path.join(project_root(), "engine/dot/ssh.net.dot"))
+        g = DGraph.read_dot(os.path.join(project_root(), "dot/ssh.net.dot"))
         den = partition.partition(g, SpectralCluster.SpectralCluster(), stop_criteria.SizeCriteria(4))
         labeler = TfIdfLabeler.TfIdfLabeler(g, den, 'Both')
         labeler.label()
