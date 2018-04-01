@@ -33,7 +33,7 @@ class KMeansClustering (Cluster):
 
     def _find_k(self, vector):
 
-        maxK = range(1, min(len(vector), self.MAX_K))
+        maxK = range(1, min(len(vector), self.MAX_K, self.n))
         distortion_values = []
         vector = np.array(vector)
         for k in maxK:
@@ -41,7 +41,7 @@ class KMeansClustering (Cluster):
             kmeanModel.fit(vector)
             distortion = sum(np.min(cdist(vector, kmeanModel.cluster_centers_, 'euclidean'), axis=1)) / vector.shape[0]
             distortion_values.append((k, distortion))
-        best_k = min(distortion_values, key=lambda x:x[1])
+        best_k = min(distortion_values, key=lambda x: x[1])
         return best_k[0]
 
     def cluster(self,dgraph):
@@ -60,9 +60,10 @@ class KMeansClustering (Cluster):
             vector_list+=[temp] 
         
         ## Kmeans Clustering
+        chosen_k = self.n
         if self.find_best_k:
-            self.n = self._find_k(vector_list)
-        km = KMeans(self.n).fit(vector_list)
+            chosen_k = self._find_k(vector_list)
+        km = KMeans(chosen_k).fit(vector_list)
         result=km.labels_
 
         #seperating the result list to lists for each cluster (1= the node is in the substae 0= the node is not in the state)

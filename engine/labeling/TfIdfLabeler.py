@@ -8,14 +8,17 @@ from .RankingLabeler import RankingLabeler
 
 class TfIdfLabeler(RankingLabeler):
 
-    def __init__(self, graph, dendrogram, source, max_labels=3):
+    def __init__(self, graph, dendrogram, source, max_labels=3, unify_prefix=True):
         self.tfifd_labels_scores = {}
-        super().__init__(graph, dendrogram, source)
+        super().__init__(graph, dendrogram, source, max_labels, unify_prefix)
 
-    def get_edges_labels_list_in_super_node(self, super_node):
+    def is_ordered_labeler(self):
+        return False
+
+    def _get_edges_labels_list_in_super_node(self, super_node):
         return [self.graph.dgraph.edges[(edge[0], edge[1])].get('label','') for edge in super_node.projected_graph.edges()]
 
-    def get_nodes_labels_list_in_super_node(self, super_node):
+    def _get_nodes_labels_list_in_super_node(self, super_node):
         return [self.graph.node_attr(node, 'label') for node in super_node.subset]
 
     def fill_ranking_dictionary_with_nodes(self):
@@ -38,19 +41,19 @@ class TfIdfLabeler(RankingLabeler):
         for super_node in self.dendrogram.nodes()[1:]:
 
             if self.source == labeling_on_type.EDGES:
-                super_node_labels_dict[super_node] = self.get_edges_labels_list_in_super_node(super_node)
+                super_node_labels_dict[super_node] = self._get_edges_labels_list_in_super_node(super_node)
             elif self.source == labeling_on_type.NODES:
-                super_node_labels_dict[super_node] = self.get_nodes_labels_list_in_super_node(super_node)
+                super_node_labels_dict[super_node] = self._get_nodes_labels_list_in_super_node(super_node)
             else:
-                nodes_labels = self.get_nodes_labels_list_in_super_node(super_node)
-                edges_labels = self.get_edges_labels_list_in_super_node(super_node)
+                nodes_labels = self._get_nodes_labels_list_in_super_node(super_node)
+                edges_labels = self._get_edges_labels_list_in_super_node(super_node)
                 super_node_labels_dict[super_node] = nodes_labels + edges_labels
 
         def tokenize(lst):
             tokens = []
             for s in lst:
-                tokens = tokens + [s]
-                #tokens = tokens + re.sub('[' + string.punctuation + ']', '', s).split()
+                tokens.append(s) # TODO should be: tokens = tokens + re.sub('[' + string.punctuation + ']', '', s).split()
+                                 # but need need to map back to original labels
             return tokens
 
         # learn important features

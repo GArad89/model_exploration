@@ -36,7 +36,6 @@ class Cluster(ABC):
 
         cop = graph.copy()
         cop = cop.to_undirected()
-
         labels_dic = nx.get_edge_attributes(graph, 'label')
         weights_dic = nx.get_edge_attributes(graph, 'weight')
         nlabels_dic = self.unify_bi_dir_edges(labels_dic)

@@ -13,10 +13,13 @@ class RandomWalkLabeler(RankingLabeler):
 
     MIN_DELTA = 0.001
         
-    def __init__(self, graph, dendrogram, source = labeling_on_type.EDGES_AND_NODES, max_labels = 3):
+    def __init__(self, graph, dendrogram, source = labeling_on_type.EDGES_AND_NODES, max_labels=3, unify_prefix=False):
         self.google_mat = nx.google_matrix(graph.dgraph)
         self.google_mat = np.array(self.google_mat)
-        super().__init__(graph, dendrogram, source, max_labels)
+        super().__init__(graph, dendrogram, source, max_labels, unify_prefix)
+
+    def is_ordered_labeler(self):
+        return False
 
     def fill_ranking_dictionary_with_nodes(self):
         ## X(G^t)=X   X=[1/n,1/n,...,1/n] TODO: imporve this, only choose root nodes

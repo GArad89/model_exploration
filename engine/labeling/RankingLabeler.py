@@ -3,8 +3,8 @@ from .label import DendrogramLabeler, labeling_on_type
 
 
 class RankingLabeler(DendrogramLabeler):
-    def __init__(self, graph, dendrogram, source=labeling_on_type.EDGES_AND_NODES, max_labels=3):
-        super().__init__(graph, dendrogram, source, max_labels)
+    def __init__(self, graph, dendrogram, source=labeling_on_type.EDGES_AND_NODES, max_labels=3, unify_prefix=True):
+        super().__init__(graph, dendrogram, source, max_labels, unify_prefix)
         self.ranks_dict = {}
         if(source == labeling_on_type.NODES):
             self.fill_ranking_dictionary_with_nodes()
@@ -13,6 +13,9 @@ class RankingLabeler(DendrogramLabeler):
         else:
             self.fill_ranking_dictionary_with_nodes()
             self.fill_ranking_dictionary_with_edges()
+
+    def is_ordered_labeler(self):
+        return False
 
     # returns an items list of top self.max_labels most important nodes
     def get_important_nodes_list(self, items_subset):
@@ -40,7 +43,8 @@ class RankingLabeler(DendrogramLabeler):
         else:
             chosen_items = self.get_important_nodes_list(sub_graph.nodes(data=True))
             chosen_items.extend(self.get_important_edges_list(sub_graph.edges(data=True)))
-            chosen_items = sorted(chosen_items, key = lambda x : self.ranks_dict[x[0]], reverse=True)
+            chosen_items = filter(lambda x : True if x[1].get('label') else False, chosen_items)
+            chosen_items = sorted(chosen_items, key= lambda x: self.ranks_dict[x[0]], reverse=True)
             k = min(self.max_labels, len(chosen_items))
             return chosen_items[: k]
 

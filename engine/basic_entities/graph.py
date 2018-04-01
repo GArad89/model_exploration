@@ -3,6 +3,23 @@ from itertools import chain
 import numpy as np
 from collections import OrderedDict
 
+
+def map_weights_to_widths(edges2weights):
+
+    weights = np.array(list(edges2weights.values()))
+    if not np.any(weights):
+        return
+    values = []
+    for i in range(10, 101, 10):
+        values.append(np.percentile(weights, i))
+    weights2widths = {}
+    for e, w in edges2weights.items():
+        i = 0
+        while w > values[i]:
+            i += 1
+        weights2widths[e[0], e[1]] = i * 0.5 + 0.5
+    return weights2widths
+
 class OrderedDiGraph(nx.DiGraph):
     """
     nx.DiGraph that retains ordering when iterating on it
@@ -96,6 +113,7 @@ class DGraph:
         ":returns: number of strongly-connected components in the graph"
         return sum(1 for _ in nx.strongly_connected_components(self.dgraph))
 
+
     @staticmethod
     def read_dot(path):
         multigraph = nx.drawing.nx_pydot.read_dot(path)
@@ -111,10 +129,18 @@ class DGraph:
             attributes.append(data)
             edges_dic[(src, dst)] = attributes
 
-        ## unify edges data
+        ## prepare normalized weights; TODO: some arbitrariness may occur when only some of the edges are weighted
+        weights = {}
+        for edge, data in edges_dic.items():
+            hasWeight = any([d.get("weight") for d in data])
+            if hasWeight:
+                weights[(edge[0], edge[1])] = sum([float(d.get("weight", 0.0)) for d in data])
+        weights2widths = map_weights_to_widths(weights)
 
+        ## unify edges data
         for edge, data in edges_dic.items():
             has_weight_attr = False
+            has_penwidth_attr = False
             agg_dic = {}
             for attr in data[0]:
                 agg_value = ""
@@ -122,14 +148,21 @@ class DGraph:
                     agg_value = ";\n".join([d.get(attr, "").strip("\"").strip("\'") for d in data])
                 elif attr == "weight":
                     has_weight_attr = True
-                    agg_value = sum([float(d.get(attr, [])) for d in data])
+                    agg_value = weights[(edge[0], edge[1])]
+                elif attr == "penwidth":
+                    has_penwidth_attr = True
                 else:
-                    agg_value = data.get[attr][0]
+                    agg_value = data[0].get(attr, '')
                 agg_dic[attr] = agg_value
 
-            if has_weight_attr is False:
-                agg_dic['weight'] = max(1, len(data))
-            agg_dic['penwidth'] = agg_dic['weight']
+            if not has_weight_attr: ## if no edge weight is defined, assign eqaul weights to all edges
+                agg_dic['weight'] = max(1, len(data)) ## edge weight = number of transition in multigraph
+                if not has_penwidth_attr:
+                    agg_dic['penwidth'] = min(agg_dic['weight'], 5.5)
+                    has_penwidth_attr = True
+
+            if has_penwidth_attr is False:
+                agg_dic['penwidth'] = weights2widths[(edge[0], edge[1])]
 
             nx_graph.add_edge(edge[0], edge[1], **agg_dic)
 
@@ -146,5 +179,18 @@ class DGraph:
     def project(self, vertices):  
         return DGraph(self.subgraph(vertices))     
 
+    def get_sink_nodes(self):
+        sink_nodes = []
+        for node_item in self.dgraph.nodes(data=True):
+            if len(self.dgraph.out_edges(node_item[0])) == 0:
+                sink_nodes.append(node_item)
+        return sink_nodes
+
+    def get_initial_nodes(self):
+        inital_nodes = []
+        for node_item in self.dgraph.nodes(data=True):
+            if len(self.dgraph.in_edges(node_item[0])) == 0:
+                inital_nodes.append(node_item)
+        return inital_nodes
 
 

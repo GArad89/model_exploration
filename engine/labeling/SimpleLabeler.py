@@ -2,10 +2,13 @@ from .label import DendrogramLabeler, labeling_on_type
 import itertools
 
 
-class PrefixLabeler(DendrogramLabeler):
+class SimpleLabeler(DendrogramLabeler):
 
-    def __init__(self, graph, dendrogram, source, max_labels=3):
-        super().__init__(graph, dendrogram, source, max_labels)
+    def __init__(self, graph, dendrogram, source, max_labels=3, unify_prefix=False):
+        super().__init__(graph, dendrogram, source, max_labels, unify_prefix)
+
+    def is_ordered_labeler(self):
+        return False
 
     def select_important_nodes_and_edges(self, super_node):
         sub_dgraph = super_node.projected_graph.dgraph

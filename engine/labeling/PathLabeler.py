@@ -1,57 +1,38 @@
 from .label import DendrogramLabeler, labeling_on_type
 import networkx as nx
 import random
-
+import operator
 
 class PathLabeler(DendrogramLabeler):
 
-    def __init__(self, graph, dendrogram, labeling_source, max_labels=3):
-        super().__init__(graph, dendrogram, labeling_source, max_labels)
+    def __init__(self, graph, dendrogram, labeling_source, max_labels=3, unify_prefix=False):
+        super().__init__(graph, dendrogram, labeling_source, max_labels, unify_prefix)
         self.ranks = nx.pagerank_numpy(self.graph.dgraph)
 
-    def get_sink_nodes(self):
-        sink_nodes = []
-        for node_item in self.graph.dgraph.nodes(data=True):
-            if len(self.graph.dgraph.out_edges(node_item[0])) == 0:
-                sink_nodes.append(node_item)
-        return sink_nodes
+    def is_ordered_labeler(self):
+        return True
 
-    def get_initial_nodes(self):
-        inital_nodes = []
-        for node_item in self.graph.dgraph.nodes(data=True):
-            if len(self.graph.dgraph.in_edges(node_item[0])) == 0:
-                inital_nodes.append(node_item)
-        return inital_nodes
+    def _is_init_or_term(self, edges, cluster_nodes, index):
 
-    def get_strategic_nodes(self, super_node):
+        edges_filtered = list(filter(lambda edge: operator.itemgetter(index)(edge) not in cluster_nodes, edges))
+        # no_self_loops = list(filter(lambda out_edge: out_edge[0] != out_edge[1], out_edges_filtered))
+        return len(edges_filtered) > 0 or len(edges) == 0
+
+    def get_init_and_terminal_nodes(self, super_node):
         """
-        :return: two lists: first list is the starting nodes and the second one is the end nodes list
+        :return: two lists: first list is the starting nodes (in the project model)
+        and the second one is the end nodes list (in the project model)
         """
         cluster_nodes = super_node.projected_graph.dgraph.nodes(data=True)
-
-        end_nodes = []
+        init_nodes, end_nodes = [], []
         for node_item in cluster_nodes:
             out_edges = self.graph.dgraph.out_edges(node_item[0])
-            out_edges_filtered = list(filter(lambda out_edge: out_edge[1] not in cluster_nodes , out_edges))
-            if len(out_edges_filtered) > 0:
+            if self._is_init_or_term(out_edges, cluster_nodes, 1):
                 end_nodes.append(node_item)
-
-        start_nodes = []
-        for node_item in cluster_nodes:
             in_edges = self.graph.dgraph.in_edges(node_item[0])
-            in_edges_filtered = list(filter(lambda in_edge: in_edge[0] not in cluster_nodes , in_edges))
-            if len(in_edges_filtered) > 0:
-                start_nodes.append(node_item)
-
-        # cluster contains the 'initial' node, choose it as a starting node
-        if len(start_nodes) == 0:
-            start_nodes = [node_item1 for node_item1,node_item2 in zip(self.get_initial_nodes(),cluster_nodes) if node_item1[0] == node_item2[0]]
-
-        # no out edges from this cluster to another - choose the sink nodes
-        if len(end_nodes) == 0:
-            end_nodes = [node_item1 for node_item1, node_item2 in zip(self.get_sink_nodes(), cluster_nodes) if node_item1[0] == node_item2[0]]
-
-        return start_nodes, end_nodes
+            if self._is_init_or_term(in_edges, cluster_nodes, 0):
+                init_nodes.append(node_item)
+        return init_nodes, end_nodes
 
     def sort_nodes_by_ranks(self, node_items_list):
         return sorted(node_items_list, key=lambda node_item: self.ranks[node_item[0]])
@@ -85,7 +66,7 @@ class PathLabeler(DendrogramLabeler):
         return path
 
     def select_important_nodes_and_edges(self, super_node):
-        start_nodes, end_nodes = self.get_strategic_nodes(super_node)
+        start_nodes, end_nodes = self.get_init_and_terminal_nodes(super_node)
         path = self.traverse_cluster(start_nodes, end_nodes, super_node)
         if self.source == labeling_on_type.NODES:
             return path
