@@ -1,0 +1,22 @@
+digraph Automaton {
+  0 [shape=doublecircle,label=""];
+  0 -> 3 [label="java.util.StringTokenizer.nextToken",style="setlinewidth(1)",color=black]
+  0 -> 0 [label="java.util.StringTokenizer.hasMoreElements",style="setlinewidth(1)",color=black]
+  0 -> 0 [label="java.util.StringTokenizer.hasMoreTokens",style="setlinewidth(1)",color=black]
+  0 -> 1 [label="java.util.StringTokenizer.countTokens",style="setlinewidth(1)",color=black]
+  0 -> 3 [label="java.util.StringTokenizer.nextElement",style="setlinewidth(1)",color=black]
+  1 [shape=doublecircle,label=""];
+  1 -> 1 [label="java.util.StringTokenizer.nextToken",style="setlinewidth(1)",color=black]
+  1 -> 0 [label="java.util.StringTokenizer.hasMoreElements",style="setlinewidth(1)",color=black]
+  1 -> 0 [label="java.util.StringTokenizer.hasMoreTokens",style="setlinewidth(1)",color=black]
+  1 -> 1 [label="java.util.StringTokenizer.countTokens",style="setlinewidth(1)",color=black]
+  1 -> 1 [label="java.util.StringTokenizer.nextElement",style="setlinewidth(1)",color=black]
+  2 [shape=circle,label=""];
+  100 [shape=circle,label=""];
+  100 -> 2
+  2 -> 3 [label="java.util.StringTokenizer.init",style="setlinewidth(1)",color=black]
+  3 [shape=doublecircle,label=""];
+  3 -> 0 [label="java.util.StringTokenizer.hasMoreElements",style="setlinewidth(1)",color=black]
+  3 -> 0 [label="java.util.StringTokenizer.hasMoreTokens",style="setlinewidth(1)",color=black]
+  3 -> 1 [label="java.util.StringTokenizer.countTokens",style="setlinewidth(1)",color=black]
+}

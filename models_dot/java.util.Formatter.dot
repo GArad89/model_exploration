@@ -1,0 +1,21 @@
+digraph Automaton {
+  0 [shape=circle,label=""];
+  0 -> 2 [label="java.util.Formatter.format",style="setlinewidth(1)",color=black]
+  0 -> 0 [label="java.util.Formatter.locale",style="setlinewidth(1)",color=black]
+  0 -> 0 [label="java.util.Formatter.out",style="setlinewidth(1)",color=black]
+  0 -> 0 [label="java.util.Formatter.ioException",style="setlinewidth(1)",color=black]
+  0 -> 1 [label="java.util.Formatter.close",style="setlinewidth(1)",color=black]
+  1 [shape=doublecircle,label=""];
+  1 -> 1 [label="java.util.Formatter.ioException",style="setlinewidth(1)",color=black]
+  2 [shape=circle,label=""];
+  2 -> 2 [label="java.util.Formatter.format",style="setlinewidth(1)",color=black]
+  2 -> 2 [label="java.util.Formatter.locale",style="setlinewidth(1)",color=black]
+  2 -> 2 [label="java.util.Formatter.out",style="setlinewidth(1)",color=black]
+  2 -> 0 [label="java.util.Formatter.flush",style="setlinewidth(1)",color=black]
+  2 -> 2 [label="java.util.Formatter.ioException",style="setlinewidth(1)",color=black]
+  2 -> 1 [label="java.util.Formatter.close",style="setlinewidth(1)",color=black]
+  3 [shape=circle,label=""];
+  100 [shape=circle,label=""];
+  100 -> 3
+  3 -> 0 [label="java.util.Formatter.init",style="setlinewidth(1)",color=black]
+}

@@ -1,0 +1,63 @@
+digraph Automaton {
+  initial [shape=plaintext,label=""];
+  initial -> 20
+  20 [shape=circle, label = "",style=filled, fillcolor=cyan];
+  21 [shape=circle, label = "",style=filled, fillcolor=cyan];
+  22 [shape=circle, label = "",style=filled, fillcolor=cyan];
+  20 -> 21 [label="login",style="setlinewidth(1)",color=black, fontsize=26]
+  21 -> 22 [label="enter_pass",style="setlinewidth(1)",color=black, fontsize=26]
+  22 -> 0 [label="authenticated",style="setlinewidth(1)",color=black, fontsize=26]
+  22 -> 22 [label="retry",style="setlinewidth(1)",color=black, fontsize=26]
+  0 [shape=circle, label = "",style=filled, fillcolor=cyan];
+  0 -> 1 [label="select_item",style="setlinewidth(1)",color=black, fontsize=26]
+  1 [shape=circle, label = "",style=filled, fillcolor=green];
+  1 -> 2 [label="get_item_type",style="setlinewidth(1)",color=black, fontsize=26]
+  2 [shape=circle, label = "",style=filled, fillcolor=green];
+  2 -> 3 [label="select_wood_type",style="setlinewidth(1)",color=black, fontsize=26]
+  2 -> 6 [label="get_country",style="setlinewidth(1)",color=black, fontsize=26]
+  2 -> 11 [label="get_language",style="setlinewidth(1)",color=black, fontsize=26]
+  3 [shape=circle, label = "",style=filled, fillcolor=green];
+  3 -> 4 [label="select_color",style="setlinewidth(1)",color=black, fontsize=26]
+  4 [shape=circle, label = "",style=filled, fillcolor=green];
+  4 -> 8 [label="select_style",style="setlinewidth(1)",color=black, fontsize=26]
+  8 [shape=circle, label = "",style=filled, fillcolor=green];
+  8 -> 9 [label="add_item_to_cart",style="setlinewidth(1)",color=black, fontsize=26]
+  9 [shape=circle, label = "",style=filled, fillcolor=green];
+  9 -> 10 [label="exit",style="setlinewidth(1)",color=black, fontsize=26]
+  9 -> 1 [label="select_item",style="setlinewidth(1)",color=black, fontsize=26]
+  10 [shape=doublecircle, label = "",style=filled, fillcolor=orange];
+  6 [shape=circle, label = "",style=filled, fillcolor=green];
+  6 -> 7 [label="validate_country_voltage",style="setlinewidth(1)",color=black, fontsize=26]
+  7 [shape=circle, label = "",style=filled, fillcolor=green];
+  7 -> 8 [label="get_color",style="setlinewidth(1)",color=black, fontsize=26]
+  11 [shape=circle, label = "",style=radial, fillcolor="yellow;0.4:green;0.6"];
+  11 -> 12 [label="get_font_size",style="setlinewidth(1)",color=black, fontsize=26]
+  12 [shape=circle, label = "",style=radial, fillcolor="yellow;0.4:green;0.6"];
+  12 -> 13  [label="get_font_color",style="setlinewidth(1)",color=black, fontsize=26]
+  13 [shape=circle, label = "",style=radial, fillcolor="yellow;0.4:green;0.6"];
+  13 -> 8  [label="get_font_style",style="setlinewidth(1)",color=black, fontsize=26]
+  11 [shape=circle];
+  11 -> 15 [label="get_font_size",style="setlinewidth(1)",color=black, fontsize=26]
+  15 [shape=circle, label = "",style=radial, fillcolor="yellow;0.4:green;0.6"];
+  15 -> 16  [label="get_cloth_type",style="setlinewidth(1)",color=black, fontsize=26]
+  16 [shape=circle, label = "",style=radial, fillcolor="yellow;0.4:green;0.6"];
+  16 -> 8  [label="get_model",style="setlinewidth(1)",color=black, fontsize=26]
+
+  30 [shape=circle, label = "",style=filled, fillcolor=orange];
+  31 [shape=circle, label = "",style=filled, fillcolor=orange];
+  32 [shape=circle, label = "",style=filled, fillcolor=orange];
+  33 [shape=circle, label = "",style=filled, fillcolor=orange];
+  34 [shape=circle, label = "",style=filled, fillcolor=orange];
+  35 [shape=circle, label = "",style=filled, fillcolor=orange];
+  
+  9 -> 30  [label="proceed_to_payment",style="setlinewidth(1)",color=black, fontsize=26]
+  30 -> 31  [label="select_payment_type",style="setlinewidth(1)",color=black, fontsize=26]
+  31 -> 32  [label="get_member_card",style="setlinewidth(1)",color=black, fontsize=26]
+  31 -> 33  [label="get_credit_card",style="setlinewidth(1)",color=black, fontsize=26]
+  32 -> 34  [label="process_payment",style="setlinewidth(1)",color=black, fontsize=26]
+  33 -> 34  [label="process_payment",style="setlinewidth(1)",color=black, fontsize=26]
+  34 -> 35  [label="payment_approved",style="setlinewidth(1)",color=black, fontsize=26]
+  34 -> 30  [label="payment_rejected",style="setlinewidth(1)",color=black, fontsize=26]
+  35 -> 1  [label="select_item",style="setlinewidth(1)",color=black, fontsize=26]
+  35 -> 10  [label="exit",style="setlinewidth(1)",color=black, fontsize=26]
+  }

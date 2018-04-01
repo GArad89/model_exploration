@@ -1,0 +1,181 @@
+digraph G {
+  0 [label="Ljava/io/OutputStream;_write"];
+  1 [label="Ljava/net/Socket;_connect"];
+  2 [label="Ljava/net/Socket;_onDestroy"];
+  3 [label="app/Activity;_onCreate"];
+  4 [label="app/Activity;_startActivityForResult"];
+  5 [label="app/PendingIntent;_getBroadcast"];
+  6 [label="content/ContentResolver;_onResume"];
+  7 [label="content/ContentResolver;_query"];
+  8 [label="content/Context;_onCreate"];
+  9 [label="content/Context;_onPause"];
+  10 [label="content/Context;_onResume"];
+  11 [label="content/Context;_onStartCommand"];
+  12 [label="content/Context;_registerReceiver"];
+  13 [label="content/Context;_sendBroadcast"];
+  14 [label="content/Context;_startActivity"];
+  15 [label="content/Context;_startService"];
+  16 [label="content/Intent;_setAction"];
+  17 [label="content/IntentFilter;_addAction"];
+  18 [label="content/IntentFilter;_onResume"];
+  19 [label="content/SharedPreferences$Editor;_putInt"];
+  20 [label="database/Cursor;_getString"];
+  21 [label="database/Cursor;_onResume"];
+  22 [label="database/Cursor;_query"];
+  23 [label="os/Bundle;_getBoolean"];
+  24 [label="os/Bundle;_getInt"];
+  25 [label="os/Bundle;_getParcelable"];
+  26 [label="os/Bundle;_getString"];
+  27 [label="os/Bundle;_onCreate"];
+  28 [label="os/Bundle;_putBoolean"];
+  29 [label="os/Bundle;_putInt"];
+  30 [label="os/Bundle;_putParcelable"];
+  31 [label="os/Bundle;_putSerializable"];
+  32 [label="os/Bundle;_putString"];
+  33 [label="os/Handler;_obtainMessage"];
+  34 [label="telephony/TelephonyManager;_getDeviceId"];
+  35 [label="telephony/TelephonyManager;_onCreate"];
+  36 [label="util/Log;_d"];
+  37 [label="util/Log;_e"];
+  38 [label="util/Log;_i"];
+  39 [label="util/Log;_onCreate"];
+  40 [label="util/Log;_onDestroy"];
+  41 [label="util/Log;_onPause"];
+  42 [label="util/Log;_onReceive"];
+  43 [label="util/Log;_onResume"];
+  44 [label="util/Log;_onStartCommand"];
+  45 [label="util/Log;_v"];
+  46 [label="util/Log;_w"];
+  47 [label="TERMINAL",shape=diamond];
+  48 [label="INITIAL",shape=box];
+0->1 
+0->37 
+1->2 
+1->46 
+2->32 
+3->34 
+4->3 
+5->45 
+6->12 
+7->6 
+7->7 
+7->19 
+7->20 
+7->45 
+8->8 
+8->10 
+8->11 
+8->16 
+8->34 
+8->38 
+9->8 
+9->9 
+10->7 
+10->10 
+11->38 
+12->31 
+12->46 
+13->38 
+14->8 
+14->9 
+15->8 
+15->14 
+15->17 
+15->38 
+16->5 
+16->13 
+16->14 
+16->15 
+16->19 
+16->38 
+16->45 
+17->17 
+17->18 
+17->38 
+18->16 
+19->14 
+19->16 
+20->7 
+20->20 
+20->21 
+20->22 
+20->38 
+20->45 
+20->46 
+20->47 
+21->12 
+21->20 
+21->21 
+22->21 
+23->23 
+23->25 
+24->4 
+24->38 
+25->20 
+26->24 
+26->26 
+27->23 
+28->27 
+28->28 
+28->36 
+29->32 
+30->28 
+31->14 
+31->28 
+31->31 
+32->26 
+32->31 
+32->32 
+33->36 
+34->35 
+35->17 
+35->30 
+35->33 
+35->35 
+35->38 
+36->0 
+36->36 
+36->38 
+36->45 
+37->29 
+37->37 
+38->14 
+38->16 
+38->20 
+38->36 
+38->38 
+38->39 
+38->40 
+38->45 
+39->34 
+39->38 
+39->39 
+39->43 
+39->44 
+39->45 
+40->38 
+40->42 
+41->39 
+42->41 
+42->42 
+42->45 
+43->7 
+43->43 
+44->45 
+45->15 
+45->16 
+45->20 
+45->36 
+45->38 
+45->39 
+45->40 
+45->42 
+45->44 
+45->45 
+46->7 
+46->20 
+46->37 
+46->45 
+46->46 
+48->1 
+}
