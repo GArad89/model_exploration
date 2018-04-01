@@ -83,6 +83,7 @@ def algorithm_choice_form():
         labeling_method = request.values['labeling-method']
         labeling_source = labeling_sources[request.values['labeling-source']]
         max_labels = int(request.values['max-labels'])
+        unify_labels = request.values['unify-labels'] == 'True'
         #TODO: if labeling_source not in labeling_sources: raise Exception('aaah')
 
         result = run_algorithm(graph,
@@ -92,7 +93,8 @@ def algorithm_choice_form():
                                stopping_criterion_parameter,
                                labeling_method,
                                labeling_source,
-                               max_labels)
+                               max_labels,
+                               unify_labels)
         result_id = get_results().save(result)
 
         return redirect(url_for('show_results', result_id=result_id))

@@ -379,7 +379,7 @@
       canvas.height *= pixelRatio;
 
       context.setTransform(pixelRatio,0,0,pixelRatio,0,0);
-      
+
       if(options.canvg) {
         options.canvg(canvas, src);
       } else {

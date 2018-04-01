@@ -85,12 +85,12 @@
 
   #svg_supergraph {
     width: 100%;
-    height: auto;
+    height: 1080;
   }
 
   #svg_concrete_graph {
     width: 100%;
-    height: auto;
+    height: 1080;
   }
 </style>
 {% endblock %} {% block title %}Explore!{% endblock %} {% block body %}
@@ -102,6 +102,8 @@
   <button id='btn_export_supergraph_dot' class="btn btn-info">Export Super Graph .dot</button>
   <button id='btn_expand_all' class="btn btn-info">Expand All</button>
   <button id='btn_collapse_all' class="btn btn-info">Collapse All</button>
+   <input id='search_bar' type="text" placeholder="Search.." name="search">
+   <button id='search_button' type="submit">Submit</button>
 </div>
 
 <svg id="d3-main" style="border: 1px dashed black;"></svg>
@@ -122,7 +124,8 @@
 
   var i = 0,
     duration = 750,
-    root;
+    root,
+    recieved_data;
 
   var viewbox = "0 0 " + (width + margin.right + margin.left) + " " + (height + margin.top + margin.bottom);
   var svg = d3.select("#d3-main")
@@ -163,6 +166,88 @@
     zoom.transform(svg, d3.zoomIdentity.scale(1))
   });
 
+
+  $('#search_button').click(function() {
+    var val = document.getElementById('search_bar').value;
+    highlight_label_in_supergraph(val);
+  });
+
+  function highlight_label_in_supergraph(searched_label) {
+
+    var superGraphSvg = SVG.get('svg_supergraph');
+    var text_elements = superGraphSvg.select("text");
+    var item_found = false
+    // handle nodes
+    // get active clusters!
+    var activeNodes = {};
+    var graph_objects = superGraphSvg.select("g").members
+    for (i = 0; i < graph_objects.length; i++) {
+      var obj = graph_objects[i];
+      if (obj.node.id.includes("cluster")){
+        activeNodes[obj.node.id] = obj;
+      }
+    }
+    var nodes2highligth = []
+    for (i = 0; i < recieved_data.clusters.length; i++) {
+      cluster_node = recieved_data.clusters[i];
+      if (!(cluster_node.id in activeNodes)){
+        continue;
+      }
+
+      cluster_concrete_nodes = new Set(cluster_node.vertices);
+      for (j = 0; j < recieved_data.edges.length; j++) {
+        edge = recieved_data.edges[j];
+        if (cluster_concrete_nodes.has(edge[0]) && cluster_concrete_nodes.has(edge[1])){
+          if (edge[2].label !== undefined && edge[2].label.includes(searched_label)){
+            nodes2highligth.push(cluster_node.id);
+            item_found = true;
+            break;
+          }
+        }
+      }
+    }
+
+    nodes2highligth.forEach(function(elem){
+      elements = superGraphSvg.select("[id=" + elem + "] polygon")
+      elements.animate({
+        ease: '<>'
+      }).attr({
+        fill: 'lightblue'
+      }).animate().attr({
+        fill: '#ffffff'
+      }).animate().attr({
+        fill: 'lightblue'
+      })
+    });
+
+    // handle edges
+    text_elements.members.forEach( function(text_element){
+      var text = text_element.node.innerHTML;
+      var highlight_element = false;
+      if (text.includes(searched_label)){
+        var element = text_element.node.parentElement;
+        if (element.attributes.class.value == "node"){
+          return;
+        }
+        item_found = true;
+        if (highlight_element = true){
+          text_element.animate({
+            ease: '<>'
+          }).attr({
+            fill: 'blue'
+          }).animate().attr({
+            fill: '#ffffff'
+          }).animate().attr({
+            fill: 'blue'
+          });
+        }
+      }
+    });
+
+    if (!item_found){
+      alert("label '" + searched_label + "' is not in the model!")
+    }
+  }
 
   $('#btn_export_dendrogram').click(function() {
     saveSvgAsPng(document.getElementById("d3-main"), "diagram.png", {
@@ -240,7 +325,7 @@
   d3.json("{{ url_for('get_result', result_id=result_id) }}", function(error, data) {
     if (error) throw error;
     console.log(data);
-
+    recieved_data = data;
     // set up for graph view
 
     // mapping of: cluster i id -> cluster struct (e.g. verices: [vertex i1, vertex i2, ..., ik])
@@ -382,21 +467,68 @@
         }
       }
 
-      var concrete_nodes = clicked_cluster.vertices;
+      var concrete_nodes = clicked_cluster.vertices.slice(0,clicked_cluster.vertices.length);
       var set1 = new Set(concrete_nodes);
       // alert(concrete_nodes);
       for (var j = 0; j < concrete_nodes.length; j++) {
         console.log('node:' + concrete_nodes[j]);
       }
+
       var concrete_edges = [];
+      var shape_dic = {};
+      var add_init = false, add_term = false;
+      var in_crossing_edges = {}, out_crossing_edges = {};
+
       for (var i = 0; i < data.edges.length; i++) {
         edge = data.edges[i];
         if (set1.has(edge[0]) && set1.has(edge[1])) {
-          concrete_edges.push(edge);
-          console.log(edge[0] + " -> " + edge[1] + ": " + edge[2]);
+          concrete_edges.push(edge); // Keep both edge ends in cluster
+          continue;
         }
+        if (!set1.has(edge[0]) && !set1.has(edge[1])) {
+          continue; // SKIP: both edge ends in cluster
+        }
+        n_edge = [];
+        var attr = Object.assign({}, edge[2]);
+        if (set1.has(edge[0])){
+          n_edge.push(edge[0]);
+          n_edge.push("1001"); //TODO: use a better solution then using random id
+          n_edge.push(attr);
+          add_term=true;
+          if (!(edge[0] in out_crossing_edges)){
+            out_crossing_edges[edge[0]] = []
+          }
+          out_crossing_edges[edge[0]].push(n_edge);
+        }
+        if (set1.has(edge[1])){
+          n_edge.push("1000"); //TODO: use a better solution then using random id
+          n_edge.push(edge[1]);
+          n_edge.push(attr);
+          add_init=true;
+          if (!(edge[1] in in_crossing_edges)){
+            in_crossing_edges[edge[1]] = []
+          }
+          in_crossing_edges[edge[1]].push(n_edge);
+        }
+        // concrete_edges.push(n_edge);
       }
-      var svgString = concreteGraphToGraphviz(concrete_nodes, concrete_edges, colors_dic);
+
+      handle_crossing_edges(in_crossing_edges, concrete_edges);
+      handle_crossing_edges(out_crossing_edges, concrete_edges);
+
+      if (add_init){
+        concrete_nodes.push("1000");
+        concrete_nodes_dic["1000"] = {"label" : "IN", "style":"dashed"};
+        shape_dic["1000"] = "invtriangle";
+      }
+      if (add_term){
+        concrete_nodes.push("1001");
+        concrete_nodes_dic["1001"] = {"label" : "OUT", "style":"dashed"};
+        shape_dic["1001"] = "triangle";
+      }
+
+      assign_width_to_concrete_edges(concrete_edges);
+      var svgString = concreteGraphToGraphviz(concrete_nodes, concrete_edges, colors_dic, shape_dic);
       lastSelectedConcreteGraph = svgString;
       try{
         present_concrete_graph(svgString, concrete_nodes, concrete_edges);
@@ -414,6 +546,75 @@
       // }
     }
 
+    function assign_width_to_concrete_edges(concrete_edges){
+
+      var max = null;
+      var min = null;
+      concrete_edges.forEach(function(edge){
+        var w = edge[2].width;
+        if (w == undefined){
+          return;
+        }
+        if (max == null){
+          max = w;
+          min = w;
+        }
+        if (w > max){
+          max = w;
+        }
+        if (w < min){
+          min = w;
+        }
+      });
+      if (max-min > 0){
+      concrete_edges.forEach(function(edge){
+        var w = edge[2].width;
+        if (w == undefined){
+          w = min;
+        }
+        edge[2].penwidth = 0.5 + 5.0*(w-min)/(max-min);
+      });
+      }
+    }
+
+    function handle_crossing_edges(out_crossing_edges, concrete_edges){
+      // Crossing edges, are edges that extend beyond the super-state model
+      // these, are marked in a different style, and connected to
+      // dummy start and terminal nodes
+      Object.keys(out_crossing_edges).forEach(function(source) {
+        var edges = out_crossing_edges[source];
+        var labels2weights = {};
+        edges.forEach(function(e){
+            var l = e[2].label;
+            var w = e[2].weight;
+            if (w == null){
+              w = 0;
+            }
+            if (!(l in labels2weights)){
+              labels2weights[l] = 0;
+            }
+            labels2weights[l] += w;
+        });
+        var labels = "";
+        var total = 0;
+        // Sort edges by visits!
+        var transitions_names = Object.keys(labels2weights).map(function(key) {
+            return [key, labels2weights[key]];
+        });
+
+        // Sort the array based on the second element
+        transitions_names.sort(function(first, second) {
+            return second[1].weight - first[1].weight;
+        });
+        transitions_names.reverse();
+        transitions_names.forEach(function(edge_tuple) {
+          labels += edge_tuple[0] + " weight:" + edge_tuple[1] + "\n";
+          total += edge_tuple[1];
+        });
+        var edge = [edges[0][0], edges[0][1], {"label": labels, "weight": total, "style":"dotted"}];
+        concrete_edges.push(edge);
+      });
+    }
 
     root.children.forEach(collapse);
 
@@ -471,8 +672,8 @@
 
           var cluster = idToCluster[d.data.id];
           //console.log(cluster);
-          vertices_no_initial = cluster.vertices.filter(vertex => vertex != "initial")
-          tooltip_div.html('#Nodes: ' + (vertices_no_initial.length))
+          // vertices_no_initial = cluster.vertices.filter(vertex => vertex != "initial") //TODO: remove this line
+          tooltip_div.html('#Nodes: ' + (cluster.vertices.length))
             .style("left", (d3.event.pageX) + "px")
             .style("top", (d3.event.pageY - 28) + "px");
         })
@@ -662,10 +863,7 @@
         superEdges[srcNode] = existingEdges;
       });
 
-      var dotContent = supergraphToGraphviz(supergraphNodes, superEdges);
-      lastSupergraphGraphviz = dotContent; // store raw .dot content so we can export it
-      // max RAM set in webapp_config.py
-      var svgString = Viz(dotContent); // TODO: FIXME add var from webapp_config.py
+      var svgString = supergraphToGraphviz(supergraphNodes, superEdges);//Viz(dotContent); // TODO: FIXME add var from webapp_config.py
       document.getElementById('supergraph').innerHTML = svgString;
       supergraph_svg_elem = $("#supergraph").find("svg")[0];
       supergraph_svg_elem.id = 'svg_supergraph';
@@ -686,9 +884,8 @@
           nodeElement.on('mouseenter', function(e) {
             // TODO: make sure all other fake-hovers are removed
             console.log('hover on');
-            console.log(dendrogramElement);
             // note: jquery addClass/removeClass don't work inside svg :(
-            dendrogramElement[0].classList.add('hover');
+            dendrogramElement[0].classList.add("hover");
           });
           nodeElement.on('mouseleave', function(e) {
             console.log('hover off');
@@ -737,19 +934,59 @@
         return attributes[0];
       }
 
-      // multiple edges, do our thing
-      // merge labels from multiple edges
-      // TODO: merge weights?
+
+      // ## get labels and create labels 2 weights
       var labels = attributes.map(function(item) {
-        return item.label;
+        var st = [];
+        st.push(item.label);
+        if (item.weight !== undefined) {
+          st.push(item.weight);
+        }
+        return st;
       }).filter(function(v) {
         return v !== undefined;
       });
 
-      var uniqueLabels = Array.from(new Set(labels));
+      var labels_map = {};
+      labels.forEach(function(label){
+        if ( ! (label[0] in labels_map) ){
+          labels_map[label[0]] = 0
+        }
+        if (label.length == 2){
+          labels_map[label[0]] += label[1]
+        }
+      });
+
+
+      // ## sort labels by weights
+      var super_tran_label = "";
+      // Create items array
+      var items = Object.keys(labels_map).map(function(key) {
+         return [key, labels_map[key]];
+      });
+      // Sort the array based on weight
+      items.sort(function(first, second) {
+         return second[1] - first[1];
+      });
+      var top3items = items.slice(0, 3);
+      top3items.forEach(function(item){
+        super_tran_label += item[0] + ":" + item[1] + "\n";
+      });
+      if (items.length > 3){
+        super_tran_label += "...";
+      }
+
+      var weights = attributes.map(function(item) {
+        return item.weight;
+      }).filter(function(v) {
+        return v !== undefined;
+      });
+      // compute weight of all edges, to add a total attribute
+      var sum = weights.reduce(function(a, b) {return a + b}, 0);
 
       return {
-        label: uniqueLabels.join('\n')
+        label: super_tran_label,
+        weight: sum
       };
     }
 
@@ -794,6 +1031,7 @@
         });
       }
       if (attributes.penwidth !== undefined) {
+        <!--max_width = Math.max(Math.min(attributes.penwidth, 5.5),0.5);-->
         attributeList.push({
           name: 'penwidth',
           value: attributes.penwidth
@@ -815,11 +1053,16 @@
     // NOTE: to style the graph use CSS (see '.node text' above for example)
     function supergraphToGraphviz(supergraphNodes, superEdges) {
       var graphvizOutput = '';
-      console.log(supergraphNodes)
-      console.log(superEdges);
-
-      // TODO: get node shape from original graph potentially
       // TODO: get smart name for result (e.g. model name)
+      for (var key in superEdges) {
+          // check if the property/key is defined in the object itself, not in parent
+          if (superEdges.hasOwnProperty(key)) {
+            var weights =  superEdges[key].forEach(function(edge, index) {
+              return edge.attrs.weight;
+            });
+          }
+      }
+
       graphvizOutput += 'Digraph "Supergraph" {\n';
 
       // assign a number to every cluster for the graphviz graph, which is
@@ -883,12 +1126,18 @@
 
       graphvizOutput += '}\n';
       console.log(graphvizOutput);
-      return graphvizOutput;
+      lastSupergraphGraphviz = graphvizOutput; // store raw .dot content so we can export it
+      var viz_content = Viz(graphvizOutput);
+      for (var key in supernodeToGraph) {
+        cluster = idToCluster[key]
+        viz_content = viz_content.replace("<title>"+supernodeToGraph[key]+"</title>","<title>#Nodes: "+cluster.vertices.length+"</title>")
+      }
+      return viz_content;
     }
 
-    // convert SsuperNodes, into a .dot file, render to svg
+    // convert SuperNodes, into a .dot file, render to svg
     // NOTE: to style the graph use CSS (see '.node text' above for example)
-    function concreteGraphToGraphviz(nodes, edges, colors_dic) {
+    function concreteGraphToGraphviz(nodes, edges, colors_dic, shape_dic) {
       var graphvizOutput = '';
       graphvizOutput += 'Digraph "Concretegraph" {\n';
 
@@ -910,13 +1159,26 @@
         }
         attributes += 'id=' + graphvizEscape(node);
         // write node to graphviz;
-        color = "green";//get_color(colors_dic[node]);
-        colors_map = ["red", "green", "cyan", "yellow","gray","cornsilk","aliceblue","deeppink"]
-        color_tag ="style=filled,fillcolor=" + colors_map[colors_dic[node]];
-        graphvizOutput += '' + parseInt(node) + ' [' + attributes + ", " + color_tag +'];\n';
+        var color = "white";//get_color(colors_dic[node]); TODO: improve this!
+        var colors_map = ["aliceblue", "green", "cyan", "yellow","gray","cornsilk","salmon","deeppink","greenyellow"]
+        if (node in colors_dic && colors_dic[node] < colors_map.length) {
+          color = colors_map[colors_dic[node]]
+        }
+        var color_tag = "fillcolor=" + color;
+        var style_tag = "style=filled";
+        if (concrete_nodes_dic[node].style != undefined) {
+          style_tag = "style=" + concrete_nodes_dic[node].style;
+        }
+        var shape = 'circle';
+        if (node in shape_dic) {
+          shape = shape_dic[node];
+        }
+        shape_tag ='shape=' + shape;
+        graphvizOutput += '' + parseInt(node) + ' [' + shape_tag + ", " + attributes + ", " + color_tag + ", " +  style_tag + ', fixedsize=true,width=1,height=1' + '];\n';
+        <!--console.log(parseInt(node) + ' [' + shape_tag + ", " + attributes + ", " + color_tag + ', fixedsize=true,width=1,height=1' + '];\n');-->
       });
 
-      // go over each concrete node and write it in dot format
+      // go over each concrete edge and write it in dot format
       edges.forEach(function(edge, index) {
         // join together edges from the original graph to form edges from/to clusters
         // for each target vertex, store array of attributes from edges contributing to this super-edge
@@ -970,6 +1232,7 @@
       svg_concrete_graph.call(zoom_concrete_graph.transform, asZoomTransform);
 
     }
+
 
     function getActiveClusters(root) {
       var active = [];
