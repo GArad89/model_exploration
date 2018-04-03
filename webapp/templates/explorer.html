@@ -92,22 +92,17 @@
     width: 100%;
     height: 1080;
   }
+
 </style>
 {% endblock %} {% block title %}Explore!{% endblock %} {% block body %}
 <div class="container p-3">
-  <button id='btn_reset' class="btn btn-info">Reset</button>
-  <button id='btn_export_dendrogram' class="btn btn-info">Export Dendrogram</button>
-  <button id='btn_export_supergraph' class="btn btn-info">Export Super Graph</button>
   <button id='btn_export_concrete_dot' class="btn btn-info">Export Last Selected Concrete Graph .dot</button>
-  <button id='btn_export_supergraph_dot' class="btn btn-info">Export Super Graph .dot</button>
-  <button id='btn_expand_all' class="btn btn-info">Expand All</button>
-  <button id='btn_collapse_all' class="btn btn-info">Collapse All</button>
    <input id='search_bar' type="text" placeholder="Search.." name="search">
    <button id='search_button' type="submit">Submit</button>
 </div>
 
-<svg id="d3-main" style="border: 1px dashed black;"></svg>
-<div id="supergraph"></div>
+<!-- <svg id="d3-main" style="border: 1px dashed black;"></svg> -->
+<!-- <div id="supergraph"></div> -->
 <div id="concrete_graph"></div>
 {% endblock %} {% block end_of_body %}
 <script type="text/javascript">
@@ -169,7 +164,7 @@
 
   $('#search_button').click(function() {
     var val = document.getElementById('search_bar').value;
-    highlight_label_in_supergraph(val);
+    highlight_label_in_concrete_graph(val);
   });
 
   function highlight_label_in_supergraph(searched_label) {
@@ -195,7 +190,19 @@
       }
 
       cluster_concrete_nodes = new Set(cluster_node.vertices);
-      for (j = 0; j < recieved_data.edges.length; j++) {
+      // search labels of the super-state concrete nodes
+      for (var j = 0; j < recieved_data.vertices.length; j++) {
+        node = recieved_data.vertices[j];
+        if (cluster_concrete_nodes.has(node[0])){
+          if (node[1].label !== undefined && node[1].label.includes(searched_label)){
+            nodes2highligth.push(cluster_node.id);
+            item_found = true;
+            break;
+          }
+        }
+      }
+      // search labels of the super-state concrete edges
+      for (var j = 0; j < recieved_data.edges.length; j++) {
         edge = recieved_data.edges[j];
         if (cluster_concrete_nodes.has(edge[0]) && cluster_concrete_nodes.has(edge[1])){
           if (edge[2].label !== undefined && edge[2].label.includes(searched_label)){
@@ -244,6 +251,43 @@
       }
     });
 
+    if (!item_found){
+      alert("label '" + searched_label + "' is not in the model!")
+    }
+  }
+
+
+  function highlight_label_in_concrete_graph(searched_label){
+
+    var concreteGraphSvg = SVG.get('svg_concrete_graph');
+    if (concreteGraphSvg == null){
+      return;
+    }
+    var item_found = false;
+    var text_elements = concreteGraphSvg.select("text");
+    // handle edges
+    text_elements.members.forEach( function(text_element){
+      var text = text_element.node.innerHTML;
+      var highlight_element = false;
+      if (text.includes(searched_label)){
+        item_found = true;
+        var element = text_element.node.parentElement;
+        // if (element.attributes.class.value == "node"){
+        //   return;
+        // }
+        if (highlight_element = true){
+          text_element.animate({
+            ease: '<>'
+          }).attr({
+            fill: 'blue',
+          }).animate().attr({
+            fill: '#ffffff',
+          }).animate().attr({
+            fill: 'blue',
+          });
+        }
+      }
+    });
     if (!item_found){
       alert("label '" + searched_label + "' is not in the model!")
     }
@@ -417,8 +461,8 @@
         }
 
         // concrete graph
-        concreteGraphSvg = SVG.get('svg_concrete_graph')
-        clicked_cluster = idToCluster[d.data.id]
+        concreteGraphSvg = SVG.get('svg_concrete_graph');
+        clicked_cluster = idToCluster[d.data.id];
 
         for (var i = 0; i < clicked_cluster.vertices.length; i++) {
 
@@ -450,7 +494,6 @@
 
     // Toggle children on click.
     function rightClickOnDendrogram(d) {
-      document.getElementById('tree-' + d.data.id).classList.remove('hover');
       // collapse
       var clicked_cluster = idToCluster[d.data.id];
 
@@ -622,7 +665,7 @@
 
     function update(source) {
       updateTree(source);
-      updateGraph(source);
+      rightClickOnDendrogram(source);
     }
 
     function updateTree(source) {
@@ -1160,10 +1203,10 @@
         attributes += 'id=' + graphvizEscape(node);
         // write node to graphviz;
         var color = "white";//get_color(colors_dic[node]); TODO: improve this!
-        var colors_map = ["aliceblue", "green", "cyan", "yellow","gray","cornsilk","salmon","deeppink","greenyellow"]
-        if (node in colors_dic && colors_dic[node] < colors_map.length) {
-          color = colors_map[colors_dic[node]]
-        }
+        // var colors_map = ["aliceblue", "green", "cyan", "yellow","gray","cornsilk","salmon","deeppink","greenyellow"]
+        // if (node in colors_dic && colors_dic[node] < colors_map.length) {
+        //   color = colors_map[colors_dic[node]]
+        // }
         var color_tag = "fillcolor=" + color;
         var style_tag = "style=filled";
         if (concrete_nodes_dic[node].style != undefined) {
