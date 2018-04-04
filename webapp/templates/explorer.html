@@ -17,6 +17,7 @@
     fill: grey;
     stroke: steelblue;
     stroke-width: 1.5px;
+    r: 20px;
   }
 
   .node:hover circle,
@@ -48,7 +49,6 @@
   .edge,
   .edge text,
   .node text {
-    font: 10px sans-serif;
     pointer-events: none;
     /* don't block clicks on underlying node */
   }
@@ -84,13 +84,15 @@
   }
 
   #svg_supergraph {
-    width: 100%;
-    height: 1080;
+    width: 50%;
+    height: 75%;
+    border: 1px dashed black;
   }
 
   #svg_concrete_graph {
-    width: 100%;
-    height: 1080;
+    width: 49%;
+    height: 75%;
+    border: 1px dashed black;
   }
 </style>
 {% endblock %} {% block title %}Explore!{% endblock %} {% block body %}
@@ -106,21 +108,21 @@
    <button id='search_button' type="submit">Submit</button>
 </div>
 
-<svg id="d3-main" style="border: 1px dashed black;"></svg>
-<div id="supergraph"></div>
-<div id="concrete_graph"></div>
+<svg id="d3-main" style="height: 25%;width: 100%; border: 1px dashed black"></svg>
+<span id="supergraph"></span>
+<span id="concrete_graph"></span>
 {% endblock %} {% block end_of_body %}
 <script type="text/javascript">
   var shownDuplicateMessage = false; // only show duplicate vertex warning once
 
   var margin = {
       top: 20,
-      right: 120,
+      right: 10,
       bottom: 20,
-      left: 120
+      left: 10
     },
-    width = 960 - margin.right - margin.left,
-    height = 800 - margin.top - margin.bottom;
+    width = screen.width - margin.right - margin.left,
+    height = screen.height - margin.top - margin.bottom;
 
   var i = 0,
     duration = 750,
@@ -668,6 +670,7 @@
     function update(source) {
       updateTree(source);
       updateGraph(source);
+      rightClickOnDendrogram(source);
     }
 
     function updateTree(source) {
@@ -734,6 +737,8 @@
 
       // Add labels for the nodes
       nodeEnter.append('text')
+        .text("text")
+        .style("font-size", "30px")
         .attr("dy", ".35em")
         .attr("fill", "#202020")
         .attr("x", function(d) {
@@ -916,8 +921,9 @@
       supergraphNodes.forEach(function(d3Node) {
         var nodeElement = $('#' + d3Node.data.id),
           dendrogramElement = $('#tree-' + d3Node.data.id);
-        if (!d3Node.data.isConcrete) {
 
+        if (!d3Node.data.isConcrete) {
+          // nodeElement[0].children[2].attributes["font-size"] = "1";
           // node is a cluster, make it so click on node in super-state graph expands it
           nodeElement.on('click', function(e) {
             console.log('click on ' + d3Node.data.id);
@@ -1219,8 +1225,8 @@
           shape = shape_dic[node];
         }
         shape_tag ='shape=' + shape;
-        graphvizOutput += '' + parseInt(node) + ' [' + shape_tag + ", " + attributes + ", " + color_tag + ", " +  style_tag + ', fixedsize=true,width=1,height=1' + '];\n';
-        <!--console.log(parseInt(node) + ' [' + shape_tag + ", " + attributes + ", " + color_tag + ', fixedsize=true,width=1,height=1' + '];\n');-->
+        graphvizOutput += '' + parseInt(node) + ' [' + shape_tag + ", " + attributes + ", " + color_tag + ", " +  style_tag + ', fixedsize=true,width=1,height=1,fontsize=20' + '];\n';
+        <!--console.log(parseInt(node) + ' [' + shape_tag + ", " + attributes + ", " + color_tag + ', fixedsize=true,width=1,height=1,fontsize=20' + '];\n');-->
       });
 
       // go over each concrete edge and write it in dot format
@@ -1233,7 +1239,7 @@
           attributes = attributesToGraphViz(edge[2]);
         }
         graphvizOutput += '' + edge[0] + ' -> ' + edge[1];
-        graphvizOutput += ' [' + attributes + '];\n';
+        graphvizOutput += ' [' + attributes + ',fontsize=20];\n';
       });
       graphvizOutput += '}\n';
       return graphvizOutput;
