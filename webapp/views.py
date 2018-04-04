@@ -9,6 +9,22 @@ import yaml
 import logging
 import logging.config
 
+from flask import make_response
+from functools import wraps, update_wrapper
+from datetime import datetime
+
+
+def nocache(view):
+    @wraps(view)
+    def no_cache(*args, **kwargs):
+        response = make_response(view(*args, **kwargs))
+        response.headers['Last-Modified'] = datetime.now()
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
+        return response
+
+    return update_wrapper(no_cache, view)
 
 app = Flask(__name__)
 app.config.from_object('website_config')
@@ -38,11 +54,13 @@ def get_results():
 
 ############ main flow ##################
 @app.route('/')
+@nocache
 def model_choice_form():
     return render_template('model_choice.html', models=get_models().list())
 
 
 @app.route('/choose_algorithm', methods=['GET', 'POST'])
+@nocache
 def algorithm_choice_form():
     # take model id either from form or from get param, prefer the form
     model_id = request.values.get('model_id','') or request.values.get('model','')
@@ -112,6 +130,7 @@ def algorithm_choice_form():
 
 
 @app.route('/explore/<result_id>')
+@nocache
 def show_results(result_id):
     # pass result id so d3 can ajax to get the json of the result
     return render_template('explorer.html', 
@@ -119,6 +138,7 @@ def show_results(result_id):
                            VIZJS_MAX_RAM=app.config['VIZJS_MAX_RAM'])
 
 @app.route('/results/<result_id>')
+@nocache
 def get_result(result_id):
     "return clustering algorithm results by id"
     return jsonify(get_results().open(result_id))
@@ -130,6 +150,7 @@ def json_error(message, status_code = 400):
     return response
 
 @app.route('/models', methods=['GET', 'POST'])
+@nocache
 def models_endpoint():
     if request.method == 'POST':
         # method == POST, handle upload
