@@ -158,8 +158,8 @@ class DendrogramLabeler(ABC):
                         super_node.label += "Init & Terminal"
                     else:
                         super_node.label += "Terminal"
-                else:
-                    super_node.label += "Unlabeled"
+                # else:
+                    # super_node.label += "Unlabeled"
 
     @abstractmethod
     def select_important_nodes_and_edges(self, super_node):
