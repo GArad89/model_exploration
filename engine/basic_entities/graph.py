@@ -120,12 +120,16 @@ class DGraph:
         nx_graph = OrderedDiGraph()
         # create the graph ordered, for consistency when running algorithms
         for node, data in sorted(multigraph.nodes(data=True)):
+            if "label" not in data:
+                data["label"] = ""
             nx_graph.add_node(node, **data)
 
         ## edges may be spread across the dot model
         edges_dic = {}
         for src, dst, data in multigraph.edges(data=True):
             attributes = edges_dic.get((src, dst), [])
+            if "label" not in data:
+                data["label"] = ""
             attributes.append(data)
             edges_dic[(src, dst)] = attributes
 
