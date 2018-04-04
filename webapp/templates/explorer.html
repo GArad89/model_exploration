@@ -74,41 +74,46 @@
   }
 
   #supergraph {
-    border: 1px dashed black;
     text-align: center;
   }
 
   #concrete_graph {
-    border: 1px dashed black;
     text-align: center;
   }
 
   #svg_supergraph {
     width: 50%;
     height: 75%;
-    border: 1px dashed black;
+    border: 2px dashed black;
   }
 
   #svg_concrete_graph {
     width: 49%;
     height: 75%;
-    border: 1px dashed black;
+    border: 2px dashed black;
   }
 </style>
 {% endblock %} {% block title %}Explore!{% endblock %} {% block body %}
 <div class="container p-3">
-  <button id='btn_reset' class="btn btn-info">Reset</button>
-  <button id='btn_export_dendrogram' class="btn btn-info">Export Dendrogram</button>
-  <button id='btn_export_supergraph' class="btn btn-info">Export Super Graph</button>
-  <button id='btn_export_concrete_dot' class="btn btn-info">Export Last Selected Concrete Graph .dot</button>
-  <button id='btn_export_supergraph_dot' class="btn btn-info">Export Super Graph .dot</button>
-  <button id='btn_expand_all' class="btn btn-info">Expand All</button>
-  <button id='btn_collapse_all' class="btn btn-info">Collapse All</button>
-   <input id='search_bar' type="text" placeholder="Search.." name="search">
-   <button id='search_button' type="submit">Submit</button>
+  <div align="left">
+    <div style="display: inline-block; height: 20%;  vertical-align: top;">
+      <button id='btn_reset' class="btn btn-info" style="margin:4px 4px">Reset</button> <br/>
+      <button id='btn_export_dendrogram' class="btn btn-info" style="margin:4px 4px">Export Dendrogram</button> <br/>
+      <button id='btn_export_supergraph' class="btn btn-info" style="margin:4px 4px">Export Super Graph</button> <br/>
+      <button id='btn_export_concrete_dot' class="btn btn-info" style="margin:4px 4px">Export Concrete Graph .dot</button> <br/>
+      <button id='btn_export_supergraph_dot' class="btn btn-info" style="margin:4px 4px">Export Super Graph .dot</button> <br/>
+      <button id='btn_expand_all' class="btn btn-info" style="margin:4px 4px">Expand All</button> <br/>
+      <button id='btn_collapse_all' class="btn btn-info" style="margin:4px 4px">Collapse All</button> <br/>
+      <input id='search_bar' type="text" placeholder="Search label..." name="search"  style="margin:4px 4px">
+      <button id='search_button' type="submit" style="margin:4px 4px">Submit</button>
+    </div>
+    <div align="right" style="display: inline-block; width: 75%; height: 40%;">
+      <svg id="d3-main" style=" display: inline-block; width: 100%; height: 100%; border: 2px dashed black"></svg>
+    </div>
+  </div>
 </div>
 
-<svg id="d3-main" style="height: 25%;width: 100%; border: 1px dashed black"></svg>
+
 <span id="supergraph"></span>
 <span id="concrete_graph"></span>
 {% endblock %} {% block end_of_body %}
@@ -427,17 +432,31 @@
         d._children = d.children;
         d.children = null;
         update(d);
+        superGraphSvg = SVG.get('svg_supergraph')
+        elements = superGraphSvg.select("[id='" + d.data.id + "'] polygon");
+        elements.attr({
+          'fill': '#ffffff'
+        })
+        elements.animate({
+          ease: '<>'
+        }).attr({
+          fill: '#ffcc00'
+        }).animate().attr({
+          fill: '#ffffff'
+        }).animate().attr({
+          fill: '#ffcc00'
+        })
       } else {
         // expand
         d.children = d._children;
         d._children = null;
-
+        var ch = d.children;
         update(d);
         superGraphSvg = SVG.get('svg_supergraph')
         clicked_cluster = idToCluster[d.data.id]
 
-        for (var i = 0; i < clicked_cluster.vertices.length; i++) {
-          elements = superGraphSvg.select("[id='" + clicked_cluster.vertices[i] + "'] ellipse")
+        for (var i = 0; i < ch.length; i++) {
+          elements = superGraphSvg.select("[id='" + ch[i].data.id + "'] polygon");
           elements.attr({
             'fill': '#ffffff'
           })
@@ -450,8 +469,9 @@
           }).animate().attr({
             fill: '#ffcc00'
           })
-
-          elements = superGraphSvg.select("[id=cluster_" + clicked_cluster.vertices[i] + "] polygon")
+        }
+        for (var i = 0; i < clicked_cluster.vertices.length; i++) {
+          elements = superGraphSvg.select("[id='" + clicked_cluster.vertices[i] + "'] ellipse");
           elements.animate({
             ease: '<>'
           }).attr({
@@ -768,8 +788,17 @@
           return d._children !== undefined && d._children !== null;
         })
         .classed('hover', false)
-        .attr('cursor', 'pointer');
-
+        .attr('cursor', 'pointer')
+        .style("stroke", function (d) {
+          if (d == source){
+            return "darkorange";
+          };
+        })
+        .style("stroke-width", function (d) {
+          if (d == source){
+            return "10";
+          };
+      });
 
       // Remove any exiting nodes
       var nodeExit = node.exit().transition()
