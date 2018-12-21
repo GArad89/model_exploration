@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% block head %}
+    <title>{% block title %}Placeholder{% endblock %} | Model Explorer</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+	<link rel="stylesheet" href="/static/style.css">
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+{% endblock head %}
+</head>
+<body>
+
+{% block body_title %}
+<div class="container nav-background">
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="{{ url_for('model_choice_form') }}">Model Explorer</a>
+    <a class="navbar-text" id="page-title">{{ self.title() }}</a>
+  </nav>
+</div>
+{% endblock %}
+
+<div class="container pb-3" id="main-block">
+{% block body %}{% endblock %}
+</div>
+{% block end_of_body %}{% endblock %}
+</body>
+</html>

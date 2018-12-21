@@ -105,3 +105,17 @@ venv.bak/
 .mypy_cache/
 
 # End of https://www.gitignore.io/api/python
+
+# uploaded models
+models_dot/*.dot
+# results of algorithm runs
+results/*.json
+# log files and rotated logs
+logs/*.log*
+
+# test outputs
+tests/dot_export/
+tests/results/
+
+.idea
+

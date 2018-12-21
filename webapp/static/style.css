@@ -1,0 +1,20 @@
+.bar {
+    height: 18px;
+    background: green;
+}
+
+#page-title {
+	color: #005765;
+}
+
+body {
+	background-color: #4372bc;
+}
+
+.container.nav-background {
+	background-color: #a8dce4;
+}
+
+div.container {
+	background-color: white;
+}
